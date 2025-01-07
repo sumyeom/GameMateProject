@@ -71,4 +71,21 @@ public class FollowService {
                 .map(FollowFindResponseDto::toDto)
                 .toList();
     }
+
+    // 팔로잉 목록보기
+    public List<FollowFindResponseDto> findFollowingList(FollowFindRequestDto dto) {
+        User follower = userRepository.findByEmail(dto.getEmail()).orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND_USER));
+        List<Follow> FollowListByFollower = followRepository.findByFollower(follower);
+
+        List<User> FollowingListByFollower = new ArrayList<>();
+
+        for (Follow follow : FollowListByFollower) {
+            FollowingListByFollower.add(follow.getFollowee());
+        }
+
+        return FollowingListByFollower
+                .stream()
+                .map(FollowFindResponseDto::toDto)
+                .toList();
+    }
 }

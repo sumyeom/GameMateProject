@@ -38,7 +38,7 @@ public class FollowController {
     }
 
     /**
-     * 팔로우 목록 보기
+     * 팔로워 목록 보기
      * @param dto FollowFindRequestDto
      * @return followerList
      */
@@ -46,5 +46,16 @@ public class FollowController {
     public ResponseEntity<List<FollowFindResponseDto>> findFollowerList(@RequestBody FollowFindRequestDto dto) {
         List<FollowFindResponseDto> followerList = followService.findFollowerList(dto);
         return new ResponseEntity<>(followerList, HttpStatus.OK);
+    }
+
+    /**
+     * 팔로잉 목록 보기
+     * @param dto FollowFindRequestDto
+     * @return followeeList
+     */
+    @GetMapping("/following-list")
+    public ResponseEntity<List<FollowFindResponseDto>> findFollowingList(@RequestBody FollowFindRequestDto dto) {
+        List<FollowFindResponseDto> followingList = followService.findFollowingList(dto);
+        return new ResponseEntity<>(followingList, HttpStatus.OK);
     }
 }
