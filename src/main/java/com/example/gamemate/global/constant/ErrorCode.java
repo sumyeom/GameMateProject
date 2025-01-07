@@ -16,6 +16,9 @@ public enum ErrorCode {
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "로그인이 필요합니다."),
     NO_SESSION(HttpStatus.UNAUTHORIZED, "NO_SESSION","로그인이 필요합니다."),
 
+    /* 404 찾을 수 없음 */
+    NOT_FOUND_USER(HttpStatus.NOT_FOUND, "NOT_FOUND_USER", "유저를 찾을 수 없습니다."),
+    NOT_FOUND_FOLLOW(HttpStatus.NOT_FOUND,"NOT_FOUND_FOLLOW", "팔로우를 찾을 수 없습니다."),
 
     /* 500 서버 오류 */
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"INTERNAL_SERVER_ERROR","서버 오류 입니다."),;
