@@ -1,6 +1,6 @@
 package com.example.gamemate.domain.follow;
 
-import com.example.gamemate.global.BaseCreatedEntity;
+import com.example.gamemate.global.common.BaseCreatedEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 

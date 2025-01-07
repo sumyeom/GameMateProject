@@ -43,8 +43,8 @@ public class FollowController {
      * @return followerList
      */
     @GetMapping("/follower-list")
-    public ResponseEntity<List<FollowFindResponseDto>> findFollowerList(@RequestBody FollowFindRequestDto dto) {
-        List<FollowFindResponseDto> followerList = followService.findFollowerList(dto);
+    public ResponseEntity<List<FollowFindResponseDto>> findFollowerList(@RequestParam String email) {
+        List<FollowFindResponseDto> followerList = followService.findFollowerList(email);
         return new ResponseEntity<>(followerList, HttpStatus.OK);
     }
 
@@ -54,8 +54,8 @@ public class FollowController {
      * @return followeeList
      */
     @GetMapping("/following-list")
-    public ResponseEntity<List<FollowFindResponseDto>> findFollowingList(@RequestBody FollowFindRequestDto dto) {
-        List<FollowFindResponseDto> followingList = followService.findFollowingList(dto);
+    public ResponseEntity<List<FollowFindResponseDto>> findFollowingList(@RequestParam String email) {
+        List<FollowFindResponseDto> followingList = followService.findFollowingList(email);
         return new ResponseEntity<>(followingList, HttpStatus.OK);
     }
 }
