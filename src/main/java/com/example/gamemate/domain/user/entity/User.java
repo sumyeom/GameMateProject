@@ -59,7 +59,7 @@ public class User extends BaseEntity {
     }
 
     public void deleteSoftly() {
-        this.modifiedAt = LocalDateTime.now();
+        markDeletedAt();
     }
 
 }

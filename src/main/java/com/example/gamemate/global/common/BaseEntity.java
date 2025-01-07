@@ -20,6 +20,10 @@ public abstract class BaseEntity {
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    protected LocalDateTime modifiedAt;
+    private LocalDateTime modifiedAt;
+
+    public void markDeletedAt() {
+        this.modifiedAt = LocalDateTime.now();
+    }
 
 }
