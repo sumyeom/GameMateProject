@@ -1,14 +1,14 @@
 package com.example.gamemate.domain.follow;
 
-import com.example.gamemate.domain.follow.dto.FollowCreateRequestDto;
-import com.example.gamemate.domain.follow.dto.FollowCreateResponseDto;
-import com.example.gamemate.domain.follow.dto.FollowDeleteResponseDto;
+import com.example.gamemate.domain.follow.dto.*;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -53,5 +53,22 @@ public class FollowService {
         followRepository.delete(findFollow);
 
         return new FollowDeleteResponseDto("팔로우가 취소되었습니다.");
+    }
+
+    // 팔로워 목록보기
+    public List<FollowFindResponseDto> findFollowerList(FollowFindRequestDto dto) {
+        User followee = userRepository.findByEmail(dto.getEmail()).orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND_USER));
+        List<Follow> FollowListByFollowee = followRepository.findByFollowee(followee);
+
+        List<User> FollowerListByFollowee = new ArrayList<>();
+
+        for (Follow follow : FollowListByFollowee) {
+            FollowerListByFollowee.add(follow.getFollower());
+        }
+
+        return FollowerListByFollowee
+                .stream()
+                .map(FollowFindResponseDto::toDto)
+                .toList();
     }
 }

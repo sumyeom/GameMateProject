@@ -1,12 +1,12 @@
 package com.example.gamemate.domain.follow;
 
-import com.example.gamemate.domain.follow.dto.FollowCreateRequestDto;
-import com.example.gamemate.domain.follow.dto.FollowCreateResponseDto;
-import com.example.gamemate.domain.follow.dto.FollowDeleteResponseDto;
+import com.example.gamemate.domain.follow.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,5 +35,16 @@ public class FollowController {
     public ResponseEntity<FollowDeleteResponseDto> deleteFollow(@PathVariable Long followId) {
         FollowDeleteResponseDto followDeleteResponseDto = followService.deleteFollow(followId);
         return new ResponseEntity<>(followDeleteResponseDto,HttpStatus.OK);
+    }
+
+    /**
+     * 팔로우 목록 보기
+     * @param dto FollowFindRequestDto
+     * @return followerList
+     */
+    @GetMapping("/follower-list")
+    public ResponseEntity<List<FollowFindResponseDto>> findFollowerList(@RequestBody FollowFindRequestDto dto) {
+        List<FollowFindResponseDto> followerList = followService.findFollowerList(dto);
+        return new ResponseEntity<>(followerList, HttpStatus.OK);
     }
 }
