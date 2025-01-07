@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class FollowService {
@@ -26,6 +28,10 @@ public class FollowService {
 
         if (followRepository.existsByFollowerAndFollowee(follower, followee)) {
             throw new ApiException(ErrorCode.IS_ALREADY_FOLLOWED);
+        }
+
+        if (Objects.equals(follower.getEmail(), dto.getEmail())) {
+            throw new ApiException(ErrorCode.INVALID_INPUT);
         }
 
         Follow follow = new Follow(follower,followee);
