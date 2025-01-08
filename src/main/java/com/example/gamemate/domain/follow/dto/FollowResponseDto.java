@@ -3,10 +3,10 @@ package com.example.gamemate.domain.follow.dto;
 import lombok.Getter;
 
 @Getter
-public class FollowDeleteResponseDto {
+public class FollowResponseDto {
     private String message;
 
-    public FollowDeleteResponseDto(String message) {
+    public FollowResponseDto(String message) {
         this.message = message;
     }
 }

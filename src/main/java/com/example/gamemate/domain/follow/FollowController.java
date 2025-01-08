@@ -21,9 +21,9 @@ public class FollowController {
      * @return message = "팔로우 했습니다."
      */
     @PostMapping
-    public ResponseEntity<FollowCreateResponseDto> createFollow(@RequestBody FollowCreateRequestDto dto) {
-        FollowCreateResponseDto followCreateResponseDto = followService.createFollow(dto);
-        return new ResponseEntity<>(followCreateResponseDto, HttpStatus.CREATED);
+    public ResponseEntity<FollowResponseDto> createFollow(@RequestBody FollowCreateRequestDto dto) {
+        FollowResponseDto followResponseDto = followService.createFollow(dto);
+        return new ResponseEntity<>(followResponseDto, HttpStatus.CREATED);
     }
 
     /**
@@ -32,9 +32,9 @@ public class FollowController {
      * @return message = "팔로우를 취소했습니다."
      */
     @DeleteMapping("/{followId}")
-    public ResponseEntity<FollowDeleteResponseDto> deleteFollow(@PathVariable Long followId) {
-        FollowDeleteResponseDto followDeleteResponseDto = followService.deleteFollow(followId);
-        return new ResponseEntity<>(followDeleteResponseDto,HttpStatus.OK);
+    public ResponseEntity<FollowResponseDto> deleteFollow(@PathVariable Long followId) {
+        FollowResponseDto followResponseDto = followService.deleteFollow(followId);
+        return new ResponseEntity<>(followResponseDto,HttpStatus.OK);
     }
 
     /**
@@ -44,9 +44,9 @@ public class FollowController {
      * @return message = "팔로우 중 입니다." or "아직 팔로우 하지 않았습니다."
      */
     @GetMapping("/status")
-    public ResponseEntity<FollowStatusResponseDto> findFollow(@RequestParam String followerEmail, @RequestParam String followeeEmail) {
-        FollowStatusResponseDto followStatusResponseDto = followService.findFollow(followerEmail, followeeEmail);
-        return new ResponseEntity<>(followStatusResponseDto, HttpStatus.OK);
+    public ResponseEntity<FollowResponseDto> findFollow(@RequestParam String followerEmail, @RequestParam String followeeEmail) {
+        FollowResponseDto followResponseDto = followService.findFollow(followerEmail, followeeEmail);
+        return new ResponseEntity<>(followResponseDto, HttpStatus.OK);
     }
 
     /**
