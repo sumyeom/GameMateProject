@@ -38,6 +38,18 @@ public class FollowController {
     }
 
     /**
+     * 팔로우 상태 확인 (follower 가 followee 를 팔로우 했는지 확인)
+     * @param followerEmail
+     * @param followeeEmail
+     * @return message = "팔로우 중 입니다." or "아직 팔로우 하지 않았습니다."
+     */
+    @GetMapping("/status")
+    public ResponseEntity<FollowStatusResponseDto> findFollow(@RequestParam String followerEmail, @RequestParam String followeeEmail) {
+        FollowStatusResponseDto followStatusResponseDto = followService.findFollow(followerEmail, followeeEmail);
+        return new ResponseEntity<>(followStatusResponseDto, HttpStatus.OK);
+    }
+
+    /**
      * 팔로우 목록 보기
      * @param email 팔로우 목록을 보고 싶은 유저 email
      * @return followerList

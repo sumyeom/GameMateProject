@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +46,6 @@ public class FollowService {
     @Transactional
     public FollowDeleteResponseDto deleteFollow(Long followId) {
         Follow findFollow = followRepository.findById(followId).orElseThrow(() -> new ApiException(ErrorCode.FOLLOW_NOT_FOUND));
-
         User follower = userRepository.findById(1L).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         if (findFollow.getFollower() != follower) {
@@ -55,6 +55,18 @@ public class FollowService {
         followRepository.delete(findFollow);
 
         return new FollowDeleteResponseDto("팔로우가 취소되었습니다.");
+    }
+
+    // 팔로우 상태 확인
+    public FollowStatusResponseDto findFollow(String followerEmail, String followeeEmail) {
+        User follower = userRepository.findByEmail(followerEmail).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+        User followee = userRepository.findByEmail(followeeEmail).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+
+        if (!followRepository.existsByFollowerAndFollowee(follower, followee)) {
+            return new FollowStatusResponseDto("아직 팔로우 하지 않았습니다.");
+        }
+
+        return new FollowStatusResponseDto("팔로우 중 입니다.");
     }
 
     // 팔로워 목록보기
