@@ -1,6 +1,8 @@
 package com.example.gamemate.domain.follow;
 
 import com.example.gamemate.domain.follow.dto.*;
+import com.example.gamemate.domain.user.entity.User;
+import com.example.gamemate.domain.user.repository.UserRepository;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import jakarta.transaction.Transactional;
@@ -32,7 +34,7 @@ public class FollowService {
             throw new ApiException(ErrorCode.INVALID_INPUT);
         }
 
-        Follow follow = new Follow(follower,followee);
+        Follow follow = new Follow(follower, followee);
         followRepository.save(follow);
 
         return new FollowCreateResponseDto("팔로우 했습니다.");

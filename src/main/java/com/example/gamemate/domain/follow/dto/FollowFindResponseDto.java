@@ -1,6 +1,6 @@
 package com.example.gamemate.domain.follow.dto;
 
-import com.example.gamemate.domain.follow.User;
+import com.example.gamemate.domain.user.entity.User;
 import lombok.Getter;
 
 @Getter

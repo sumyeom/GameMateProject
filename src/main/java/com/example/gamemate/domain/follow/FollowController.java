@@ -38,8 +38,8 @@ public class FollowController {
     }
 
     /**
-     * 팔로워 목록 보기
-     * @param dto FollowFindRequestDto
+     * 팔로우 목록 보기
+     * @param email 팔로우 목록을 보고 싶은 유저 email
      * @return followerList
      */
     @GetMapping("/follower-list")
@@ -50,8 +50,8 @@ public class FollowController {
 
     /**
      * 팔로잉 목록 보기
-     * @param dto FollowFindRequestDto
-     * @return followeeList
+     * @param email 팔로잉 목록을 보고 싶은 유저 email
+     * @return followingList
      */
     @GetMapping("/following-list")
     public ResponseEntity<List<FollowFindResponseDto>> findFollowingList(@RequestParam String email) {
