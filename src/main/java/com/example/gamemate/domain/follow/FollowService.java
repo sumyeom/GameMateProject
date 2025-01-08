@@ -2,6 +2,7 @@ package com.example.gamemate.domain.follow;
 
 import com.example.gamemate.domain.follow.dto.*;
 import com.example.gamemate.domain.user.entity.User;
+import com.example.gamemate.domain.user.enums.UserStatus;
 import com.example.gamemate.domain.user.repository.UserRepository;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
@@ -25,6 +26,10 @@ public class FollowService {
     public FollowResponseDto createFollow(FollowCreateRequestDto dto) {
         User follower = userRepository.findById(1L).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
         User followee = userRepository.findByEmail(dto.getEmail()).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+
+        if (followee.getUserStatus() == UserStatus.WITHDRAW) {
+            throw new ApiException(ErrorCode.IS_WITHDRAW_USER);
+        }
 
         if (followRepository.existsByFollowerAndFollowee(follower, followee)) {
             throw new ApiException(ErrorCode.IS_ALREADY_FOLLOWED);
@@ -57,9 +62,14 @@ public class FollowService {
     }
 
     // 팔로우 상태 확인
+    // todo : 로그인한 유저(follower) 기준으로 상대 유저(followee)가 팔로우 되어 있는지 확인이 필요한 것이므로, 로그인 구현시 코드 수정해야함.
     public FollowResponseDto findFollow(String followerEmail, String followeeEmail) {
         User follower = userRepository.findByEmail(followerEmail).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
         User followee = userRepository.findByEmail(followeeEmail).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+
+        if (followee.getUserStatus() == UserStatus.WITHDRAW) {
+            throw new ApiException(ErrorCode.IS_WITHDRAW_USER);
+        }
 
         if (!followRepository.existsByFollowerAndFollowee(follower, followee)) {
             return new FollowResponseDto("아직 팔로우 하지 않았습니다.");
@@ -71,12 +81,18 @@ public class FollowService {
     // 팔로워 목록보기
     public List<FollowFindResponseDto> findFollowerList(String email) {
         User followee = userRepository.findByEmail(email).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
-        List<Follow> FollowListByFollowee = followRepository.findByFollowee(followee);
 
+        if (followee.getUserStatus() == UserStatus.WITHDRAW) {
+            throw new ApiException(ErrorCode.IS_WITHDRAW_USER);
+        }
+
+        List<Follow> FollowListByFollowee = followRepository.findByFollowee(followee);
         List<User> FollowerListByFollowee = new ArrayList<>();
 
         for (Follow follow : FollowListByFollowee) {
-            FollowerListByFollowee.add(follow.getFollower());
+            if (follow.getFollower().getUserStatus() != UserStatus.WITHDRAW) {
+                FollowerListByFollowee.add(follow.getFollower());
+            }
         }
 
         return FollowerListByFollowee
@@ -88,12 +104,18 @@ public class FollowService {
     // 팔로잉 목록보기
     public List<FollowFindResponseDto> findFollowingList(String email) {
         User follower = userRepository.findByEmail(email).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
-        List<Follow> FollowListByFollower = followRepository.findByFollower(follower);
 
+        if (follower.getUserStatus() == UserStatus.WITHDRAW) {
+            throw new ApiException(ErrorCode.IS_WITHDRAW_USER);
+        }
+
+        List<Follow> FollowListByFollower = followRepository.findByFollower(follower);
         List<User> FollowingListByFollower = new ArrayList<>();
 
         for (Follow follow : FollowListByFollower) {
-            FollowingListByFollower.add(follow.getFollowee());
+            if (follow.getFollowee().getUserStatus() != UserStatus.WITHDRAW) {
+                FollowingListByFollower.add(follow.getFollowee());
+            }
         }
 
         return FollowingListByFollower
