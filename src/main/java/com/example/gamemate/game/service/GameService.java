@@ -3,10 +3,12 @@ package com.example.gamemate.game.service;
 import com.example.gamemate.game.dto.*;
 import com.example.gamemate.game.entity.Game;
 import com.example.gamemate.game.repository.GameRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +16,7 @@ import javax.ws.rs.NotFoundException;
 
 
 @Service
+@Slf4j
 public class GameService {
     private final GameRepository gameRepository;
 
@@ -36,21 +39,21 @@ public class GameService {
 
     }
 
-    public Page<GameFindAllResponseDto> findAllGame(int page, int size){
+    public Page<GameFindAllResponseDto> findAllGame(int page, int size) {
 
-        Pageable pageable = PageRequest.of(page,size);
+        Pageable pageable = PageRequest.of(page, size);
         return gameRepository.findAll(pageable).map(GameFindAllResponseDto::new);
     }
 
     @Transactional
-    public GameFindByResponseDto findGameById(Long id){
-        Game game = gameRepository.findGameById(id).orElseThrow(()->new NotFoundException("게임이 존재하지 않습니다."));
+    public GameFindByResponseDto findGameById(Long id) {
+        Game game = gameRepository.findGameById(id).orElseThrow(() -> new NotFoundException("게임이 존재하지 않습니다."));
         return new GameFindByResponseDto(game);
     }
 
     @Transactional
-    public GameUpdateResponseDto updateGame(Long id, GameUpdateRequestDto requestDto){
-        Game game = gameRepository.findGameById(id).orElseThrow(()-> new NotFoundException("게임이 존해 하지 않습니다."));
+    public GameUpdateResponseDto updateGame(Long id, GameUpdateRequestDto requestDto) {
+        Game game = gameRepository.findGameById(id).orElseThrow(() -> new NotFoundException("게임이 존해 하지 않습니다."));
 
         game.updateGame(
                 requestDto.getTitle(),
@@ -62,8 +65,17 @@ public class GameService {
         return new GameUpdateResponseDto(updateGame);
     }
 
-    public void deleteGame(Long id){
-        Game game = gameRepository.findGameById(id).orElseThrow(()-> new NotFoundException("게임을 찾을 없습니다."));
+    public void deleteGame(Long id) {
+        Game game = gameRepository.findGameById(id).orElseThrow(() -> new NotFoundException("게임을 찾을 없습니다."));
         gameRepository.delete(game);
+    }
+
+    public Page<GameSearchResponseDto> searchGame(String keyword, String genre, String platform, int page, int size) {
+
+        log.info("Searching games with parameters - keyword: {}, genre: {}, platform: {}",
+                keyword, genre, platform);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Game> games = gameRepository.searchGames(keyword, genre, platform, pageable);
+        return games.map(GameSearchResponseDto::new);
     }
 }

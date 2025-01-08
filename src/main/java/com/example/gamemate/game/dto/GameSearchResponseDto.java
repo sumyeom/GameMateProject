@@ -6,22 +6,20 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class GameFindByResponseDto {
+public class GameSearchResponseDto {
     private final Long id;
     private final String title;
     private final String genre;
     private final String platform;
-    private final String description;
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
 
-    public GameFindByResponseDto(Game game) {
+    public GameSearchResponseDto(Game game) {
         // game 객체의 필드들을 이용해 DTO의 필드들을 초기화
         this.id = game.getId();
         this.title = game.getTitle();
         this.genre = game.getGenre();
         this.platform = game.getPlatform();
-        this.description = game.getDescription();
         this.createdAt = game.getCreatedAt();
         this.modifiedAt = game.getModifiedAt();
     }
