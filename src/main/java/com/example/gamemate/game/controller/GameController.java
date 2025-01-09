@@ -42,7 +42,8 @@ public class GameController {
      * @return
      */
     @GetMapping
-    public ResponseEntity<Page<GameFindAllResponseDto>> findAllGame(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int szie) {
+    public ResponseEntity<Page<GameFindAllResponseDto>> findAllGame(@RequestParam(defaultValue = "0") int page,
+                                                                    @RequestParam(defaultValue = "10") int szie) {
 
         Page<GameFindAllResponseDto> games = gameService.findAllGame(page, szie);
         return ResponseEntity.ok(games);
@@ -55,9 +56,9 @@ public class GameController {
      * @return
      */
     @GetMapping("/{id}")
-    public ResponseEntity<GameFindByResponseDto> findGameById(@PathVariable Long id) {
+    public ResponseEntity<GameFindByIdResponseDto> findGameById(@PathVariable Long id) {
 
-        GameFindByResponseDto gameById = gameService.findGameById(id);
+        GameFindByIdResponseDto gameById = gameService.findGameById(id);
         return ResponseEntity.ok(gameById);
     }
 
@@ -93,5 +94,46 @@ public class GameController {
         Page<GameSearchResponseDto> games = gameService.searchGame(keyword, genre, platform, page, size);
         return ResponseEntity.ok(games);
 
+    }
+
+                                                    //게임 요청 관련
+    /**
+     * 게임등록 요청
+     * @param requestDto
+     * @return
+     */
+    @PostMapping("/requests")
+    public ResponseEntity<GameEnrollRequestResponseDto>CreateGameEnrollRequest(@RequestBody GameEnrollRequestCreateRequestDto requestDto){
+
+        GameEnrollRequestResponseDto responseDto = gameService.createGameEnrollRequest(requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+    }
+    /**
+     * 게임등록 요청 전체 조회
+     * @return
+     */
+    @GetMapping("/requests")
+    public ResponseEntity<Page<GameEnrollRequestResponseDto>>findAllGameEnrollRequest(){
+
+        Page<GameEnrollRequestResponseDto> gameEnrollRequestAll = gameService.findAllGameEnrollRequest();
+        return ResponseEntity.ok(gameEnrollRequestAll);
+    }
+    /**
+     * 게임등록 요청 단건 조회
+     * @param id
+     * @return
+     */
+    @GetMapping("/requests/{id}")
+    public ResponseEntity<GameEnrollRequestResponseDto> findGameEnrollRequestById(@PathVariable Long id) {
+
+        GameEnrollRequestResponseDto gameEnrollRequestById = gameService.findGameEnrollRequestById(id);
+        return ResponseEntity.ok(gameEnrollRequestById);
+    }
+
+    @PatchMapping("/requests/{id}")
+    public ResponseEntity<GameEnrollRequestResponseDto> updateGameEnroll(@PathVariable Long id, @RequestBody GameEnrollRequestUpdateRequestDto requestDto) {
+
+        GameEnrollRequestResponseDto responseDto = gameService.updateGameEnroll(id, requestDto);
+        return ResponseEntity.ok(responseDto);
     }
 }

@@ -1,6 +1,7 @@
 package com.example.gamemate.game.dto;
 
 import lombok.Getter;
+import java.time.LocalDateTime;
 
 @Getter
 public class GameCreateRequestDto {
@@ -10,10 +11,12 @@ public class GameCreateRequestDto {
     private String description;
 
 
-    public GameCreateRequestDto(String title, String genre, String platform , String description) {
+
+    public GameCreateRequestDto(String title, String genre, String platform , String description ) {
         this.title = title;
         this.genre = genre;
         this.platform = platform;
         this.description = description;
+
     }
 }

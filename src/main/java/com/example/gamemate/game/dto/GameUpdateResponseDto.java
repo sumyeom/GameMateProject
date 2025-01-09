@@ -3,6 +3,8 @@ package com.example.gamemate.game.dto;
 import com.example.gamemate.game.entity.Game;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 public class GameUpdateResponseDto {
     private Long id;
@@ -10,6 +12,7 @@ public class GameUpdateResponseDto {
     private String genre;
     private String platform;
     private String description;
+    private final LocalDateTime modifiedAt;
 
     public GameUpdateResponseDto(Game game) {
         // game 객체의 필드들을 이용해 DTO의 필드들을 초기화
@@ -18,5 +21,6 @@ public class GameUpdateResponseDto {
         this.genre = game.getGenre();
         this.platform = game.getPlatform();
         this.description = game.getDescription();
+        this.modifiedAt = game.getModifiedAt();
     }
 }

@@ -1,6 +1,7 @@
 package com.example.gamemate.game.entity;
 
 import com.example.gamemate.base.BaseEntity;
+import com.example.gamemate.review.entity.Review;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,6 +34,9 @@ public class Game extends BaseEntity {
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL)
     private List<GameImage> gameImages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
+    private List<Review> reviews = new ArrayList<>();
 
     public Game(String title, String genre, String platform, String description) {
         this.title = title;

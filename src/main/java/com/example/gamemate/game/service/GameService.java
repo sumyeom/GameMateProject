@@ -1,8 +1,13 @@
 package com.example.gamemate.game.service;
 
 import com.example.gamemate.game.dto.*;
+import com.example.gamemate.game.entity.GamaEnrollRequest;
 import com.example.gamemate.game.entity.Game;
+import com.example.gamemate.game.repository.GameEnrollRequestRepository;
 import com.example.gamemate.game.repository.GameRepository;
+import com.example.gamemate.review.dto.ReviewFindByAllResponseDto;
+import com.example.gamemate.review.entity.Review;
+import com.example.gamemate.review.repository.ReviewRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,11 +24,15 @@ import javax.ws.rs.NotFoundException;
 @Slf4j
 public class GameService {
     private final GameRepository gameRepository;
+    private final ReviewRepository reviewRepository;
+    private final GameEnrollRequestRepository gameEnrollRequestRepository;
 
     @Autowired
-    public GameService(GameRepository gameRepository) {
+    public GameService(GameRepository gameRepository, ReviewRepository reviewRepository, GameEnrollRequestRepository gameEnrollRequestRepository) {
 
         this.gameRepository = gameRepository;
+        this.reviewRepository=reviewRepository;
+        this.gameEnrollRequestRepository = gameEnrollRequestRepository;
     }
 
     public GameCreateResponseDto createGame(GameCreateRequestDto gameCreateRequestDto) {
@@ -46,9 +55,19 @@ public class GameService {
     }
 
     @Transactional
-    public GameFindByResponseDto findGameById(Long id) {
+    public GameFindByIdResponseDto findGameById(Long id) {
+
         Game game = gameRepository.findGameById(id).orElseThrow(() -> new NotFoundException("게임이 존재하지 않습니다."));
-        return new GameFindByResponseDto(game);
+
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("createdAt").descending());
+        Page<Review> reviewPage = reviewRepository.findAllByGame(game, pageable);
+
+        // Review를 ReviewFindByAllResponseDto로 변환
+        Page<ReviewFindByAllResponseDto> reviews = reviewPage.map(review ->
+                new ReviewFindByAllResponseDto(review)
+        );
+
+        return new GameFindByIdResponseDto(game, reviews);
     }
 
     @Transactional
@@ -78,4 +97,58 @@ public class GameService {
         Page<Game> games = gameRepository.searchGames(keyword, genre, platform, pageable);
         return games.map(GameSearchResponseDto::new);
     }
+
+    public GameEnrollRequestResponseDto createGameEnrollRequest(GameEnrollRequestCreateRequestDto requestDto) {
+        GamaEnrollRequest gameEnrollRequest = new GamaEnrollRequest(
+                requestDto.getTitle(),
+                requestDto.getGenre(),
+                requestDto.getPlatform(),
+                requestDto.getDescription()
+        );
+        GamaEnrollRequest saveEnrollRequest = gameEnrollRequestRepository.save(gameEnrollRequest);
+        return new GameEnrollRequestResponseDto(saveEnrollRequest);
+    }
+
+    public Page<GameEnrollRequestResponseDto> findAllGameEnrollRequest() {
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        return gameEnrollRequestRepository.findAll(pageable).map(GameEnrollRequestResponseDto::new);
+    }
+
+    @Transactional
+    public GameEnrollRequestResponseDto findGameEnrollRequestById(Long id) {
+
+        GamaEnrollRequest gamaEnrollRequest = gameEnrollRequestRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("게임이 존재하지 않습니다."));
+
+        return new GameEnrollRequestResponseDto(gamaEnrollRequest);
+    }
+
+    @Transactional
+    public GameEnrollRequestResponseDto updateGameEnroll(Long id, GameEnrollRequestUpdateRequestDto requestDto) {
+        GamaEnrollRequest gamaEnrollRequest = gameEnrollRequestRepository.findById(id).orElseThrow(() -> new NotFoundException("게임이 존해 하지 않습니다."));
+
+        gamaEnrollRequest.updateGameEnroll(
+                requestDto.getTitle(),
+                requestDto.getGenre(),
+                requestDto.getPlatform(),
+                requestDto.getDescription(),
+                requestDto.getIsAccepted()
+        );
+        GamaEnrollRequest updateGameEnroll = gameEnrollRequestRepository.save(gamaEnrollRequest);
+
+        Boolean accepted = requestDto.getIsAccepted();
+        if(accepted == true){
+            Game game = new Game(
+                    requestDto.getTitle(),
+                    requestDto.getGenre(),
+                    requestDto.getPlatform(),
+                    requestDto.getDescription()
+            );
+            gameRepository.save(game);
+        }
+        return new GameEnrollRequestResponseDto(updateGameEnroll);
+    }
+
 }
