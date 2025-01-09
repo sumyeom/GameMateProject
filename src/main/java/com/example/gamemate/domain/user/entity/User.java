@@ -1,13 +1,11 @@
 package com.example.gamemate.domain.user.entity;
 
 import com.example.gamemate.global.common.BaseEntity;
-import com.example.gamemate.domain.user.enums.Authority;
+import com.example.gamemate.domain.user.enums.Role;
 import com.example.gamemate.domain.user.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user")
@@ -33,7 +31,7 @@ public class User extends BaseEntity {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    private Authority auth;
+    private Role role;
 
     private Boolean isPremium;
 
@@ -45,7 +43,7 @@ public class User extends BaseEntity {
         this.name = name;
         this.nickname = nickname;
         this.password = password;
-        this.auth = Authority.USER;
+        this.role = Role.USER;
         this.isPremium = false;
         this.userStatus = UserStatus.ACTIVE;
     }
