@@ -1,5 +1,6 @@
 package com.example.gamemate.domain.auth.controller;
 
+import com.example.gamemate.domain.auth.dto.EmailLoginRequestDto;
 import com.example.gamemate.domain.auth.dto.SignupRequestDto;
 import com.example.gamemate.domain.auth.dto.SignupResponseDto;
 import com.example.gamemate.domain.auth.service.AuthService;
@@ -23,6 +24,12 @@ public class AuthController {
     public ResponseEntity<SignupResponseDto> signup(@Valid @RequestBody SignupRequestDto requestDto) {
         SignupResponseDto responseDto = authService.signup(requestDto);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> emailLogin(@Valid @RequestBody EmailLoginRequestDto requestDto) {
+        authService.emailLogin(requestDto);
+        return new ResponseEntity<>("로그인 되었습니다.", HttpStatus.OK);
     }
 
 
