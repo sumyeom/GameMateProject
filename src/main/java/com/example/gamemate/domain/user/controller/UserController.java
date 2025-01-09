@@ -17,25 +17,33 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProfileResponseDto> findProfile(@PathVariable Long id) {
-        ProfileResponseDto responseDto = userService.findProfile(id);
+    public ResponseEntity<ProfileResponseDto> findProfile(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String token) {
+
+        String jwtToken = token.substring(7);
+        ProfileResponseDto responseDto = userService.findProfile(id, jwtToken);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<ProfileResponseDto> updateProfile(
             @PathVariable Long id,
-            @Valid @RequestBody ProfileUpdateRequestDto requestDto) {
-        ProfileResponseDto responseDto = userService.updateProfile(id, requestDto.getNewNickname());
+            @Valid @RequestBody ProfileUpdateRequestDto requestDto,
+            @RequestHeader("Authorization") String token) {
+        String jwtToken = token.substring(7);
+        ProfileResponseDto responseDto = userService.updateProfile(id, requestDto.getNewNickname(), jwtToken);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     @PatchMapping("/{id}/password")
     public ResponseEntity<String> updatePassword(
             @PathVariable Long id,
-            @Valid @RequestBody PasswordUpdateRequestDto requestDto) {
+            @Valid @RequestBody PasswordUpdateRequestDto requestDto,
+            @RequestHeader("Authorization") String token) {
 
-        userService.updatePassword(id, requestDto.getNewPassword());
+        String jwtToken = token.substring(7);
+        userService.updatePassword(id, requestDto.getOldPassword(), requestDto.getNewPassword(), jwtToken);
         return new ResponseEntity<>("비밀번호가 변경되었습니다.", HttpStatus.OK);
     }
 }
