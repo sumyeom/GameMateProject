@@ -23,4 +23,15 @@ public class NotificationService {
         Notification notification = new Notification(type.getContent(), type, user);
         notificationRepository.save(notification);
     }
+
+    // 알림 전체 보기
+    // todo 현재 로그인이 구현되어 있지 않아 1번 유저의 알림 목록을 불러오게 설정, 추후 로그인 구현시 로그인한 유저의 id값을 넣도록 변경
+    public List<NotificationResponseDto> findAllNotification() {
+        List<Notification> notificationList = notificationRepository.findAllByUserId(1L);
+
+        return notificationList
+                .stream()
+                .map(NotificationResponseDto::toDto)
+                .toList();
+    }
 }
