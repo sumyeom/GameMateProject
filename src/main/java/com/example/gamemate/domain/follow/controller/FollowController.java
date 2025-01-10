@@ -33,7 +33,7 @@ public class FollowController {
     /**
      * 팔로우 취소
      * @param id 취소할 팔로우 식별자
-     * @return message = "팔로우를 취소했습니다."
+     * @return NO_CONTENT
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFollow(

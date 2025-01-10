@@ -28,8 +28,10 @@ public class FollowService {
     @Transactional
     public FollowResponseDto createFollow(FollowCreateRequestDto dto) {
 
-        User follower = userRepository.findById(1L).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
-        User followee = userRepository.findByEmail(dto.getEmail()).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+        User follower = userRepository.findById(1L)
+                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+        User followee = userRepository.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         if (followee.getUserStatus() == UserStatus.WITHDRAW) {
             throw new ApiException(ErrorCode.IS_WITHDRAW_USER);
@@ -54,8 +56,10 @@ public class FollowService {
     @Transactional
     public void deleteFollow(Long id) {
 
-        Follow findFollow = followRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.FOLLOW_NOT_FOUND));
-        User follower = userRepository.findById(1L).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+        Follow findFollow = followRepository.findById(id)
+                .orElseThrow(() -> new ApiException(ErrorCode.FOLLOW_NOT_FOUND));
+        User follower = userRepository.findById(1L)
+                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         if (findFollow.getFollower() != follower) {
             throw new ApiException(ErrorCode.INVALID_INPUT);
@@ -68,8 +72,10 @@ public class FollowService {
     // todo : 로그인한 유저(follower) 기준으로 상대 유저(followee)가 팔로우 되어 있는지 확인이 필요한 것이므로, 로그인 구현시 코드 수정해야함.
     public FollowResponseDto findFollow(String followerEmail, String followeeEmail) {
 
-        User follower = userRepository.findByEmail(followerEmail).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
-        User followee = userRepository.findByEmail(followeeEmail).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+        User follower = userRepository.findByEmail(followerEmail)
+                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+        User followee = userRepository.findByEmail(followeeEmail)
+                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         if (followee.getUserStatus() == UserStatus.WITHDRAW) {
             throw new ApiException(ErrorCode.IS_WITHDRAW_USER);
@@ -85,7 +91,8 @@ public class FollowService {
     // 팔로워 목록보기
     public List<FollowFindResponseDto> findFollowers(String email) {
 
-        User followee = userRepository.findByEmail(email).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+        User followee = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         if (followee.getUserStatus() == UserStatus.WITHDRAW) {
             throw new ApiException(ErrorCode.IS_WITHDRAW_USER);
@@ -107,7 +114,8 @@ public class FollowService {
     // 팔로잉 목록보기
     public List<FollowFindResponseDto> findFollowing(String email) {
 
-        User follower = userRepository.findByEmail(email).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+        User follower = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         if (follower.getUserStatus() == UserStatus.WITHDRAW) {
             throw new ApiException(ErrorCode.IS_WITHDRAW_USER);
