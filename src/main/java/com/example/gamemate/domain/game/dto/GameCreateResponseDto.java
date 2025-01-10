@@ -1,6 +1,6 @@
-package com.example.gamemate.game.dto;
+package com.example.gamemate.domain.game.dto;
 
-import com.example.gamemate.game.entity.Game;
+import com.example.gamemate.domain.game.entity.Game;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -14,6 +14,8 @@ public class GameCreateResponseDto {
     private String description;
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
+    private final String fileName;
+    private final String imageUrl;
 
     public GameCreateResponseDto(Game game) {
         // game 객체의 필드들을 이용해 DTO의 필드들을 초기화
@@ -24,6 +26,9 @@ public class GameCreateResponseDto {
         this.description = game.getDescription();
         this.createdAt = game.getCreatedAt();
         this.modifiedAt =game.getModifiedAt();
-
+        this.fileName = game.getImages().isEmpty() ? null :
+                game.getImages().get(0).getFileName();
+        this.imageUrl = game.getImages().isEmpty() ? null :
+                game.getImages().get(0).getFilePath();
     }
 }

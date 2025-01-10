@@ -1,7 +1,7 @@
-package com.example.gamemate.game.entity;
+package com.example.gamemate.domain.game.entity;
 
-import com.example.gamemate.base.BaseEntity;
-import com.example.gamemate.review.entity.Review;
+import com.example.gamemate.domain.review.entity.Review;
+import com.example.gamemate.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,11 +29,11 @@ public class Game extends BaseEntity {
     @Column(name = "description", nullable = false, length = 255)
     private String description;
 
-    @Column(name = "platform", nullable = false, length = 255)
+    @Column(name = "platform", nullable = false, length = 20)
     private String platform;
 
-    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL)
-    private List<GameImage> gameImages = new ArrayList<>();
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<GameImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
     private List<Review> reviews = new ArrayList<>();
@@ -50,6 +50,18 @@ public class Game extends BaseEntity {
         this.genre = genre;
         this.platform = platform;
         this.description = description;
+    }
+
+    public void addImage(GameImage gameImage) {
+        this.images.add(gameImage);
+    }
+
+    public void removeGameImage(GameImage gameImage) {
+        this.images.remove(gameImage);
+    }
+
+    public void clearImages() {
+        this.images.clear();
     }
 
 

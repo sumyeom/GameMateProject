@@ -1,9 +1,11 @@
-package com.example.gamemate.game.dto;
+package com.example.gamemate.domain.game.dto;
 
 import lombok.Getter;
-import java.time.LocalDateTime;
+import lombok.NoArgsConstructor;
+
 
 @Getter
+@NoArgsConstructor
 public class GameCreateRequestDto {
     private String title;
     private String genre;
@@ -19,4 +21,5 @@ public class GameCreateRequestDto {
         this.description = description;
 
     }
+
 }
