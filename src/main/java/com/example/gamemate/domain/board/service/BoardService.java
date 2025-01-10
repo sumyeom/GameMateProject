@@ -102,19 +102,13 @@ public class BoardService {
      * @return
      */
     @Transactional
-    public BoardResponseDto updateBoard(Long id, BoardRequestDto dto) {
+    public void updateBoard(Long id, BoardRequestDto dto) {
         // 게시글 조회
         Board findBoard = boardRepository.findById(id)
                 .orElseThrow(()->new ApiException(BOARD_NOT_FOUND));
 
         findBoard.updateBoard(dto.getCategory(),dto.getTitle(),dto.getContent());
         Board updatedBoard = boardRepository.save(findBoard);
-        return new BoardResponseDto(
-                updatedBoard.getBoardId(),
-                updatedBoard.getCategory(),
-                updatedBoard.getTitle(),
-                updatedBoard.getContent()
-        );
     }
 
     /**

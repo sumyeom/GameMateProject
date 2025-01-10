@@ -83,13 +83,13 @@ public class BoardController {
      * @return
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<BoardResponseDto> updateBoard(
+    public ResponseEntity<String> updateBoard(
             @PathVariable Long id,
             @Valid @RequestBody BoardRequestDto dto
     ){
 
-        BoardResponseDto responseDto = boardService.updateBoard(id, dto);
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+        boardService.updateBoard(id, dto);
+        return new ResponseEntity<>("업데이트 되었습니다.", HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -103,6 +103,6 @@ public class BoardController {
     ){
 
         boardService.deleteBoard(id);
-        return new ResponseEntity<>("삭제되었습니다", HttpStatus.OK);
+        return new ResponseEntity<>("삭제 되었습니다", HttpStatus.NO_CONTENT);
     }
 }
