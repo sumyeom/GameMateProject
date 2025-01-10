@@ -36,12 +36,12 @@ public class FollowController {
      * @return message = "팔로우를 취소했습니다."
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<FollowResponseDto> deleteFollow(
+    public ResponseEntity<Void> deleteFollow(
             @PathVariable Long id
     ) {
 
-        FollowResponseDto followResponseDto = followService.deleteFollow(id);
-        return new ResponseEntity<>(followResponseDto,HttpStatus.OK);
+        followService.deleteFollow(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**

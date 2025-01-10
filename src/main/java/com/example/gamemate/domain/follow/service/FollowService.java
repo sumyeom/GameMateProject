@@ -52,7 +52,7 @@ public class FollowService {
     // 팔로우 취소하기
     // todo: 현재 로그인이 구현되지 않아 1번유저가 팔로우를 취소 하는것으로 구현했으니 추후 로그인이 구현되면 follower 는 로그인한 유저로 설정
     @Transactional
-    public FollowResponseDto deleteFollow(Long id) {
+    public void deleteFollow(Long id) {
 
         Follow findFollow = followRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.FOLLOW_NOT_FOUND));
         User follower = userRepository.findById(1L).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
@@ -62,8 +62,6 @@ public class FollowService {
         }
 
         followRepository.delete(findFollow);
-
-        return new FollowResponseDto("팔로우가 취소되었습니다.");
     }
 
     // 팔로우 상태 확인
