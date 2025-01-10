@@ -31,7 +31,7 @@ public class GameService {
     public GameService(GameRepository gameRepository, ReviewRepository reviewRepository, GameEnrollRequestRepository gameEnrollRequestRepository) {
 
         this.gameRepository = gameRepository;
-        this.reviewRepository=reviewRepository;
+        this.reviewRepository = reviewRepository;
         this.gameEnrollRequestRepository = gameEnrollRequestRepository;
     }
 
@@ -96,59 +96,6 @@ public class GameService {
         Pageable pageable = PageRequest.of(page, size);
         Page<Game> games = gameRepository.searchGames(keyword, genre, platform, pageable);
         return games.map(GameSearchResponseDto::new);
-    }
-
-    public GameEnrollRequestResponseDto createGameEnrollRequest(GameEnrollRequestCreateRequestDto requestDto) {
-        GamaEnrollRequest gameEnrollRequest = new GamaEnrollRequest(
-                requestDto.getTitle(),
-                requestDto.getGenre(),
-                requestDto.getPlatform(),
-                requestDto.getDescription()
-        );
-        GamaEnrollRequest saveEnrollRequest = gameEnrollRequestRepository.save(gameEnrollRequest);
-        return new GameEnrollRequestResponseDto(saveEnrollRequest);
-    }
-
-    public Page<GameEnrollRequestResponseDto> findAllGameEnrollRequest() {
-
-        Pageable pageable = PageRequest.of(0, 10);
-
-        return gameEnrollRequestRepository.findAll(pageable).map(GameEnrollRequestResponseDto::new);
-    }
-
-    @Transactional
-    public GameEnrollRequestResponseDto findGameEnrollRequestById(Long id) {
-
-        GamaEnrollRequest gamaEnrollRequest = gameEnrollRequestRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("게임이 존재하지 않습니다."));
-
-        return new GameEnrollRequestResponseDto(gamaEnrollRequest);
-    }
-
-    @Transactional
-    public GameEnrollRequestResponseDto updateGameEnroll(Long id, GameEnrollRequestUpdateRequestDto requestDto) {
-        GamaEnrollRequest gamaEnrollRequest = gameEnrollRequestRepository.findById(id).orElseThrow(() -> new NotFoundException("게임이 존해 하지 않습니다."));
-
-        gamaEnrollRequest.updateGameEnroll(
-                requestDto.getTitle(),
-                requestDto.getGenre(),
-                requestDto.getPlatform(),
-                requestDto.getDescription(),
-                requestDto.getIsAccepted()
-        );
-        GamaEnrollRequest updateGameEnroll = gameEnrollRequestRepository.save(gamaEnrollRequest);
-
-        Boolean accepted = requestDto.getIsAccepted();
-        if(accepted == true){
-            Game game = new Game(
-                    requestDto.getTitle(),
-                    requestDto.getGenre(),
-                    requestDto.getPlatform(),
-                    requestDto.getDescription()
-            );
-            gameRepository.save(game);
-        }
-        return new GameEnrollRequestResponseDto(updateGameEnroll);
     }
 
 }
