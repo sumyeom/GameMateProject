@@ -48,7 +48,12 @@ public class FollowService {
         Follow follow = new Follow(follower, followee);
         followRepository.save(follow);
 
-        return new FollowResponseDto("팔로우 했습니다.");
+        return new FollowResponseDto(
+                follow.getId(),
+                follow.getFollower().getId(),
+                follow.getFollowee().getId(),
+                follow.getCreatedAt()
+        );
     }
 
     // 팔로우 취소하기
@@ -70,7 +75,7 @@ public class FollowService {
 
     // 팔로우 상태 확인
     // todo : 로그인한 유저(follower) 기준으로 상대 유저(followee)가 팔로우 되어 있는지 확인이 필요한 것이므로, 로그인 구현시 코드 수정해야함.
-    public FollowResponseDto findFollow(String followerEmail, String followeeEmail) {
+    public FollowBooleanResponseDto findFollow(String followerEmail, String followeeEmail) {
 
         User follower = userRepository.findByEmail(followerEmail)
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
@@ -82,10 +87,18 @@ public class FollowService {
         }
 
         if (!followRepository.existsByFollowerAndFollowee(follower, followee)) {
-            return new FollowResponseDto("아직 팔로우 하지 않았습니다.");
+            return new FollowBooleanResponseDto(
+                    false,
+                    follower.getId(),
+                    followee.getId()
+            );
         }
 
-        return new FollowResponseDto("팔로우 중 입니다.");
+        return new FollowBooleanResponseDto(
+                true,
+                follower.getId(),
+                followee.getId()
+        );
     }
 
     // 팔로워 목록보기
