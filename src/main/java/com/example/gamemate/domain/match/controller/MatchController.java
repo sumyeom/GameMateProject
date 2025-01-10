@@ -1,15 +1,13 @@
 package com.example.gamemate.domain.match.controller;
 
+import com.example.gamemate.domain.match.dto.MatchUpdateRequestDto;
 import com.example.gamemate.domain.match.service.MatchService;
 import com.example.gamemate.domain.match.dto.MatchCreateRequestDto;
 import com.example.gamemate.domain.match.dto.MatchCreateResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,5 +24,17 @@ public class MatchController {
     public ResponseEntity<MatchCreateResponseDto> createMatch(@RequestBody MatchCreateRequestDto dto) {
         MatchCreateResponseDto matchCreateResponseDto = matchService.createMatch(dto);
         return new ResponseEntity<>(matchCreateResponseDto, HttpStatus.CREATED);
+    }
+
+    /**
+     * 매칭 수락/거절하기
+     * @param id 매칭 id
+     * @param dto MatchUpdateRequestDto 수락/거절
+     * @return 204 NO CONTENT
+     */
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> updateMatch(@PathVariable Long id, @RequestBody MatchUpdateRequestDto dto) {
+        matchService.updateMatch(id, dto);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

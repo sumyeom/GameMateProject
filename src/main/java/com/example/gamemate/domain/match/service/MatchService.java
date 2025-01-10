@@ -1,5 +1,6 @@
 package com.example.gamemate.domain.match.service;
 
+import com.example.gamemate.domain.match.dto.MatchUpdateRequestDto;
 import com.example.gamemate.domain.match.entity.Match;
 import com.example.gamemate.domain.match.enums.MatchStatus;
 import com.example.gamemate.domain.match.dto.MatchCreateRequestDto;
@@ -39,5 +40,24 @@ public class MatchService {
         matchRepository.save(match);
 
         return new MatchCreateResponseDto("매칭이 요청되었습니다.");
+    }
+
+    // 매칭 수락/거절
+    // todo : 현재 로그인이 구현되어 있지 않아, receiver 를 1번 유저로 설정. 로그인 구현시 수정필요
+    @Transactional
+    public void updateMatch(Long id, MatchUpdateRequestDto dto) {
+        Match findMatch = matchRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.MATCH_NOT_FOUND));
+
+        if (findMatch.getStatus() != MatchStatus.PENDING) {
+            throw new ApiException(ErrorCode.IS_ALREADY_PROCESSED);
+        }
+
+        User loginUser = userRepository.findById(1L).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+
+        if (loginUser != findMatch.getReceiver()) {
+            throw new ApiException(ErrorCode.FORBIDDEN);
+        }
+
+        findMatch.updateStatus(dto.getStatus());
     }
 }
