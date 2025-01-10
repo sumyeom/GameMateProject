@@ -1,5 +1,6 @@
 package com.example.gamemate.domain.match.service;
 
+import com.example.gamemate.domain.match.dto.MatchFindResponseDto;
 import com.example.gamemate.domain.match.dto.MatchUpdateRequestDto;
 import com.example.gamemate.domain.match.entity.Match;
 import com.example.gamemate.domain.match.enums.MatchStatus;
@@ -14,6 +15,8 @@ import com.example.gamemate.global.exception.ApiException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -59,5 +62,13 @@ public class MatchService {
         }
 
         findMatch.updateStatus(dto.getStatus());
+    }
+
+    // 매칭 전체 조회
+    // todo : 현재 로그인이 구현 되어 있지 않아, 1번 유저의 목록을 불러오도록 설정. 로그인 구현시 수정 필요
+    public List<MatchFindResponseDto> findAllMatch() {
+        List<Match> matchList = matchRepository.findAllByReceiverId(1L);
+
+        return matchList.stream().map(MatchFindResponseDto::toDto).toList();
     }
 }

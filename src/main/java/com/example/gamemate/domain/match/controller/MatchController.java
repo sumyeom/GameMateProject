@@ -1,5 +1,6 @@
 package com.example.gamemate.domain.match.controller;
 
+import com.example.gamemate.domain.match.dto.MatchFindResponseDto;
 import com.example.gamemate.domain.match.dto.MatchUpdateRequestDto;
 import com.example.gamemate.domain.match.service.MatchService;
 import com.example.gamemate.domain.match.dto.MatchCreateRequestDto;
@@ -8,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,5 +39,15 @@ public class MatchController {
     public ResponseEntity<Void> updateMatch(@PathVariable Long id, @RequestBody MatchUpdateRequestDto dto) {
         matchService.updateMatch(id, dto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     * 매칭 전체 조회
+     * @return matchFindResponseDtoList
+     */
+    @GetMapping
+    public ResponseEntity<List<MatchFindResponseDto>> findAllMatch() {
+        List<MatchFindResponseDto> matchFindResponseDtoList = matchService.findAllMatch();
+        return new ResponseEntity<>(matchFindResponseDtoList, HttpStatus.OK);
     }
 }
