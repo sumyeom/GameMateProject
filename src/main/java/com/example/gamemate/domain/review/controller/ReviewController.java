@@ -1,11 +1,10 @@
-package com.example.gamemate.review.controller;
+package com.example.gamemate.domain.review.controller;
 
-import com.example.gamemate.review.dto.ReviewCreateRequestDto;
-import com.example.gamemate.review.dto.ReviewCreateResponseDto;
-import com.example.gamemate.review.dto.ReviewUpdateRequestDto;
-import com.example.gamemate.review.dto.ReviewUpdateResponseDto;
-import com.example.gamemate.review.entity.Review;
-import com.example.gamemate.review.service.ReviewService;
+import com.example.gamemate.domain.review.dto.ReviewCreateRequestDto;
+import com.example.gamemate.domain.review.dto.ReviewCreateResponseDto;
+import com.example.gamemate.domain.review.dto.ReviewUpdateRequestDto;
+import com.example.gamemate.domain.review.dto.ReviewUpdateResponseDto;
+import com.example.gamemate.domain.review.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,8 +47,8 @@ public class ReviewController {
     @PatchMapping("/{id}")
     public ResponseEntity<ReviewUpdateResponseDto> updateReview(@PathVariable Long gameId, @PathVariable Long id, @RequestBody ReviewUpdateRequestDto requestDto) {
 
-        ReviewUpdateResponseDto responseDto = reviewService.updateReview(gameId, id, requestDto);
-        return ResponseEntity.ok(responseDto);
+        reviewService.updateReview(gameId, id, requestDto);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -63,6 +62,6 @@ public class ReviewController {
     public ResponseEntity<Void> deleteReview(@PathVariable Long gameId, @PathVariable Long id) {
 
         reviewService.deleteReview(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

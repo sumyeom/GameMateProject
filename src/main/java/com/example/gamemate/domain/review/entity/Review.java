@@ -1,8 +1,6 @@
-package com.example.gamemate.review.entity;
+package com.example.gamemate.domain.review.entity;
 
-import com.example.gamemate.base.BaseEntity;
-import com.example.gamemate.game.entity.Game;
-import com.example.gamemate.user.entity.User;
+import com.example.gamemate.domain.game.entity.Game;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Table(name = "review")
-public class Review extends BaseEntity {
+public class Review extends com.example.gamemate.global.common.BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -44,6 +42,4 @@ public class Review extends BaseEntity {
         this.star =star;
 
     }
-
-
 }

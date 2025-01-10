@@ -1,13 +1,13 @@
-package com.example.gamemate.review.service;
+package com.example.gamemate.domain.review.service;
 
-import com.example.gamemate.game.entity.Game;
-import com.example.gamemate.game.repository.GameRepository;
-import com.example.gamemate.review.dto.ReviewCreateRequestDto;
-import com.example.gamemate.review.dto.ReviewCreateResponseDto;
-import com.example.gamemate.review.dto.ReviewUpdateRequestDto;
-import com.example.gamemate.review.dto.ReviewUpdateResponseDto;
-import com.example.gamemate.review.entity.Review;
-import com.example.gamemate.review.repository.ReviewRepository;
+import com.example.gamemate.domain.game.entity.Game;
+import com.example.gamemate.domain.game.repository.GameRepository;
+import com.example.gamemate.domain.review.dto.ReviewCreateRequestDto;
+import com.example.gamemate.domain.review.dto.ReviewCreateResponseDto;
+import com.example.gamemate.domain.review.dto.ReviewUpdateRequestDto;
+import com.example.gamemate.domain.review.dto.ReviewUpdateResponseDto;
+import com.example.gamemate.domain.review.entity.Review;
+import com.example.gamemate.domain.review.repository.ReviewRepository;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.NotFoundException;

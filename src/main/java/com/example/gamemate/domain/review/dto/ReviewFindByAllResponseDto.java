@@ -1,6 +1,6 @@
-package com.example.gamemate.review.dto;
+package com.example.gamemate.domain.review.dto;
 
-import com.example.gamemate.review.entity.Review;
+import com.example.gamemate.domain.review.entity.Review;
 import lombok.Getter;
 
 import java.time.LocalDateTime;

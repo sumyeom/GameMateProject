@@ -1,25 +1,25 @@
-package com.example.gamemate.review.dto;
+package com.example.gamemate.domain.review.dto;
 
-import com.example.gamemate.review.entity.Review;
+import com.example.gamemate.domain.review.entity.Review;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
-public class ReviewUpdateResponseDto {
+public class ReviewCreateResponseDto {
     private  Long id;
     private  String content;
     private  Integer star;
     private  Long gameId;
     private  Long userId;
-    private  LocalDateTime modifiedAt;
+    private  LocalDateTime createdAt;
 
-    public ReviewUpdateResponseDto(Review review) {
+    public ReviewCreateResponseDto(Review review) {
         this.id = review.getId();
         this.content = review.getContent();
         this.star = review.getStar();
         this.gameId = review.getGame().getId();
         this.userId = review.getUserId();
-        this.modifiedAt = review.getModifiedAt();
+        this.createdAt = review.getCreatedAt();
     }
 }

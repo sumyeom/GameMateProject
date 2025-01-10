@@ -1,8 +1,4 @@
-package com.example.gamemate.review.dto;
-
-import com.example.gamemate.game.entity.Game;
-import com.example.gamemate.review.entity.Review;
-import com.example.gamemate.user.entity.User;
+package com.example.gamemate.domain.review.dto;
 
 import lombok.Getter;
 

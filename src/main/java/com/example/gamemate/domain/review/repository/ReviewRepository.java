@@ -1,13 +1,10 @@
-package com.example.gamemate.review.repository;
+package com.example.gamemate.domain.review.repository;
 
-import com.example.gamemate.game.entity.Game;
-import com.example.gamemate.like.entity.ReviewLike;
-import com.example.gamemate.review.entity.Review;
+import com.example.gamemate.domain.game.entity.Game;
+import com.example.gamemate.domain.review.entity.Review;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     Page<Review> findAllByGame(Game game, Pageable pageable);
