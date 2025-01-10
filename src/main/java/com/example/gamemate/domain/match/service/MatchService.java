@@ -71,4 +71,12 @@ public class MatchService {
 
         return matchList.stream().map(MatchFindResponseDto::toDto).toList();
     }
+
+    // 매칭 단일 조회
+    // todo : 현재 로그인이 구현 되어 있지 않아, 간단하게 구현. 로그인 구현시 수정 필요
+    public MatchFindResponseDto findMatch(Long id) {
+        Match findMatch = matchRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.MATCH_NOT_FOUND));
+
+        return MatchFindResponseDto.toDto(findMatch);
+    }
 }

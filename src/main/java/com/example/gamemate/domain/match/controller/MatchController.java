@@ -50,4 +50,15 @@ public class MatchController {
         List<MatchFindResponseDto> matchFindResponseDtoList = matchService.findAllMatch();
         return new ResponseEntity<>(matchFindResponseDtoList, HttpStatus.OK);
     }
+
+    /**
+     * 매칭 단일 조회
+     * @param id 매칭 id
+     * @return matchFindResponseDto
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<MatchFindResponseDto> findMatch(@PathVariable Long id) {
+        MatchFindResponseDto matchFindResponseDto = matchService.findMatch(id);
+        return new ResponseEntity<>(matchFindResponseDto, HttpStatus.OK);
+    }
 }
