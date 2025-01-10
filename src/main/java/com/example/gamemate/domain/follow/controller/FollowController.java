@@ -1,5 +1,6 @@
-package com.example.gamemate.domain.follow;
+package com.example.gamemate.domain.follow.controller;
 
+import com.example.gamemate.domain.follow.service.FollowService;
 import com.example.gamemate.domain.follow.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,19 +22,25 @@ public class FollowController {
      * @return message = "팔로우 했습니다."
      */
     @PostMapping
-    public ResponseEntity<FollowResponseDto> createFollow(@RequestBody FollowCreateRequestDto dto) {
+    public ResponseEntity<FollowResponseDto> createFollow(
+            @RequestBody FollowCreateRequestDto dto
+    ) {
+
         FollowResponseDto followResponseDto = followService.createFollow(dto);
         return new ResponseEntity<>(followResponseDto, HttpStatus.CREATED);
     }
 
     /**
      * 팔로우 취소
-     * @param followId 취소할 팔로우 식별자
+     * @param id 취소할 팔로우 식별자
      * @return message = "팔로우를 취소했습니다."
      */
-    @DeleteMapping("/{followId}")
-    public ResponseEntity<FollowResponseDto> deleteFollow(@PathVariable Long followId) {
-        FollowResponseDto followResponseDto = followService.deleteFollow(followId);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<FollowResponseDto> deleteFollow(
+            @PathVariable Long id
+    ) {
+
+        FollowResponseDto followResponseDto = followService.deleteFollow(id);
         return new ResponseEntity<>(followResponseDto,HttpStatus.OK);
     }
 
@@ -44,7 +51,11 @@ public class FollowController {
      * @return message = "팔로우 중 입니다." or "아직 팔로우 하지 않았습니다."
      */
     @GetMapping("/status")
-    public ResponseEntity<FollowResponseDto> findFollow(@RequestParam String followerEmail, @RequestParam String followeeEmail) {
+    public ResponseEntity<FollowResponseDto> findFollow(
+            @RequestParam String followerEmail,
+            @RequestParam String followeeEmail
+    ) {
+
         FollowResponseDto followResponseDto = followService.findFollow(followerEmail, followeeEmail);
         return new ResponseEntity<>(followResponseDto, HttpStatus.OK);
     }
@@ -54,10 +65,13 @@ public class FollowController {
      * @param email 팔로우 목록을 보고 싶은 유저 email
      * @return followerList
      */
-    @GetMapping("/follower-list")
-    public ResponseEntity<List<FollowFindResponseDto>> findFollowerList(@RequestParam String email) {
-        List<FollowFindResponseDto> followerList = followService.findFollowerList(email);
-        return new ResponseEntity<>(followerList, HttpStatus.OK);
+    @GetMapping("/followers")
+    public ResponseEntity<List<FollowFindResponseDto>> findFollowers(
+            @RequestParam String email
+    ) {
+
+        List<FollowFindResponseDto> followFindResponseDtoList = followService.findFollowers(email);
+        return new ResponseEntity<>(followFindResponseDtoList, HttpStatus.OK);
     }
 
     /**
@@ -65,9 +79,12 @@ public class FollowController {
      * @param email 팔로잉 목록을 보고 싶은 유저 email
      * @return followingList
      */
-    @GetMapping("/following-list")
-    public ResponseEntity<List<FollowFindResponseDto>> findFollowingList(@RequestParam String email) {
-        List<FollowFindResponseDto> followingList = followService.findFollowingList(email);
-        return new ResponseEntity<>(followingList, HttpStatus.OK);
+    @GetMapping("/following")
+    public ResponseEntity<List<FollowFindResponseDto>> findFollowing(
+            @RequestParam String email
+    ) {
+
+        List<FollowFindResponseDto> followFindResponseDtoList = followService.findFollowing(email);
+        return new ResponseEntity<>(followFindResponseDtoList, HttpStatus.OK);
     }
 }

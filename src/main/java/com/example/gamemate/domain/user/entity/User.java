@@ -1,6 +1,6 @@
 package com.example.gamemate.domain.user.entity;
 
-import com.example.gamemate.domain.follow.Follow;
+import com.example.gamemate.domain.follow.entity.Follow;
 import com.example.gamemate.global.common.BaseEntity;
 import com.example.gamemate.domain.user.enums.Authority;
 import com.example.gamemate.domain.user.enums.UserStatus;
@@ -8,7 +8,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity

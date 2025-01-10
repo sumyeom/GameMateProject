@@ -1,5 +1,6 @@
-package com.example.gamemate.domain.follow;
+package com.example.gamemate.domain.follow.repository;
 
+import com.example.gamemate.domain.follow.entity.Follow;
 import com.example.gamemate.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
