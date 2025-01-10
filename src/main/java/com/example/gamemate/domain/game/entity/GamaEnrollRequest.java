@@ -1,15 +1,10 @@
-package com.example.gamemate.game.entity;
+package com.example.gamemate.domain.game.entity;
 
-import com.example.gamemate.base.BaseEntity;
-import com.example.gamemate.review.entity.Review;
+import com.example.gamemate.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -30,7 +25,7 @@ public class GamaEnrollRequest extends BaseEntity {
     @Column(name = "description", length = 255)
     private String description;
 
-    @Column(name = "platform", length = 255)
+    @Column(name = "platform", length = 20)
     private String platform;
 
 //    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL)

@@ -69,12 +69,12 @@ public class GameEnrollRequestController {
     public ResponseEntity<GameEnrollRequestResponseDto> updateGameEnroll(@PathVariable Long id, @RequestBody GameEnrollRequestUpdateRequestDto requestDto) {
 
        gameEnrollRequestService.updateGameEnroll(id, requestDto);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGame(@PathVariable Long id) {
         gameEnrollRequestService.deleteGame(id);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

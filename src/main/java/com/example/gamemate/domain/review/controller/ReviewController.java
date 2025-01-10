@@ -48,7 +48,7 @@ public class ReviewController {
     public ResponseEntity<ReviewUpdateResponseDto> updateReview(@PathVariable Long gameId, @PathVariable Long id, @RequestBody ReviewUpdateRequestDto requestDto) {
 
         reviewService.updateReview(gameId, id, requestDto);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -62,6 +62,6 @@ public class ReviewController {
     public ResponseEntity<Void> deleteReview(@PathVariable Long gameId, @PathVariable Long id) {
 
         reviewService.deleteReview(id);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
