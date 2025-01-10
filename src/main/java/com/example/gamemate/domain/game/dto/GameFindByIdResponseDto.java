@@ -1,14 +1,12 @@
-package com.example.gamemate.game.dto;
+package com.example.gamemate.domain.game.dto;
 
-import com.example.gamemate.game.entity.Game;
-import com.example.gamemate.review.dto.ReviewFindByAllResponseDto;
+import com.example.gamemate.domain.game.entity.Game;
+import com.example.gamemate.domain.review.dto.ReviewFindByAllResponseDto;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @JsonPropertyOrder({ "id", "title", "genre", "platform", "description", "createdAt", "modifiedAt", "reviews" })

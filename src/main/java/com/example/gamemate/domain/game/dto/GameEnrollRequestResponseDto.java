@@ -1,7 +1,6 @@
-package com.example.gamemate.game.dto;
+package com.example.gamemate.domain.game.dto;
 
-import com.example.gamemate.game.entity.GamaEnrollRequest;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.example.gamemate.domain.game.entity.GamaEnrollRequest;
 import lombok.Getter;
 
 import java.time.LocalDateTime;

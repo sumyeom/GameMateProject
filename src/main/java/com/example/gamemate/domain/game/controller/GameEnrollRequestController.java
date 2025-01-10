@@ -1,9 +1,9 @@
-package com.example.gamemate.game.controller;
+package com.example.gamemate.domain.game.controller;
 
-import com.example.gamemate.game.dto.GameEnrollRequestCreateRequestDto;
-import com.example.gamemate.game.dto.GameEnrollRequestResponseDto;
-import com.example.gamemate.game.dto.GameEnrollRequestUpdateRequestDto;
-import com.example.gamemate.game.service.GameEnrollRequestService;
+import com.example.gamemate.domain.game.dto.GameEnrollRequestCreateRequestDto;
+import com.example.gamemate.domain.game.dto.GameEnrollRequestResponseDto;
+import com.example.gamemate.domain.game.dto.GameEnrollRequestUpdateRequestDto;
+import com.example.gamemate.domain.game.service.GameEnrollRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -68,13 +68,13 @@ public class GameEnrollRequestController {
     @PatchMapping("/{id}")
     public ResponseEntity<GameEnrollRequestResponseDto> updateGameEnroll(@PathVariable Long id, @RequestBody GameEnrollRequestUpdateRequestDto requestDto) {
 
-        GameEnrollRequestResponseDto responseDto = gameEnrollRequestService.updateGameEnroll(id, requestDto);
-        return ResponseEntity.ok(responseDto);
+       gameEnrollRequestService.updateGameEnroll(id, requestDto);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGame(@PathVariable Long id) {
         gameEnrollRequestService.deleteGame(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

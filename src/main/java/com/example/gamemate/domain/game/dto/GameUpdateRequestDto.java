@@ -1,4 +1,4 @@
-package com.example.gamemate.game.dto;
+package com.example.gamemate.domain.game.dto;
 
 import lombok.Getter;
 

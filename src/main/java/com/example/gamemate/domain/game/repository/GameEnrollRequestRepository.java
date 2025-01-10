@@ -1,6 +1,6 @@
-package com.example.gamemate.game.repository;
+package com.example.gamemate.domain.game.repository;
 
-import com.example.gamemate.game.entity.GamaEnrollRequest;
+import com.example.gamemate.domain.game.entity.GamaEnrollRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

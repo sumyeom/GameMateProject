@@ -1,19 +1,18 @@
-package com.example.gamemate.game.service;
+package com.example.gamemate.domain.game.service;
 
-import com.example.gamemate.game.dto.*;
-import com.example.gamemate.game.entity.GamaEnrollRequest;
-import com.example.gamemate.game.entity.Game;
-import com.example.gamemate.game.repository.GameEnrollRequestRepository;
-import com.example.gamemate.game.repository.GameRepository;
-import com.example.gamemate.review.dto.ReviewFindByAllResponseDto;
-import com.example.gamemate.review.entity.Review;
-import com.example.gamemate.review.repository.ReviewRepository;
+import com.example.gamemate.domain.game.dto.GameEnrollRequestCreateRequestDto;
+import com.example.gamemate.domain.game.dto.GameEnrollRequestResponseDto;
+import com.example.gamemate.domain.game.dto.GameEnrollRequestUpdateRequestDto;
+
+import com.example.gamemate.domain.game.entity.GamaEnrollRequest;
+import com.example.gamemate.domain.game.entity.Game;
+import com.example.gamemate.domain.game.repository.GameEnrollRequestRepository;
+import com.example.gamemate.domain.game.repository.GameRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,8 +61,9 @@ public class GameEnrollRequestService {
     }
 
     @Transactional
-    public GameEnrollRequestResponseDto updateGameEnroll(Long id, GameEnrollRequestUpdateRequestDto requestDto) {
-        GamaEnrollRequest gamaEnrollRequest = gameEnrollRequestRepository.findById(id).orElseThrow(() -> new NotFoundException("게임이 존해 하지 않습니다."));
+    public void updateGameEnroll(Long id, GameEnrollRequestUpdateRequestDto requestDto) {
+        GamaEnrollRequest gamaEnrollRequest = gameEnrollRequestRepository
+                .findById(id).orElseThrow(() -> new NotFoundException("게임이 존해 하지 않습니다."));
 
         gamaEnrollRequest.updateGameEnroll(
                 requestDto.getTitle(),
@@ -85,7 +85,6 @@ public class GameEnrollRequestService {
             );
             gameRepository.save(game);
         }
-        return new GameEnrollRequestResponseDto(updateGameEnroll);
     }
 
     public void deleteGame(Long id) {
