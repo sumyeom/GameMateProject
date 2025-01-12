@@ -37,19 +37,19 @@ public class CommentController {
      * @return
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<String> updateComment(
+    public ResponseEntity<void> updateComment(
             @PathVariable Long id,
             @RequestBody CommentRequestDto requestDto
     ){
         commentService.updateComment(id, requestDto);
-        return new ResponseEntity<>("업데이트 되었습니다", HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteComment(
+    public ResponseEntity<void> deleteComment(
             @PathVariable Long id
     ){
         commentService.deleteComment(id);
-        return new ResponseEntity<>("삭제 되었습니다.", HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
