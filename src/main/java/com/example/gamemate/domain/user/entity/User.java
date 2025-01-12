@@ -1,11 +1,14 @@
 package com.example.gamemate.domain.user.entity;
 
+import com.example.gamemate.domain.follow.entity.Follow;
 import com.example.gamemate.global.common.BaseEntity;
 import com.example.gamemate.domain.user.enums.Role;
 import com.example.gamemate.domain.user.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -39,6 +42,12 @@ public class User extends BaseEntity {
     private UserStatus userStatus;
 
     private String refreshToken;
+
+    @OneToMany(mappedBy = "follower")
+    private List<Follow> followingList;
+
+    @OneToMany(mappedBy = "followee")
+    private List<Follow> followerList;
 
     public User(String email, String name, String nickname, String password) {
         this.email = email;

@@ -29,7 +29,7 @@ public class UserService {
                 .orElseThrow(()-> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         if(UserStatus.WITHDRAW.equals(findUser.getUserStatus())) {
-            throw new ApiException(ErrorCode.WITHDRAWN_USER);
+            throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
         }
         return new ProfileResponseDto(findUser);
     }
@@ -76,7 +76,7 @@ public class UserService {
                 .orElseThrow(()-> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         if(UserStatus.WITHDRAW.equals(findUser.getUserStatus())) {
-            throw new ApiException(ErrorCode.WITHDRAWN_USER);
+            throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
         }
 
         findUser.deleteSoftly();

@@ -28,7 +28,7 @@ public class AuthService {
         Optional<User> findUser = userRepository.findByEmail(requestDto.getEmail());
         if(findUser.isPresent()) {
             if(findUser.get().getUserStatus() == UserStatus.WITHDRAW) {
-                throw new ApiException(ErrorCode.WITHDRAWN_USER);
+                throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
             }
             throw new ApiException(ErrorCode.DUPLICATE_EMAIL);
         }
@@ -48,7 +48,7 @@ public class AuthService {
                 .orElseThrow(()-> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         if(findUser.getUserStatus() == UserStatus.WITHDRAW) {
-            throw new ApiException(ErrorCode.WITHDRAWN_USER);
+            throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
         }
 
         if(!passwordEncoder.matches(requestDto.getPassword(), findUser.getPassword())) {
