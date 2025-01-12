@@ -37,7 +37,7 @@ public class CommentController {
      * @return
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<void> updateComment(
+    public ResponseEntity<Void> updateComment(
             @PathVariable Long id,
             @RequestBody CommentRequestDto requestDto
     ){
@@ -46,7 +46,7 @@ public class CommentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<void> deleteComment(
+    public ResponseEntity<Void> deleteComment(
             @PathVariable Long id
     ){
         commentService.deleteComment(id);
