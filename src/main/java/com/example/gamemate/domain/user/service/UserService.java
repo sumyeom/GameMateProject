@@ -1,5 +1,6 @@
 package com.example.gamemate.domain.user.service;
 
+import com.example.gamemate.domain.auth.service.AuthService;
 import com.example.gamemate.domain.user.dto.ProfileResponseDto;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.domain.user.enums.UserStatus;
@@ -18,6 +19,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final AuthService authService;
 
     public ProfileResponseDto findProfile(Long id, String token) {
 
@@ -63,6 +65,26 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(newPassword);
         findUser.updatePassword(encodedPassword);
         userRepository.save(findUser);
+    }
+
+    public void withdrawUser(String token) {
+
+        validateToken(token);
+
+        String email = jwtTokenProvider.getEmailFromToken(token);
+        User findUser = userRepository.findByEmail(email)
+                .orElseThrow(()-> new ApiException(ErrorCode.USER_NOT_FOUND));
+
+        if(UserStatus.WITHDRAW.equals(findUser.getUserStatus())) {
+            throw new ApiException(ErrorCode.WITHDRAWN_USER);
+        }
+
+        findUser.deleteSoftly();
+        findUser.updateUserStatus(UserStatus.WITHDRAW);
+        findUser.removeRefreshToken();
+
+        userRepository.save(findUser);
+
     }
 
     private void validateToken(String token) {

@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -13,20 +14,22 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
+@Slf4j
 @Component
 public class JwtTokenProvider {
 
     @Value("${spring.jwt.secret}")
     private String secretKey;
-    //Todo 변수명 단위 보이도록 바꿀지 고민
-    private final long accessTokenExpirationTime = 1000 * 60 * 60; //60분
+
+    private final long accessTokenExpirationMs = 1000 * 60 * 60; //60분
+    private final long refreshTokenExpirationMs = 1000 * 60 * 60 * 24 * 3; //3일
 
     public String createAccessToken(String email, Role role) {
         Claims claims = Jwts.claims().setSubject(email);
         claims.put("role", role.getName());
 
         Date now = new Date();
-        Date validity = new Date(now.getTime() + accessTokenExpirationTime);
+        Date validity = new Date(now.getTime() + accessTokenExpirationMs);
         Key signingKey = generateSigningKey();
 
         return Jwts.builder()
@@ -37,6 +40,20 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    public String createRefreshToken(String email) {
+        Claims claims = Jwts.claims().setSubject(email);
+
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + refreshTokenExpirationMs);
+        Key signingKey = generateSigningKey();
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(signingKey)
+                .compact();
+    }
 
     public boolean validateToken(String token) {
         try{
@@ -63,7 +80,5 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody();
     }
-
-
 
 }

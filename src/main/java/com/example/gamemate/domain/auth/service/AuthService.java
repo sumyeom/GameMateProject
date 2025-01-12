@@ -1,15 +1,15 @@
 package com.example.gamemate.domain.auth.service;
 
-import com.example.gamemate.domain.auth.dto.EmailLoginRequestDto;
-import com.example.gamemate.domain.auth.dto.EmailLoginResponseDto;
-import com.example.gamemate.domain.auth.dto.SignupRequestDto;
-import com.example.gamemate.domain.auth.dto.SignupResponseDto;
+import com.example.gamemate.domain.auth.dto.*;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.domain.user.enums.UserStatus;
 import com.example.gamemate.domain.user.repository.UserRepository;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import com.example.gamemate.global.provider.JwtTokenProvider;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -42,7 +42,7 @@ public class AuthService {
         return new SignupResponseDto(savedUser);
     }
 
-    public EmailLoginResponseDto emailLogin(EmailLoginRequestDto requestDto) {
+    public EmailLoginResponseDto emailLogin(EmailLoginRequestDto requestDto, HttpServletResponse response) {
 
         User findUser = userRepository.findByEmail(requestDto.getEmail())
                 .orElseThrow(()-> new ApiException(ErrorCode.USER_NOT_FOUND));
@@ -55,10 +55,68 @@ public class AuthService {
             throw new ApiException(ErrorCode.INVALID_PASSWORD);
         }
 
-        String jwtToken = jwtTokenProvider.createAccessToken(findUser.getEmail(), findUser.getRole());
+        String accessToken = jwtTokenProvider.createAccessToken(findUser.getEmail(), findUser.getRole());
+        String refreshToken = jwtTokenProvider.createRefreshToken(findUser.getEmail());
 
-        //Todo 로그인응답dto에서 토큰만 주면 되나?
-        return new EmailLoginResponseDto(jwtToken, findUser.getEmail(), findUser.getNickname());
+        findUser.updateRefreshToken(refreshToken);
+        userRepository.save(findUser);
+
+        addRefreshTokenToCookie(response, refreshToken);
+
+        return new EmailLoginResponseDto(accessToken);
     }
 
+    public TokenRefreshResponseDto refreshAccessToken(String refreshToken) {
+        if(!jwtTokenProvider.validateToken(refreshToken)) {
+            throw new ApiException(ErrorCode.INVALID_TOKEN);
+        }
+
+        String email = jwtTokenProvider.getEmailFromToken(refreshToken);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(()-> new ApiException(ErrorCode.USER_NOT_FOUND));
+
+        if(!refreshToken.equals(user.getRefreshToken())) {
+            throw new ApiException(ErrorCode.INVALID_TOKEN);
+        }
+
+        String newAccessToken = jwtTokenProvider.createAccessToken(email, user.getRole());
+        return new TokenRefreshResponseDto(newAccessToken);
+    }
+
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = extractRefreshTokenFromCookie(request);
+        if(refreshToken != null) {
+            String email = jwtTokenProvider.getEmailFromToken(refreshToken);
+            userRepository.findByEmail(email).ifPresent(user -> {
+                user.removeRefreshToken();
+                userRepository.save(user);
+            });
+
+            Cookie cookie = new Cookie("refresh_token", null);
+            cookie.setMaxAge(0);
+            cookie.setPath("/");
+            response.addCookie(cookie);
+        }
+    }
+
+    private void addRefreshTokenToCookie(HttpServletResponse response, String refreshToken) {
+        Cookie cookie = new Cookie("refresh_token", refreshToken);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true); // HTTPS에서만 전송
+        cookie.setPath("/");
+        cookie.setMaxAge(3 * 24 * 60 * 60); // 3일
+        response.addCookie(cookie);
+    }
+
+    private String extractRefreshTokenFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refresh_token".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
 }

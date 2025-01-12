@@ -38,6 +38,8 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
 
+    private String refreshToken;
+
     public User(String email, String name, String nickname, String password) {
         this.email = email;
         this.name = name;
@@ -46,6 +48,7 @@ public class User extends BaseEntity {
         this.role = Role.USER;
         this.isPremium = false;
         this.userStatus = UserStatus.ACTIVE;
+        this.refreshToken = null;
     }
 
     public void updatePassword(String newPassword) {
@@ -56,8 +59,20 @@ public class User extends BaseEntity {
         this.nickname = newNickname;
     }
 
+    public void updateUserStatus(UserStatus status) {
+        this.userStatus = status;
+    }
+
     public void deleteSoftly() {
         markDeletedAt();
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public void removeRefreshToken() {
+        this.refreshToken = null;
     }
 
 }

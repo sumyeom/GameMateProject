@@ -1,4 +1,4 @@
-package com.example.gamemate.global.config;
+package com.example.gamemate.global.config.auth;
 
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.domain.user.repository.UserRepository;
