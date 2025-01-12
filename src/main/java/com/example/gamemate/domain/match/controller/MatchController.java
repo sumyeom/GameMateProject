@@ -24,7 +24,10 @@ public class MatchController {
      * @return message = "매칭이 요청되었습니다."
      */
     @PostMapping
-    public ResponseEntity<MatchCreateResponseDto> createMatch(@RequestBody MatchCreateRequestDto dto) {
+    public ResponseEntity<MatchCreateResponseDto> createMatch(
+            @RequestBody MatchCreateRequestDto dto
+    ) {
+
         MatchCreateResponseDto matchCreateResponseDto = matchService.createMatch(dto);
         return new ResponseEntity<>(matchCreateResponseDto, HttpStatus.CREATED);
     }
@@ -36,29 +39,48 @@ public class MatchController {
      * @return 204 NO CONTENT
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> updateMatch(@PathVariable Long id, @RequestBody MatchUpdateRequestDto dto) {
+    public ResponseEntity<Void> updateMatch(
+            @PathVariable Long id,
+            @RequestBody MatchUpdateRequestDto dto
+    ) {
+
         matchService.updateMatch(id, dto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
-     * 매칭 전체 조회
+     * 받은 매칭 전체 조회
      * @return matchFindResponseDtoList
      */
-    @GetMapping
-    public ResponseEntity<List<MatchFindResponseDto>> findAllMatch() {
-        List<MatchFindResponseDto> matchFindResponseDtoList = matchService.findAllMatch();
+    @GetMapping("/received-match")
+    public ResponseEntity<List<MatchFindResponseDto>> findAllReceivedMatch() {
+
+        List<MatchFindResponseDto> matchFindResponseDtoList = matchService.findAllReceivedMatch();
         return new ResponseEntity<>(matchFindResponseDtoList, HttpStatus.OK);
     }
 
     /**
-     * 매칭 단일 조회
-     * @param id 매칭 id
-     * @return matchFindResponseDto
+     * 받은 매칭 전체 조회
+     * @return matchFindResponseDtoList
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<MatchFindResponseDto> findMatch(@PathVariable Long id) {
-        MatchFindResponseDto matchFindResponseDto = matchService.findMatch(id);
-        return new ResponseEntity<>(matchFindResponseDto, HttpStatus.OK);
+    @GetMapping("/sent-match")
+    public ResponseEntity<List<MatchFindResponseDto>> findAllSentMatch() {
+
+        List<MatchFindResponseDto> matchFindResponseDtoList = matchService.findAllSentMatch();
+        return new ResponseEntity<>(matchFindResponseDtoList, HttpStatus.OK);
+    }
+
+    /**
+     * 매칭 삭제(취소)
+     * @param id 매칭 id
+     * @return NO_CONTENT
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMatch(
+            @PathVariable Long id
+    ) {
+
+        matchService.deleteMatch(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

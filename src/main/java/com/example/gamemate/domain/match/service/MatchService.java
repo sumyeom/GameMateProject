@@ -21,6 +21,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class MatchService {
+
     private final UserRepository userRepository;
     private final MatchRepository matchRepository;
 
@@ -28,8 +29,11 @@ public class MatchService {
     // todo : 현재 로그인이 구현되어 있지 않아, 로그인 유저를 1번 유저로 설정
     @Transactional
     public MatchCreateResponseDto createMatch(MatchCreateRequestDto dto) {
-        User loginUser = userRepository.findById(1L).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
-        User receiver = userRepository.findById(dto.getUserId()).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+
+        User loginUser = userRepository.findById(1L)
+                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+        User receiver = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         if (receiver.getUserStatus() == UserStatus.WITHDRAW) {
             throw new ApiException(ErrorCode.IS_WITHDRAW_USER);
@@ -49,13 +53,16 @@ public class MatchService {
     // todo : 현재 로그인이 구현되어 있지 않아, receiver 를 1번 유저로 설정. 로그인 구현시 수정필요
     @Transactional
     public void updateMatch(Long id, MatchUpdateRequestDto dto) {
-        Match findMatch = matchRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.MATCH_NOT_FOUND));
+
+        Match findMatch = matchRepository.findById(id)
+                .orElseThrow(() -> new ApiException(ErrorCode.MATCH_NOT_FOUND));
 
         if (findMatch.getStatus() != MatchStatus.PENDING) {
             throw new ApiException(ErrorCode.IS_ALREADY_PROCESSED);
         }
 
-        User loginUser = userRepository.findById(1L).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+        User loginUser = userRepository.findById(1L)
+                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         if (loginUser != findMatch.getReceiver()) {
             throw new ApiException(ErrorCode.FORBIDDEN);
@@ -64,19 +71,32 @@ public class MatchService {
         findMatch.updateStatus(dto.getStatus());
     }
 
-    // 매칭 전체 조회
+    // 보낸 매칭 전체 조회
     // todo : 현재 로그인이 구현 되어 있지 않아, 1번 유저의 목록을 불러오도록 설정. 로그인 구현시 수정 필요
-    public List<MatchFindResponseDto> findAllMatch() {
+    public List<MatchFindResponseDto> findAllReceivedMatch() {
+
         List<Match> matchList = matchRepository.findAllByReceiverId(1L);
 
         return matchList.stream().map(MatchFindResponseDto::toDto).toList();
     }
 
-    // 매칭 단일 조회
-    // todo : 현재 로그인이 구현 되어 있지 않아, 간단하게 구현. 로그인 구현시 수정 필요
-    public MatchFindResponseDto findMatch(Long id) {
-        Match findMatch = matchRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.MATCH_NOT_FOUND));
+    // 받은 매칭 전체 조회
+    // todo : 현재 로그인이 구현 되어 있지 않아, 1번 유저의 목록을 불러오도록 설정. 로그인 구현시 수정 필요
+    public List<MatchFindResponseDto> findAllSentMatch() {
 
-        return MatchFindResponseDto.toDto(findMatch);
+        List<Match> matchList = matchRepository.findAllBySenderId(1L);
+
+        return matchList.stream().map(MatchFindResponseDto::toDto).toList();
+    }
+
+    // 매치 삭제 (취소)
+    // todo : 로그인 구현시 로그인한유저가 sender 일때만 삭제 가능하도록 수정
+    @Transactional
+    public void deleteMatch(Long id) {
+
+        Match findMatch = matchRepository.findById(id)
+                .orElseThrow(() -> new ApiException(ErrorCode.MATCH_NOT_FOUND));
+
+        matchRepository.delete(findMatch);
     }
 }

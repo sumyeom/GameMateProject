@@ -10,6 +10,9 @@ import java.util.List;
 
 @Repository
 public interface MatchRepository extends JpaRepository<Match, Long> {
+
     Boolean existsBySenderAndReceiverAndStatus(User sender, User receiver, MatchStatus status);
     List<Match> findAllByReceiverId(Long receiverId);
+    List<Match> findAllBySenderId(Long senderId);
+
 }
