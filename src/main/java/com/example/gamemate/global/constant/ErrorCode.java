@@ -22,6 +22,7 @@ public enum ErrorCode {
     USER_WITHDRAWN(HttpStatus.NOT_FOUND, "USER_WITHDRAWN", "탈퇴한 유저입니다."),
     FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND,"FOLLOW_NOT_FOUND", "팔로우를 찾을 수 없습니다."),
     BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "BOARD_NOT_FOUND", "게시글을 찾을 수 없습니다."),
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT_NOT_FOUND", "댓글을 찾을 수 없습니다."),
     GAME_NOT_FOUND(HttpStatus.NOT_FOUND,"GAME_NOT_FOUND","게임을 찾을 수 없습니다."),
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND,"REVIEW_NOT_FOUND","리뷰를 찾을 수 없습니다."),
 
