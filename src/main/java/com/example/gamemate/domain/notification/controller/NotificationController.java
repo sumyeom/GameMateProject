@@ -17,8 +17,13 @@ import java.util.List;
 public class NotificationController {
     private final NotificationService notificationService;
 
+    /**
+     * 알림 전체 보기
+     * @return NotificationResponseDtoList
+     */
     @GetMapping
     public ResponseEntity<List<NotificationResponseDto>> findAllNotification() {
+
         List<NotificationResponseDto> NotificationResponseDtoList = notificationService.findAllNotification();
         return new ResponseEntity<>(NotificationResponseDtoList, HttpStatus.OK);
     }

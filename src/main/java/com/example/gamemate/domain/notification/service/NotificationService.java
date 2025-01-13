@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
-    private final UserRepository userRepository;
     private final JavaMailSender javaMailSender;
 
     // 알림 생성
@@ -38,6 +37,7 @@ public class NotificationService {
     // 알림 전체 보기
     // todo 현재 로그인이 구현되어 있지 않아 1번 유저의 알림 목록을 불러오게 설정, 추후 로그인 구현시 로그인한 유저의 id값을 넣도록 변경
     public List<NotificationResponseDto> findAllNotification() {
+
         List<Notification> notificationList = notificationRepository.findAllByUserId(1L);
 
         return notificationList
