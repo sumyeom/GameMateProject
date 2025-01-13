@@ -72,8 +72,8 @@ public class GameController {
             games = gameService.findAllGame(page, size);
         }
 
+        return new ResponseEntity<>(games, HttpStatus.OK);
 
-        return ResponseEntity.ok(games);
     }
 
     /**
@@ -87,7 +87,8 @@ public class GameController {
             @PathVariable Long id) {
 
         GameFindByIdResponseDto gameById = gameService.findGameById(id);
-        return ResponseEntity.ok(gameById);
+        return new ResponseEntity<>(gameById, HttpStatus.OK);
+
     }
 
     /**

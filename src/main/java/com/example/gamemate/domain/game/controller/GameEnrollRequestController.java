@@ -32,7 +32,7 @@ public class GameEnrollRequestController {
             @RequestBody GameEnrollRequestCreateRequestDto requestDto) {
 
         GameEnrollRequestResponseDto responseDto = gameEnrollRequestService.createGameEnrollRequest(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     /**

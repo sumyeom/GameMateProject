@@ -30,13 +30,12 @@ public class ReviewController {
      * @return
      */
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<ReviewCreateResponseDto> createReview(
             @PathVariable Long gameId,
             @RequestBody ReviewCreateRequestDto requestDto) {
 
         ReviewCreateResponseDto responseDto = reviewService.createReview(gameId, requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
     /**
