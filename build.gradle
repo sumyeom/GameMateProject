@@ -46,6 +46,9 @@ dependencies {
     // test
     testImplementation 'org.mockito:mockito-core'
     testImplementation 'org.assertj:assertj-core'
+
+    // mail
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {
