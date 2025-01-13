@@ -2,7 +2,7 @@ package com.example.gamemate.domain.user.entity;
 
 import com.example.gamemate.domain.follow.entity.Follow;
 import com.example.gamemate.global.common.BaseEntity;
-import com.example.gamemate.domain.user.enums.Authority;
+import com.example.gamemate.domain.user.enums.Role;
 import com.example.gamemate.domain.user.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -34,12 +34,14 @@ public class User extends BaseEntity {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    private Authority auth;
+    private Role role;
 
     private Boolean isPremium;
 
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
+
+    private String refreshToken;
 
     @OneToMany(mappedBy = "follower")
     private List<Follow> followingList;
@@ -52,9 +54,10 @@ public class User extends BaseEntity {
         this.name = name;
         this.nickname = nickname;
         this.password = password;
-        this.auth = Authority.USER;
+        this.role = Role.USER;
         this.isPremium = false;
         this.userStatus = UserStatus.ACTIVE;
+        this.refreshToken = null;
     }
 
     public void updatePassword(String newPassword) {
@@ -65,8 +68,20 @@ public class User extends BaseEntity {
         this.nickname = newNickname;
     }
 
+    public void updateUserStatus(UserStatus status) {
+        this.userStatus = status;
+    }
+
     public void deleteSoftly() {
         markDeletedAt();
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public void removeRefreshToken() {
+        this.refreshToken = null;
     }
 
 }

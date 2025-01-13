@@ -34,7 +34,7 @@ public class FollowService {
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         if (followee.getUserStatus() == UserStatus.WITHDRAW) {
-            throw new ApiException(ErrorCode.IS_WITHDRAW_USER);
+            throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
         }
 
         if (followRepository.existsByFollowerAndFollowee(follower, followee)) {
@@ -83,7 +83,7 @@ public class FollowService {
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         if (followee.getUserStatus() == UserStatus.WITHDRAW) {
-            throw new ApiException(ErrorCode.IS_WITHDRAW_USER);
+            throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
         }
 
         if (!followRepository.existsByFollowerAndFollowee(follower, followee)) {
@@ -108,7 +108,7 @@ public class FollowService {
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         if (followee.getUserStatus() == UserStatus.WITHDRAW) {
-            throw new ApiException(ErrorCode.IS_WITHDRAW_USER);
+            throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
         }
 
         List<Follow> followListByFollowee = followRepository.findByFollowee(followee);
@@ -131,7 +131,7 @@ public class FollowService {
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         if (follower.getUserStatus() == UserStatus.WITHDRAW) {
-            throw new ApiException(ErrorCode.IS_WITHDRAW_USER);
+            throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
         }
 
         List<Follow> followListByFollower = followRepository.findByFollower(follower);
