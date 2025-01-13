@@ -27,12 +27,9 @@ public class ReviewService {
     private final UserRepository userRepository;
 
     @Transactional
-    public ReviewCreateResponseDto createReview(String email, Long gameId, ReviewCreateRequestDto requestDto) {
+    public ReviewCreateResponseDto createReview(User loginUser, Long gameId, ReviewCreateRequestDto requestDto) {
 
-        // 이메일로 유저 조회
-        User user = userRepository.findByEmail(email).
-                orElseThrow(() -> new ApiException(USER_NOT_FOUND));
-        Long userId = user.getId();
+        Long userId = loginUser.getId();
 
         // 사용자가 이미 해당 게임에 대한 리뷰를 작성했는지 확인
         boolean hasReview = reviewRepository.existsByUserIdAndGameId(userId, gameId);
@@ -53,12 +50,9 @@ public class ReviewService {
         return new ReviewCreateResponseDto(saveReview);
     }
 
-    public void updateReview(String email, Long gameId, Long id, ReviewUpdateRequestDto requestDto) {
+    public void updateReview(User loginUser, Long gameId, Long id, ReviewUpdateRequestDto requestDto) {
 
-        // 이메일로 유저 조회
-        User user = userRepository.findByEmail(email).
-                orElseThrow(() -> new ApiException(USER_NOT_FOUND));
-        Long userId = user.getId();
+        Long userId = loginUser.getId();
 
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new ApiException(REVIEW_NOT_FOUND));

@@ -45,14 +45,9 @@ public class ReviewController {
     public ResponseEntity<ReviewCreateResponseDto> createReview(
             @PathVariable Long gameId,
             @RequestBody ReviewCreateRequestDto requestDto,
-            @RequestHeader("Authorization") String token) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        // "Bearer " 접두사 제거
-        token = token.substring(7);
-        // 토큰에서 이메일 추출
-        String email = jwtTokenProvider.getEmailFromToken(token);
-
-        ReviewCreateResponseDto responseDto = reviewService.createReview(email, gameId, requestDto);
+        ReviewCreateResponseDto responseDto = reviewService.createReview(userDetails.getUser(), gameId, requestDto);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
@@ -69,14 +64,9 @@ public class ReviewController {
             @PathVariable Long gameId,
             @PathVariable Long id,
             @RequestBody ReviewUpdateRequestDto requestDto,
-            @RequestHeader("Authorization") String token) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        // "Bearer " 접두사 제거
-        token = token.substring(7);
-        // 토큰에서 이메일 추출
-        String email = jwtTokenProvider.getEmailFromToken(token);
-
-        reviewService.updateReview(email, gameId, id, requestDto);
+        reviewService.updateReview(userDetails.getUser(), gameId, id, requestDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -92,8 +82,6 @@ public class ReviewController {
             @PathVariable Long gameId,
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-
-
 
         reviewService.deleteReview(userDetails.getUser(), id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

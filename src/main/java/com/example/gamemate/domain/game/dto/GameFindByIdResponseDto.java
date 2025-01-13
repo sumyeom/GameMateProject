@@ -21,9 +21,10 @@ public class GameFindByIdResponseDto {
     private final String fileName;
     private final String imageUrl;
     private final Page<ReviewFindByAllResponseDto> reviews;
+    private final String nickname;
 //    private final List<ReviewFindByAllResponseDto> reviews;
 
-    public GameFindByIdResponseDto(Game game, Page<ReviewFindByAllResponseDto> reviews) {
+    public GameFindByIdResponseDto(Game game, Page<ReviewFindByAllResponseDto> reviews, String nickname) {
         // game 객체의 필드들을 이용해 DTO의 필드들을 초기화
         this.id = game.getId();
         this.title = game.getTitle();
@@ -37,6 +38,7 @@ public class GameFindByIdResponseDto {
         this.imageUrl = game.getImages().isEmpty() ? null :
                 game.getImages().get(0).getFilePath();
         this.reviews = reviews;
+        this.nickname = nickname;
 //        this.reviews = game.getReviews().stream()
 //                .map(ReviewFindByAllResponseDto::new)
 //                .collect(Collectors.toList());
