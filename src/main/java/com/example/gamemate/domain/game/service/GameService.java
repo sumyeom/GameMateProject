@@ -13,7 +13,6 @@ import com.example.gamemate.global.exception.ApiException;
 import com.example.gamemate.global.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +37,7 @@ public class GameService {
     private final S3Service s3Service;
     private final GameImageRepository gameImageRepository;
 
+    @Transactional
     public GameCreateResponseDto createGame(GameCreateRequestDto gameCreateRequestDto , MultipartFile file) {
 
         // 게임 엔티티 생성

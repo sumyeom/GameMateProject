@@ -2,6 +2,7 @@ package com.example.gamemate.domain.game.entity;
 
 import com.example.gamemate.global.common.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Table(name = "game_enroll_request")
-@AllArgsConstructor
 @NoArgsConstructor
 public class GamaEnrollRequest extends BaseEntity {
     @Id

@@ -32,7 +32,6 @@ public class GameController {
      * @return
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<GameCreateResponseDto> createGame(
             @RequestPart(value = "gameData") String gameDataString,
             @RequestPart(value = "file", required = false) MultipartFile file) {
@@ -46,14 +45,14 @@ public class GameController {
         }
 
         GameCreateResponseDto responseDto = gameService.createGame(requestDto, file);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
     /**
      * 게임 전체 조회
      *
      * @param page
-     * @param szie
+     * @param size
      * @return
      */
     @GetMapping
@@ -92,14 +91,14 @@ public class GameController {
     }
 
     /**
-     * 게임 정보 수정
      *
      * @param id
-     * @param requestDto
+     * @param gameDataString
+     * @param newFile
      * @return
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<GameUpdateResponseDto> updateGame(
+    public ResponseEntity<Void> updateGame(
             @PathVariable Long id,
             @RequestPart(value = "gameData") String gameDataString,
             @RequestPart(value = "file", required = false) MultipartFile newFile) {

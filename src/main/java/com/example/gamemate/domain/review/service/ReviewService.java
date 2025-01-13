@@ -12,6 +12,7 @@ import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.example.gamemate.global.constant.ErrorCode.REVIEW_NOT_FOUND;
 
@@ -22,6 +23,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final GameRepository gameRepository;
 
+    @Transactional
     public ReviewCreateResponseDto createReview(Long gameId, ReviewCreateRequestDto requestDto) {
 
         Game game = gameRepository.findById(gameId)
@@ -37,7 +39,7 @@ public class ReviewService {
         return new ReviewCreateResponseDto(saveReview);
     }
 
-    public ReviewUpdateResponseDto updateReview(Long gameId, Long id, ReviewUpdateRequestDto requestDto) {
+    public void updateReview(Long gameId, Long id, ReviewUpdateRequestDto requestDto) {
 
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new ApiException(REVIEW_NOT_FOUND));
@@ -48,7 +50,6 @@ public class ReviewService {
         );
 
         Review updateReview = reviewRepository.save(review);
-        return new ReviewUpdateResponseDto(updateReview);
     }
 
     public void deleteReview(Long id) {

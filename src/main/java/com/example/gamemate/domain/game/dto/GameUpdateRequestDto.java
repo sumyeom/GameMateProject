@@ -12,7 +12,7 @@ public class GameUpdateRequestDto {
     private String description;
 
 
-    public GameUpdateRequestDto(String title, String genre, String platform , String description) {
+    public GameUpdateRequestDto(String title, String genre, String platform, String description) {
         this.title = title;
         this.genre = genre;
         this.platform = platform;

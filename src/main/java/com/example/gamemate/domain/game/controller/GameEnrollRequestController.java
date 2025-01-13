@@ -44,7 +44,8 @@ public class GameEnrollRequestController {
     public ResponseEntity<Page<GameEnrollRequestResponseDto>> findAllGameEnrollRequest() {
 
         Page<GameEnrollRequestResponseDto> gameEnrollRequestAll = gameEnrollRequestService.findAllGameEnrollRequest();
-        return ResponseEntity.ok(gameEnrollRequestAll);
+        return new ResponseEntity<>(gameEnrollRequestAll, HttpStatus.OK);
+
     }
 
     /**
@@ -58,7 +59,7 @@ public class GameEnrollRequestController {
             @PathVariable Long id) {
 
         GameEnrollRequestResponseDto gameEnrollRequestById = gameEnrollRequestService.findGameEnrollRequestById(id);
-        return ResponseEntity.ok(gameEnrollRequestById);
+        return new ResponseEntity<>(gameEnrollRequestById, HttpStatus.OK);
     }
 
     /**
@@ -69,7 +70,7 @@ public class GameEnrollRequestController {
      * @return
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<GameEnrollRequestResponseDto> updateGameEnroll(
+    public ResponseEntity<Void> updateGameEnroll(
             @PathVariable Long id,
             @RequestBody GameEnrollRequestUpdateRequestDto requestDto) {
 

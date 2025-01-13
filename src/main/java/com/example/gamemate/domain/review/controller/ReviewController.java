@@ -48,7 +48,7 @@ public class ReviewController {
      * @return
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<ReviewUpdateResponseDto> updateReview(
+    public ResponseEntity<Void> updateReview(
             @PathVariable Long gameId,
             @PathVariable Long id,
             @RequestBody ReviewUpdateRequestDto requestDto) {
