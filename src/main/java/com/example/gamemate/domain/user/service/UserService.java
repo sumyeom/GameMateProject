@@ -37,7 +37,7 @@ public class UserService {
         return new ProfileResponseDto(findUser);
     }
 
-    public ProfileResponseDto updateProfile(Long id, String newNickname, String token) {
+    public void updateProfile(Long id, String newNickname, String token) {
 
         validateToken(token);
 
@@ -49,7 +49,6 @@ public class UserService {
         findUser.updateProfile(newNickname);
         User savedUser = userRepository.save(findUser);
 
-        return new ProfileResponseDto(savedUser);
     }
 
     public void updatePassword(Long id, String oldPassword, String newPassword, String token) {
