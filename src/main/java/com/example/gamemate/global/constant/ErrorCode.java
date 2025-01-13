@@ -14,6 +14,7 @@ public enum ErrorCode {
     IS_WITHDRAWN_USER(HttpStatus.BAD_REQUEST, "IS_WITHDRAW_USER", "탈퇴한 회원입니다."),
     DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "DUPLICATE_USER", "이미 사용 중인 이메일입니다."),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "INVALID_PASSWORD", "비밀번호가 일치하지 않습니다."),
+    REVIEW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST,"REVIEW_ALREADY_EXISTS","이미 리뷰를 작성한 회원입니다."),
 
     /* 401 인증 오류 */
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "로그인이 필요합니다."),
