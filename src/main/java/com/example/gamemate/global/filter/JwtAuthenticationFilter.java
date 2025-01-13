@@ -62,55 +62,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private Authentication createAuthentication(String email) {
-            List<GrantedAuthority> authorities = Collections.singletonList(
-                    new SimpleGrantedAuthority("ROLE_USER")
-            );
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-            // UserDetails 객체 생성
-            UserDetails userDetails = User.builder()
-                    .username(email)
-                    .password("") // 토큰 기반 인증이므로 비밀번호는 불필요
-                    .authorities(authorities)
-                    .build();
-
-            // Authentication 객체 생성 및 반환
-            return new UsernamePasswordAuthenticationToken(
-                    userDetails,
-                    "",
-                    authorities
-            );
+        return new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.getAuthorities()
+        );
     }
 
     private String extractToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
-        }
-        return null;
-    }
-
-    private void authenticate(HttpServletRequest request) {
-        log.info("인증 처리");
-
-        String token = this.getTokenFromRequest(request);
-        if(token == null || !jwtTokenProvider.validateToken(token)) {
-            return;
-        }
-
-        String username = this.jwtTokenProvider.getEmailFromToken(token);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-    }
-
-    private String getTokenFromRequest(HttpServletRequest request) {
-        final String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-        final String headerPrefix = "Bearer ";
-
-        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(headerPrefix)) {
-            return bearerToken.substring(headerPrefix.length());
         }
         return null;
     }

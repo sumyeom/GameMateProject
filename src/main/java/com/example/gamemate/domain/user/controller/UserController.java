@@ -36,7 +36,7 @@ public class UserController {
             @Valid @RequestBody ProfileUpdateRequestDto requestDto,
             @RequestHeader("Authorization") String token) {
         String jwtToken = token.substring(7);
-        ProfileResponseDto responseDto = userService.updateProfile(id, requestDto.getNewNickname(), jwtToken);
+        userService.updateProfile(id, requestDto.getNewNickname(), jwtToken);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
