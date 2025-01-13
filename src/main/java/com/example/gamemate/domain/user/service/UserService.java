@@ -11,9 +11,11 @@ import com.example.gamemate.global.provider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
 
     private final UserRepository userRepository;
@@ -21,6 +23,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
 
+    @Transactional(readOnly = true)
     public ProfileResponseDto findProfile(Long id, String token) {
 
         validateToken(token);
