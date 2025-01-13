@@ -16,7 +16,8 @@ public class GameEnrollRequestController {
     private final GameEnrollRequestService gameEnrollRequestService;
 
     @Autowired
-    public GameEnrollRequestController(GameEnrollRequestService gameEnrollRequestService) {
+    public GameEnrollRequestController(
+            GameEnrollRequestService gameEnrollRequestService) {
         this.gameEnrollRequestService = gameEnrollRequestService;
     }
 
@@ -27,7 +28,8 @@ public class GameEnrollRequestController {
      * @return
      */
     @PostMapping
-    public ResponseEntity<GameEnrollRequestResponseDto> CreateGameEnrollRequest(@RequestBody GameEnrollRequestCreateRequestDto requestDto) {
+    public ResponseEntity<GameEnrollRequestResponseDto> CreateGameEnrollRequest(
+            @RequestBody GameEnrollRequestCreateRequestDto requestDto) {
 
         GameEnrollRequestResponseDto responseDto = gameEnrollRequestService.createGameEnrollRequest(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
@@ -52,7 +54,8 @@ public class GameEnrollRequestController {
      * @return
      */
     @GetMapping("/{id}")
-    public ResponseEntity<GameEnrollRequestResponseDto> findGameEnrollRequestById(@PathVariable Long id) {
+    public ResponseEntity<GameEnrollRequestResponseDto> findGameEnrollRequestById(
+            @PathVariable Long id) {
 
         GameEnrollRequestResponseDto gameEnrollRequestById = gameEnrollRequestService.findGameEnrollRequestById(id);
         return ResponseEntity.ok(gameEnrollRequestById);
@@ -66,14 +69,17 @@ public class GameEnrollRequestController {
      * @return
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<GameEnrollRequestResponseDto> updateGameEnroll(@PathVariable Long id, @RequestBody GameEnrollRequestUpdateRequestDto requestDto) {
+    public ResponseEntity<GameEnrollRequestResponseDto> updateGameEnroll(
+            @PathVariable Long id,
+            @RequestBody GameEnrollRequestUpdateRequestDto requestDto) {
 
        gameEnrollRequestService.updateGameEnroll(id, requestDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteGame(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteGame(
+            @PathVariable Long id) {
         gameEnrollRequestService.deleteGame(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

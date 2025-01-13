@@ -18,6 +18,7 @@ public class ReviewController {
 
     @Autowired
     public ReviewController(ReviewService reviewService) {
+
         this.reviewService = reviewService;
     }
 
@@ -30,7 +31,9 @@ public class ReviewController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<ReviewCreateResponseDto> createReview(@PathVariable Long gameId, @RequestBody ReviewCreateRequestDto requestDto) {
+    public ResponseEntity<ReviewCreateResponseDto> createReview(
+            @PathVariable Long gameId,
+            @RequestBody ReviewCreateRequestDto requestDto) {
 
         ReviewCreateResponseDto responseDto = reviewService.createReview(gameId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
@@ -45,7 +48,10 @@ public class ReviewController {
      * @return
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<ReviewUpdateResponseDto> updateReview(@PathVariable Long gameId, @PathVariable Long id, @RequestBody ReviewUpdateRequestDto requestDto) {
+    public ResponseEntity<ReviewUpdateResponseDto> updateReview(
+            @PathVariable Long gameId,
+            @PathVariable Long id,
+            @RequestBody ReviewUpdateRequestDto requestDto) {
 
         reviewService.updateReview(gameId, id, requestDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -59,7 +65,9 @@ public class ReviewController {
      * @return
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReview(@PathVariable Long gameId, @PathVariable Long id) {
+    public ResponseEntity<Void> deleteReview(
+            @PathVariable Long gameId,
+            @PathVariable Long id) {
 
         reviewService.deleteReview(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

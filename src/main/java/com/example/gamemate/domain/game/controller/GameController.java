@@ -33,8 +33,9 @@ public class GameController {
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<GameCreateResponseDto> createGame(@RequestPart(value = "gameData") String gameDataString,
-                                                            @RequestPart(value = "file", required = false) MultipartFile file) {
+    public ResponseEntity<GameCreateResponseDto> createGame(
+            @RequestPart(value = "gameData") String gameDataString,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
 
         ObjectMapper mapper = new ObjectMapper();
         GameCreateRequestDto requestDto;
@@ -56,11 +57,12 @@ public class GameController {
      * @return
      */
     @GetMapping
-    public ResponseEntity<Page<GameFindAllResponseDto>> findAllGame(@RequestParam(required = false) String keyword,
-                                                                    @RequestParam(required = false) String genre,
-                                                                    @RequestParam(required = false) String platform,
-                                                                    @RequestParam(defaultValue = "0") int page,
-                                                                    @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<Page<GameFindAllResponseDto>> findAllGame(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String genre,
+            @RequestParam(required = false) String platform,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
         log.info("Search parameters - keyword: {}, genre: {}, platform: {}, page: {}, size: {}",
                 keyword, genre, platform, page, size);
@@ -82,7 +84,8 @@ public class GameController {
      * @return
      */
     @GetMapping("/{id}")
-    public ResponseEntity<GameFindByIdResponseDto> findGameById(@PathVariable Long id) {
+    public ResponseEntity<GameFindByIdResponseDto> findGameById(
+            @PathVariable Long id) {
 
         GameFindByIdResponseDto gameById = gameService.findGameById(id);
         return ResponseEntity.ok(gameById);
@@ -96,9 +99,10 @@ public class GameController {
      * @return
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<GameUpdateResponseDto> updateGame(@PathVariable Long id,
-                                                            @RequestPart(value = "gameData") String gameDataString,
-                                                            @RequestPart(value = "file", required = false) MultipartFile newFile) {
+    public ResponseEntity<GameUpdateResponseDto> updateGame(
+            @PathVariable Long id,
+            @RequestPart(value = "gameData") String gameDataString,
+            @RequestPart(value = "file", required = false) MultipartFile newFile) {
 
         ObjectMapper mapper = new ObjectMapper();
         GameUpdateRequestDto requestDto;
@@ -113,7 +117,8 @@ public class GameController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteGame(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteGame(
+            @PathVariable Long id) {
 
         gameService.deleteGame(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
