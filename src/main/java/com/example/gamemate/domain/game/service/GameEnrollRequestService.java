@@ -8,6 +8,8 @@ import com.example.gamemate.domain.game.entity.GamaEnrollRequest;
 import com.example.gamemate.domain.game.entity.Game;
 import com.example.gamemate.domain.game.repository.GameEnrollRequestRepository;
 import com.example.gamemate.domain.game.repository.GameRepository;
+import com.example.gamemate.global.constant.ErrorCode;
+import com.example.gamemate.global.exception.ApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,7 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.ws.rs.NotFoundException;
+
+import static com.example.gamemate.global.constant.ErrorCode.GAME_NOT_FOUND;
 
 
 @Service
@@ -55,7 +58,7 @@ public class GameEnrollRequestService {
     public GameEnrollRequestResponseDto findGameEnrollRequestById(Long id) {
 
         GamaEnrollRequest gamaEnrollRequest = gameEnrollRequestRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("게임이 존재하지 않습니다."));
+                .orElseThrow(() -> new ApiException(GAME_NOT_FOUND));
 
         return new GameEnrollRequestResponseDto(gamaEnrollRequest);
     }
@@ -63,7 +66,7 @@ public class GameEnrollRequestService {
     @Transactional
     public void updateGameEnroll(Long id, GameEnrollRequestUpdateRequestDto requestDto) {
         GamaEnrollRequest gamaEnrollRequest = gameEnrollRequestRepository
-                .findById(id).orElseThrow(() -> new NotFoundException("게임이 존해 하지 않습니다."));
+                .findById(id).orElseThrow(() -> new ApiException(GAME_NOT_FOUND));
 
         gamaEnrollRequest.updateGameEnroll(
                 requestDto.getTitle(),
@@ -88,7 +91,8 @@ public class GameEnrollRequestService {
     }
 
     public void deleteGame(Long id) {
-        GamaEnrollRequest gamaEnrollRequest = gameEnrollRequestRepository.findById(id).orElseThrow(() -> new NotFoundException("게임을 찾을 없습니다."));
+        GamaEnrollRequest gamaEnrollRequest = gameEnrollRequestRepository
+                .findById(id).orElseThrow(() -> new ApiException(GAME_NOT_FOUND));
         gameEnrollRequestRepository.delete(gamaEnrollRequest);
     }
 

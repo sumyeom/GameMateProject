@@ -1,8 +1,6 @@
-package com.example.gamemate.domain.game.service;
+package com.example.gamemate.global.s3;
 
-import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.UUID;
 
 @Service

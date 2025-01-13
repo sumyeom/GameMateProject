@@ -26,7 +26,8 @@ public class GameController {
     }
 
     /**
-     * @param requestDto
+     *
+     * @param gameDataString
      * @param file
      * @return
      */
@@ -95,9 +96,19 @@ public class GameController {
      * @return
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<GameUpdateResponseDto> updateGame(@PathVariable Long id, @RequestBody GameUpdateRequestDto requestDto) {
+    public ResponseEntity<GameUpdateResponseDto> updateGame(@PathVariable Long id,
+                                                            @RequestPart(value = "gameData") String gameDataString,
+                                                            @RequestPart(value = "file", required = false) MultipartFile newFile) {
 
-        gameService.updateGame(id, requestDto);
+        ObjectMapper mapper = new ObjectMapper();
+        GameUpdateRequestDto requestDto;
+        try {
+            requestDto = mapper.readValue(gameDataString, GameUpdateRequestDto.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Invalid JSON format", e);
+        }
+
+        gameService.updateGame(id, requestDto, newFile);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

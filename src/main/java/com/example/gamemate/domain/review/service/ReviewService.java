@@ -8,9 +8,12 @@ import com.example.gamemate.domain.review.dto.ReviewUpdateRequestDto;
 import com.example.gamemate.domain.review.dto.ReviewUpdateResponseDto;
 import com.example.gamemate.domain.review.entity.Review;
 import com.example.gamemate.domain.review.repository.ReviewRepository;
+import com.example.gamemate.global.constant.ErrorCode;
+import com.example.gamemate.global.exception.ApiException;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.NotFoundException;
+import static com.example.gamemate.global.constant.ErrorCode.REVIEW_NOT_FOUND;
+
 
 @Service
 public class ReviewService {
@@ -26,7 +29,7 @@ public class ReviewService {
     public ReviewCreateResponseDto createReview(Long gameId, ReviewCreateRequestDto requestDto) {
 
         Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new NotFoundException("Game not found"));
+                .orElseThrow(() -> new ApiException(REVIEW_NOT_FOUND));
 
         Review review = new Review(
                 requestDto.getContent(),
@@ -41,7 +44,7 @@ public class ReviewService {
     public ReviewUpdateResponseDto updateReview(Long gameId, Long id, ReviewUpdateRequestDto requestDto) {
 
         Review review = reviewRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("리뷰가 존재하지 않습니다."));
+                .orElseThrow(() -> new ApiException(REVIEW_NOT_FOUND));
 
         review.updateReview(
                 requestDto.getContent(),
@@ -55,7 +58,7 @@ public class ReviewService {
     public void deleteReview(Long id) {
 
         Review review = reviewRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("리뷰가 존재하지 않습니다."));
+                .orElseThrow(() -> new ApiException(REVIEW_NOT_FOUND));
 
         reviewRepository.delete(review);
     }
