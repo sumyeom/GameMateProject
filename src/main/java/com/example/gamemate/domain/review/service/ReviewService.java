@@ -10,21 +10,17 @@ import com.example.gamemate.domain.review.entity.Review;
 import com.example.gamemate.domain.review.repository.ReviewRepository;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import static com.example.gamemate.global.constant.ErrorCode.REVIEW_NOT_FOUND;
 
 
 @Service
+@RequiredArgsConstructor
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final GameRepository gameRepository;
-
-    public ReviewService(ReviewRepository reviewRepository,
-                         GameRepository gameRepository) {
-        this.reviewRepository = reviewRepository;
-        this.gameRepository = gameRepository;
-    }
 
     public ReviewCreateResponseDto createReview(Long gameId, ReviewCreateRequestDto requestDto) {
 

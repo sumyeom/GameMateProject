@@ -10,6 +10,7 @@ import com.example.gamemate.domain.game.repository.GameEnrollRequestRepository;
 import com.example.gamemate.domain.game.repository.GameRepository;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,17 +25,10 @@ import static com.example.gamemate.global.constant.ErrorCode.GAME_NOT_FOUND;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class GameEnrollRequestService {
     private final GameRepository gameRepository;
     private final GameEnrollRequestRepository gameEnrollRequestRepository;
-
-    @Autowired
-    public GameEnrollRequestService(GameRepository gameRepository , GameEnrollRequestRepository gameEnrollRequestRepository) {
-
-        this.gameRepository = gameRepository;
-
-        this.gameEnrollRequestRepository = gameEnrollRequestRepository;
-    }
 
     public GameEnrollRequestResponseDto createGameEnrollRequest(GameEnrollRequestCreateRequestDto requestDto) {
         GamaEnrollRequest gameEnrollRequest = new GamaEnrollRequest(

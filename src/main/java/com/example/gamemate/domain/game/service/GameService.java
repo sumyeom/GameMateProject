@@ -11,6 +11,7 @@ import com.example.gamemate.domain.review.entity.Review;
 import com.example.gamemate.domain.review.repository.ReviewRepository;
 import com.example.gamemate.global.exception.ApiException;
 import com.example.gamemate.global.s3.S3Service;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,20 +31,12 @@ import static com.example.gamemate.global.constant.ErrorCode.GAME_NOT_FOUND;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class GameService {
     private final GameRepository gameRepository;
     private final ReviewRepository reviewRepository;
     private final S3Service s3Service;
     private final GameImageRepository gameImageRepository;
-
-    @Autowired
-    public GameService(GameRepository gameRepository, ReviewRepository reviewRepository, S3Service s3Service,GameImageRepository gameImageRepository) {
-
-        this.gameRepository = gameRepository;
-        this.reviewRepository = reviewRepository;
-        this.s3Service = s3Service;
-        this.gameImageRepository=gameImageRepository;
-    }
 
     public GameCreateResponseDto createGame(GameCreateRequestDto gameCreateRequestDto , MultipartFile file) {
 
