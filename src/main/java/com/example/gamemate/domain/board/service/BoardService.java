@@ -11,6 +11,8 @@ import com.example.gamemate.domain.board.repository.BoardRepository;
 import com.example.gamemate.domain.comment.dto.CommentFindResponseDto;
 import com.example.gamemate.domain.comment.entity.Comment;
 import com.example.gamemate.domain.comment.repository.CommentRepository;
+import com.example.gamemate.domain.user.entity.User;
+import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.example.gamemate.global.constant.ErrorCode.BOARD_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -38,15 +39,18 @@ public class BoardService {
      * @return
      */
     @Transactional
-    public BoardResponseDto createBoard(BoardRequestDto dto) {
+    public BoardResponseDto createBoard(User loginUser, BoardRequestDto dto) {
         // 게시글 생성
-        Board newBoard = new Board(dto.getCategory(),dto.getTitle(),dto.getContent());
+        Board newBoard = new Board(dto.getCategory(),dto.getTitle(),dto.getContent(), loginUser);
         Board createdBoard = boardRepository.save(newBoard);
         return new BoardResponseDto(
                 createdBoard.getBoardId(),
                 createdBoard.getCategory(),
                 createdBoard.getTitle(),
-                createdBoard.getContent()
+                createdBoard.getContent(),
+                createdBoard.getUser().getNickname(),
+                createdBoard.getCreatedAt(),
+                createdBoard.getModifiedAt()
         );
     }
 
@@ -85,7 +89,7 @@ public class BoardService {
         Pageable pageable = PageRequest.of(page, ListSize.LIST_SIZE.getSize(), Sort.by(Sort.Order.asc("createdAt")));
         // 게시글 조회
         Board findBoard = boardRepository.findById(id)
-                .orElseThrow(()->new ApiException(BOARD_NOT_FOUND));
+                .orElseThrow(()->new ApiException(ErrorCode.BOARD_NOT_FOUND));
 
         // 댓글 조회
         Page<Comment> comments = commentRepository.findByBoard(findBoard,pageable);
@@ -117,13 +121,18 @@ public class BoardService {
      * @return
      */
     @Transactional
-    public void updateBoard(Long id, BoardRequestDto dto) {
+    public void updateBoard(User loginUser, Long id, BoardRequestDto dto) {
         // 게시글 조회
         Board findBoard = boardRepository.findById(id)
-                .orElseThrow(()->new ApiException(BOARD_NOT_FOUND));
+                .orElseThrow(()->new ApiException(ErrorCode.BOARD_NOT_FOUND));
+
+        // 게시글 작성자와 로그인한 사용자 확인
+        if(!findBoard.getUser().getId().equals(loginUser.getId())) {
+            throw new ApiException(ErrorCode.FORBIDDEN);
+        }
 
         findBoard.updateBoard(dto.getCategory(),dto.getTitle(),dto.getContent());
-        Board updatedBoard = boardRepository.save(findBoard);
+        boardRepository.save(findBoard);
     }
 
     /**
@@ -131,10 +140,15 @@ public class BoardService {
      * @param id
      */
     @Transactional
-    public void deleteBoard(Long id) {
+    public void deleteBoard(User loginUser, Long id) {
         //게시글 조회
         Board findBoard = boardRepository.findById(id)
-                .orElseThrow(()->new ApiException(BOARD_NOT_FOUND));
+                .orElseThrow(()->new ApiException(ErrorCode.BOARD_NOT_FOUND));
+
+        // 게시글 작성자와 로그인한 사용자 확인
+        if(!findBoard.getUser().getId().equals(loginUser.getId())) {
+            throw new ApiException(ErrorCode.FORBIDDEN);
+        }
 
         boardRepository.delete(findBoard);
     }
