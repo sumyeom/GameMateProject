@@ -1,9 +1,6 @@
 package com.example.gamemate.domain.review.controller;
 
-import com.example.gamemate.domain.review.dto.ReviewCreateRequestDto;
-import com.example.gamemate.domain.review.dto.ReviewCreateResponseDto;
-import com.example.gamemate.domain.review.dto.ReviewUpdateRequestDto;
-import com.example.gamemate.domain.review.dto.ReviewUpdateResponseDto;
+import com.example.gamemate.domain.review.dto.*;
 import com.example.gamemate.domain.review.service.ReviewService;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.domain.user.repository.UserRepository;
@@ -11,12 +8,18 @@ import com.example.gamemate.global.config.auth.CustomUserDetails;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import com.example.gamemate.global.provider.JwtTokenProvider;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import static com.example.gamemate.global.constant.ErrorCode.USER_NOT_FOUND;
@@ -28,62 +31,71 @@ import static com.example.gamemate.global.constant.ErrorCode.USER_NOT_FOUND;
 public class ReviewController {
 
     private final ReviewService reviewService;
-    private final JwtTokenProvider jwtTokenProvider;
 
 
     /**
-     * 게임에 대한 리뷰를 등록합니다.
+     * 리뷰등록
      *
-     * @param gameId     리뷰를 등록할 게임의 고유 식별자
-     * @param requestDto 리뷰 정보를 담고 있는 DTO 객체
-     * @param token      사용자 인증 토큰
-     * @return 등록된 리뷰의 정보
-     * @throws UnauthorizedException 유효하지 않은 토큰일 경우
-     * @throws GameNotFoundException 해당 gameId의 게임이 존재하지 않을 경우
+     * @param gameId
+     * @param requestDto
+     * @param customUserDetails
+     * @return
      */
     @PostMapping
     public ResponseEntity<ReviewCreateResponseDto> createReview(
             @PathVariable Long gameId,
-            @RequestBody ReviewCreateRequestDto requestDto,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
+            @Valid @RequestBody ReviewCreateRequestDto requestDto,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        ReviewCreateResponseDto responseDto = reviewService.createReview(userDetails.getUser(), gameId, requestDto);
+        ReviewCreateResponseDto responseDto = reviewService.createReview(customUserDetails.getUser(), gameId, requestDto);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
     /**
-     * 리뷰 수정
+     * 리뷰수정
      *
      * @param gameId
      * @param id
      * @param requestDto
+     * @param customUserDetails
      * @return
      */
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateReview(
             @PathVariable Long gameId,
             @PathVariable Long id,
-            @RequestBody ReviewUpdateRequestDto requestDto,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
+            @Valid @RequestBody ReviewUpdateRequestDto requestDto,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        reviewService.updateReview(userDetails.getUser(), gameId, id, requestDto);
+        reviewService.updateReview(customUserDetails.getUser(), gameId, id, requestDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
-     * 리뷰 삭제
+     * 리뷰삭제
      *
      * @param gameId
      * @param id
+     * @param customUserDetails
      * @return
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReview(
             @PathVariable Long gameId,
             @PathVariable Long id,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        reviewService.deleteReview(userDetails.getUser(), id);
+        reviewService.deleteReview(customUserDetails.getUser(), id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<ReviewFindByAllResponseDto>> ReviewFindAllByGameId(
+            @PathVariable Long gameId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+
+        Page<ReviewFindByAllResponseDto> responseDto = reviewService.ReviewFindAllByGameId(gameId, customUserDetails.getUser());
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+
     }
 }

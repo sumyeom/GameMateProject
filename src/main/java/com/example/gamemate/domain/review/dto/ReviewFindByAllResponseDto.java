@@ -20,7 +20,7 @@ public class ReviewFindByAllResponseDto {
         this.content = review.getContent();
         this.star = review.getStar();
         this.gameId = review.getGame().getId();
-        this.userId = review.getUserId();
+        this.userId = review.getUser().getId();
         this.createdAt = review.getCreatedAt();
         this.nickName = nickName;
     }

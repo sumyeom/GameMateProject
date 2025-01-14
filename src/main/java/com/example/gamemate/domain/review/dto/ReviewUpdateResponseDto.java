@@ -19,7 +19,7 @@ public class ReviewUpdateResponseDto {
         this.content = review.getContent();
         this.star = review.getStar();
         this.gameId = review.getGame().getId();
-        this.userId = review.getUserId();
+        this.userId = review.getUser().getId();
         this.modifiedAt = review.getModifiedAt();
     }
 }
