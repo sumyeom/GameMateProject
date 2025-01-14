@@ -2,6 +2,7 @@ package com.example.gamemate.domain.game.controller;
 
 import com.example.gamemate.domain.game.dto.*;
 import com.example.gamemate.domain.game.service.GameService;
+import com.example.gamemate.global.config.auth.CustomUserDetails;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -84,9 +86,10 @@ public class GameController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<GameFindByIdResponseDto> findGameById(
-            @PathVariable Long id) {
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        GameFindByIdResponseDto gameById = gameService.findGameById(id);
+        GameFindByIdResponseDto gameById = gameService.findGameById(userDetails.getUser(), id);
         return new ResponseEntity<>(gameById, HttpStatus.OK);
 
     }

@@ -9,6 +9,7 @@ import com.example.gamemate.domain.game.repository.GameRepository;
 import com.example.gamemate.domain.review.dto.ReviewFindByAllResponseDto;
 import com.example.gamemate.domain.review.entity.Review;
 import com.example.gamemate.domain.review.repository.ReviewRepository;
+import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.global.exception.ApiException;
 import com.example.gamemate.global.s3.S3Service;
 import lombok.RequiredArgsConstructor;
@@ -74,7 +75,9 @@ public class GameService {
     }
 
     @Transactional
-    public GameFindByIdResponseDto findGameById(Long id) {
+    public GameFindByIdResponseDto findGameById(User longinUser, Long id) {
+
+        String nickName = longinUser.getNickname();
 
         Game game = gameRepository.findGameById(id)
                 .orElseThrow(() -> new ApiException(GAME_NOT_FOUND));
@@ -82,12 +85,12 @@ public class GameService {
         Pageable pageable = PageRequest.of(0, 5, Sort.by("createdAt").descending());
         Page<Review> reviewPage = reviewRepository.findAllByGame(game, pageable);
 
-        // Review를 ReviewFindByAllResponseDto로 변환
+        // Review를 ReviewFindByAllResponseDto로 변환하면서 닉네임 추가
         Page<ReviewFindByAllResponseDto> reviews = reviewPage.map(review ->
-                new ReviewFindByAllResponseDto(review)
+                new ReviewFindByAllResponseDto(review, longinUser.getNickname())
         );
 
-        return new GameFindByIdResponseDto(game, reviews);
+        return new GameFindByIdResponseDto(game, reviews, nickName);
     }
 
     @Transactional
