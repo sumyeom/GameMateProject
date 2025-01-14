@@ -5,12 +5,14 @@ import com.example.gamemate.domain.user.dto.PasswordUpdateRequestDto;
 import com.example.gamemate.domain.user.dto.ProfileResponseDto;
 import com.example.gamemate.domain.user.dto.ProfileUpdateRequestDto;
 import com.example.gamemate.domain.user.service.UserService;
+import com.example.gamemate.global.config.auth.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,10 +25,9 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<ProfileResponseDto> findProfile(
             @PathVariable Long id,
-            @RequestHeader("Authorization") String token) {
-
-        String jwtToken = token.substring(7);
-        ProfileResponseDto responseDto = userService.findProfile(id, jwtToken);
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        ProfileResponseDto responseDto = userService.findProfile(id, customUserDetails.getUser());
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
@@ -34,9 +35,9 @@ public class UserController {
     public ResponseEntity<Void> updateProfile(
             @PathVariable Long id,
             @Valid @RequestBody ProfileUpdateRequestDto requestDto,
-            @RequestHeader("Authorization") String token) {
-        String jwtToken = token.substring(7);
-        userService.updateProfile(id, requestDto.getNewNickname(), jwtToken);
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        userService.updateProfile(id, requestDto.getNewNickname(), customUserDetails.getUser());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -44,25 +45,21 @@ public class UserController {
     public ResponseEntity<Void> updatePassword(
             @PathVariable Long id,
             @Valid @RequestBody PasswordUpdateRequestDto requestDto,
-            @RequestHeader("Authorization") String token) {
-
-        String jwtToken = token.substring(7);
-        userService.updatePassword(id, requestDto.getOldPassword(), requestDto.getNewPassword(), jwtToken);
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        userService.updatePassword(id, requestDto.getOldPassword(), requestDto.getNewPassword(), customUserDetails.getUser());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/withdraw")
     public ResponseEntity<Void> withdraw(
-            @RequestHeader("Authorization") String token,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        String jwtToken = token.substring(7);
-        userService.withdrawUser(jwtToken);
-
+        userService.withdrawUser(customUserDetails.getUser());
         authService.logout(request, response);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
 }
