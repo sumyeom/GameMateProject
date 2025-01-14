@@ -44,10 +44,10 @@ public class MatchController {
     public ResponseEntity<Void> updateMatch(
             @PathVariable Long id,
             @RequestBody MatchUpdateRequestDto dto,
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
 
-        matchService.updateMatch(id, dto, userDetails.getUser());
+        matchService.updateMatch(id, dto,customUserDetails.getUser());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -57,10 +57,10 @@ public class MatchController {
      */
     @GetMapping("/received-match")
     public ResponseEntity<List<MatchResponseDto>> findAllReceivedMatch(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
 
-        List<MatchResponseDto> matchResponseDtoList = matchService.findAllReceivedMatch(userDetails.getUser());
+        List<MatchResponseDto> matchResponseDtoList = matchService.findAllReceivedMatch(customUserDetails.getUser());
         return new ResponseEntity<>(matchResponseDtoList, HttpStatus.OK);
     }
 
@@ -70,10 +70,10 @@ public class MatchController {
      */
     @GetMapping("/sent-match")
     public ResponseEntity<List<MatchResponseDto>> findAllSentMatch(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
 
-        List<MatchResponseDto> matchResponseDtoList = matchService.findAllSentMatch(userDetails.getUser());
+        List<MatchResponseDto> matchResponseDtoList = matchService.findAllSentMatch(customUserDetails.getUser());
         return new ResponseEntity<>(matchResponseDtoList, HttpStatus.OK);
     }
 
@@ -85,10 +85,10 @@ public class MatchController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMatch(
             @PathVariable Long id,
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
 
-        matchService.deleteMatch(id, userDetails.getUser());
+        matchService.deleteMatch(id, customUserDetails.getUser());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
