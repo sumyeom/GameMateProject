@@ -14,8 +14,9 @@ public class ReviewFindByAllResponseDto {
     private  Long userId;
     private  LocalDateTime createdAt;
     private String nickName;
+    private Long likeCount;
 
-    public ReviewFindByAllResponseDto(Review review, String nickName) {
+    public ReviewFindByAllResponseDto(Review review, String nickName, Long likeCount) {
         this.id = review.getId();
         this.content = review.getContent();
         this.star = review.getStar();
@@ -23,5 +24,6 @@ public class ReviewFindByAllResponseDto {
         this.userId = review.getUser().getId();
         this.createdAt = review.getCreatedAt();
         this.nickName = nickName;
+        this.likeCount = likeCount;
     }
 }

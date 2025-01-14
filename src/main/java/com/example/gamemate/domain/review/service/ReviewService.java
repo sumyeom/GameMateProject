@@ -2,6 +2,7 @@ package com.example.gamemate.domain.review.service;
 
 import com.example.gamemate.domain.game.entity.Game;
 import com.example.gamemate.domain.game.repository.GameRepository;
+import com.example.gamemate.domain.like.repository.ReviewLikeRepository;
 import com.example.gamemate.domain.review.dto.ReviewCreateRequestDto;
 import com.example.gamemate.domain.review.dto.ReviewCreateResponseDto;
 import com.example.gamemate.domain.review.dto.ReviewFindByAllResponseDto;
@@ -28,6 +29,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
+    private final ReviewLikeRepository reviewLikeRepository;
 
     @Transactional
     public ReviewCreateResponseDto createReview(User loginUser, Long gameId, ReviewCreateRequestDto requestDto) {
@@ -101,11 +103,15 @@ public class ReviewService {
         Page<Review> reviewPage = reviewRepository.findAllByGame(game, pageable);
 
         // Review를 ReviewFindByAllResponseDto로 변환하면서 닉네임 추가
-        Page<ReviewFindByAllResponseDto> reviews = reviewPage.map(review ->
-                new ReviewFindByAllResponseDto(review, loginUser.getNickname())
-        );
-
-        return reviewPage.map(review -> new ReviewFindByAllResponseDto(review, loginUser.getNickname()));
+//        Page<ReviewFindByAllResponseDto> reviews = reviewPage.map(review ->
+//                new ReviewFindByAllResponseDto(review, loginUser.getNickname())
+//        );
+//
+//        return reviewPage.map(review -> new ReviewFindByAllResponseDto(review, loginUser.getNickname()));
+        return reviewPage.map(review -> {
+            Long likeCount = reviewLikeRepository.countByReviewIdAndStatus(review.getId(), 1);
+            return new ReviewFindByAllResponseDto(review, loginUser.getNickname(), likeCount);
+        });
     }
 
 
