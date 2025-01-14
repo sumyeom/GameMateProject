@@ -1,6 +1,7 @@
 package com.example.gamemate.global.filter;
 
 import ch.qos.logback.core.util.StringUtil;
+import com.example.gamemate.global.config.auth.CustomUserDetails;
 import com.example.gamemate.global.provider.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -62,7 +63,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private Authentication createAuthentication(String email) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(email);
 
         return new UsernamePasswordAuthenticationToken(
                 userDetails,

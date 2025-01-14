@@ -2,12 +2,14 @@ package com.example.gamemate.domain.auth.controller;
 
 import com.example.gamemate.domain.auth.dto.*;
 import com.example.gamemate.domain.auth.service.AuthService;
+import com.example.gamemate.global.config.auth.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -35,10 +37,11 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        authService.logout(request, response);
+        authService.logout(customUserDetails.getUser(), request, response);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

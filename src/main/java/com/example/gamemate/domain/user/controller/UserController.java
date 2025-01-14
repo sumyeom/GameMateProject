@@ -58,7 +58,7 @@ public class UserController {
             HttpServletResponse response
     ) {
         userService.withdrawUser(customUserDetails.getUser());
-        authService.logout(request, response);
+        authService.logout(customUserDetails.getUser(), request, response);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

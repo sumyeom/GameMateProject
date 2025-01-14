@@ -75,15 +75,11 @@ public class AuthService {
         return new TokenRefreshResponseDto(newAccessToken);
     }
 
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
+    public void logout(User user, HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = tokenService.extractRefreshTokenFromCookie(request);
         if(refreshToken != null) {
-            String email = jwtTokenProvider.getEmailFromToken(refreshToken);
-            userRepository.findByEmail(email).ifPresent(user -> {
-                user.removeRefreshToken();
-                userRepository.save(user);
-            });
-
+            user.removeRefreshToken();
+            userRepository.save(user);
             tokenService.removeRefreshTokenCookie(response);
         }
     }
