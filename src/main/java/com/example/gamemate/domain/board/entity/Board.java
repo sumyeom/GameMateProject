@@ -33,10 +33,11 @@ public class Board extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Board(BoardCategory category, String title, String content) {
+    public Board(BoardCategory category, String title, String content, User user) {
         this.category = category;
         this.title = title;
         this.content = content;
+        this.user = user;
     }
 
     public void updateBoard(BoardCategory category, String title, String content) {
