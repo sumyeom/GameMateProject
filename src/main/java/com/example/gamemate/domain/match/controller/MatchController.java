@@ -1,10 +1,9 @@
 package com.example.gamemate.domain.match.controller;
 
-import com.example.gamemate.domain.match.dto.MatchFindResponseDto;
+import com.example.gamemate.domain.match.dto.MatchResponseDto;
 import com.example.gamemate.domain.match.dto.MatchUpdateRequestDto;
 import com.example.gamemate.domain.match.service.MatchService;
 import com.example.gamemate.domain.match.dto.MatchCreateRequestDto;
-import com.example.gamemate.domain.match.dto.MatchCreateResponseDto;
 import com.example.gamemate.global.config.auth.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,12 +25,12 @@ public class MatchController {
      * @return message = "매칭이 요청되었습니다."
      */
     @PostMapping
-    public ResponseEntity<MatchCreateResponseDto> createMatch(
+    public ResponseEntity<MatchResponseDto> createMatch(
             @RequestBody MatchCreateRequestDto dto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
 
-        MatchCreateResponseDto matchCreateResponseDto = matchService.createMatch(dto, customUserDetails.getUser());
+        MatchResponseDto matchCreateResponseDto = matchService.createMatch(dto, customUserDetails.getUser());
         return new ResponseEntity<>(matchCreateResponseDto, HttpStatus.CREATED);
     }
 
@@ -57,12 +56,12 @@ public class MatchController {
      * @return matchFindResponseDtoList
      */
     @GetMapping("/received-match")
-    public ResponseEntity<List<MatchFindResponseDto>> findAllReceivedMatch(
+    public ResponseEntity<List<MatchResponseDto>> findAllReceivedMatch(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
 
-        List<MatchFindResponseDto> matchFindResponseDtoList = matchService.findAllReceivedMatch(userDetails.getUser());
-        return new ResponseEntity<>(matchFindResponseDtoList, HttpStatus.OK);
+        List<MatchResponseDto> matchResponseDtoList = matchService.findAllReceivedMatch(userDetails.getUser());
+        return new ResponseEntity<>(matchResponseDtoList, HttpStatus.OK);
     }
 
     /**
@@ -70,12 +69,12 @@ public class MatchController {
      * @return matchFindResponseDtoList
      */
     @GetMapping("/sent-match")
-    public ResponseEntity<List<MatchFindResponseDto>> findAllSentMatch(
+    public ResponseEntity<List<MatchResponseDto>> findAllSentMatch(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
 
-        List<MatchFindResponseDto> matchFindResponseDtoList = matchService.findAllSentMatch(userDetails.getUser());
-        return new ResponseEntity<>(matchFindResponseDtoList, HttpStatus.OK);
+        List<MatchResponseDto> matchResponseDtoList = matchService.findAllSentMatch(userDetails.getUser());
+        return new ResponseEntity<>(matchResponseDtoList, HttpStatus.OK);
     }
 
     /**

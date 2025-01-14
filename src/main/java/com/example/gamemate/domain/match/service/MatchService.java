@@ -1,11 +1,10 @@
 package com.example.gamemate.domain.match.service;
 
-import com.example.gamemate.domain.match.dto.MatchFindResponseDto;
+import com.example.gamemate.domain.match.dto.MatchResponseDto;
 import com.example.gamemate.domain.match.dto.MatchUpdateRequestDto;
 import com.example.gamemate.domain.match.entity.Match;
 import com.example.gamemate.domain.match.enums.MatchStatus;
 import com.example.gamemate.domain.match.dto.MatchCreateRequestDto;
-import com.example.gamemate.domain.match.dto.MatchCreateResponseDto;
 import com.example.gamemate.domain.match.repository.MatchRepository;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.domain.user.enums.UserStatus;
@@ -28,7 +27,7 @@ public class MatchService {
 
     // 매칭 요청 생성
     @Transactional
-    public MatchCreateResponseDto createMatch(MatchCreateRequestDto dto, User loginUser) {
+    public MatchResponseDto createMatch(MatchCreateRequestDto dto, User loginUser) {
 
         User receiver = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
@@ -44,7 +43,7 @@ public class MatchService {
         Match match = new Match(dto.getMessage(), loginUser, receiver);
         matchRepository.save(match);
 
-        return new MatchCreateResponseDto("매칭이 요청되었습니다.");
+        return MatchResponseDto.toDto(match);
     }
 
     // 매칭 수락/거절
@@ -66,24 +65,24 @@ public class MatchService {
     }
 
     // 받은 매칭 전체 조회
-    public List<MatchFindResponseDto> findAllReceivedMatch(User loginUser) {
+    public List<MatchResponseDto> findAllReceivedMatch(User loginUser) {
 
         List<Match> matchList = matchRepository.findAllByReceiverId(loginUser.getId());
 
         return matchList
                 .stream()
-                .map(MatchFindResponseDto::toDto)
+                .map(MatchResponseDto::toDto)
                 .toList();
     }
 
     // 보낸 매칭 전체 조회
-    public List<MatchFindResponseDto> findAllSentMatch(User loginUser) {
+    public List<MatchResponseDto> findAllSentMatch(User loginUser) {
 
         List<Match> matchList = matchRepository.findAllBySenderId(loginUser.getId());
 
         return matchList
                 .stream()
-                .map(MatchFindResponseDto::toDto)
+                .map(MatchResponseDto::toDto)
                 .toList();
     }
 
