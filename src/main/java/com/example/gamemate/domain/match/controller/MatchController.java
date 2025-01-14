@@ -47,7 +47,7 @@ public class MatchController {
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
 
-        matchService.updateMatch(id, dto,customUserDetails.getUser());
+        matchService.updateMatch(id, dto, customUserDetails.getUser());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
