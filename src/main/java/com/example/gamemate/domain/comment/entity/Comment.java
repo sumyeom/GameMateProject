@@ -27,9 +27,10 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "board_id")
     private Board board;
 
-    public Comment(String content, Board board) {
+    public Comment(String content, Board board, User user) {
         this.content = content;
         this.board = board;
+        this.user = user;
     }
 
     public void updateComment(String content) {

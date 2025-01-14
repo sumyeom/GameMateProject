@@ -6,6 +6,7 @@ import com.example.gamemate.domain.comment.dto.CommentRequestDto;
 import com.example.gamemate.domain.comment.dto.CommentResponseDto;
 import com.example.gamemate.domain.comment.entity.Comment;
 import com.example.gamemate.domain.comment.repository.CommentRepository;
+import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import lombok.RequiredArgsConstructor;
@@ -26,17 +27,18 @@ public class CommentService {
      * @return
      */
     @Transactional
-    public CommentResponseDto createComment(Long boardId, CommentRequestDto requestDto) {
+    public CommentResponseDto createComment(User loginUser, Long boardId, CommentRequestDto requestDto) {
         // 게시글 조회
         Board findBoard = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ApiException(ErrorCode.BOARD_NOT_FOUND));
 
-        Comment comment = new Comment(requestDto.getContent(), findBoard);
+        Comment comment = new Comment(requestDto.getContent(), findBoard, loginUser);
         Comment createComment = commentRepository.save(comment);
 
         return new CommentResponseDto(
                 createComment.getCommentId(),
                 createComment.getContent(),
+                createComment.getUser().getNickname(),
                 createComment.getCreatedAt(),
                 createComment.getModifiedAt()
         );
@@ -48,10 +50,15 @@ public class CommentService {
      * @param requestDto
      */
     @Transactional
-    public void updateComment(Long id, CommentRequestDto requestDto) {
+    public void updateComment(User loginUser, Long id, CommentRequestDto requestDto) {
         // 댓글 조회
         Comment findComment = commentRepository.findById(id)
                 .orElseThrow(() -> new ApiException(ErrorCode.COMMENT_NOT_FOUND));
+
+        // 댓글 작성자와 로그인한 유저 확인
+        if(!findComment.getUser().getId().equals(loginUser.getId())) {
+            throw new ApiException(ErrorCode.FORBIDDEN);
+        }
 
         findComment.updateComment(requestDto.getContent());
         commentRepository.save(findComment);
@@ -62,10 +69,15 @@ public class CommentService {
      * @param id
      */
     @Transactional
-    public void deleteComment(Long id) {
+    public void deleteComment(User loginUser, Long id) {
         // 댓글 조회
         Comment findComment = commentRepository.findById(id)
                 .orElseThrow(() -> new ApiException(ErrorCode.COMMENT_NOT_FOUND));
+
+        // 댓글 작성자와 로그인한 유저 확인
+        if(!findComment.getUser().getId().equals(loginUser.getId())) {
+            throw new ApiException(ErrorCode.FORBIDDEN);
+        }
 
         commentRepository.delete(findComment);
     }
