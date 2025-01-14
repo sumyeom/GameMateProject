@@ -5,6 +5,8 @@ import com.example.gamemate.domain.game.service.GameService;
 import com.example.gamemate.global.config.auth.CustomUserDetails;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,25 +20,22 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/games")
 @Slf4j
+@RequiredArgsConstructor
 public class GameController {
     private final GameService gameService;
-
-    @Autowired
-    public GameController(GameService gameService) {
-
-        this.gameService = gameService;
-    }
 
     /**
      *
      * @param gameDataString
      * @param file
+     * @param customUserDetails
      * @return
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<GameCreateResponseDto> createGame(
-            @RequestPart(value = "gameData") String gameDataString,
-            @RequestPart(value = "file", required = false) MultipartFile file) {
+            @Valid @RequestPart(value = "gameData") String gameDataString,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
         ObjectMapper mapper = new ObjectMapper();
         GameCreateRequestDto requestDto;
@@ -46,13 +45,12 @@ public class GameController {
             throw new RuntimeException("Invalid JSON format", e);
         }
 
-        GameCreateResponseDto responseDto = gameService.createGame(requestDto, file);
+        GameCreateResponseDto responseDto = gameService.createGame(customUserDetails.getUser(), requestDto, file);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
     /**
      * 게임 전체 조회
-     *
      * @param page
      * @param size
      * @return
@@ -87,9 +85,9 @@ public class GameController {
     @GetMapping("/{id}")
     public ResponseEntity<GameFindByIdResponseDto> findGameById(
             @PathVariable Long id,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        GameFindByIdResponseDto gameById = gameService.findGameById(userDetails.getUser(), id);
+        GameFindByIdResponseDto gameById = gameService.findGameById(customUserDetails.getUser(), id);
         return new ResponseEntity<>(gameById, HttpStatus.OK);
 
     }
@@ -104,8 +102,9 @@ public class GameController {
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateGame(
             @PathVariable Long id,
-            @RequestPart(value = "gameData") String gameDataString,
-            @RequestPart(value = "file", required = false) MultipartFile newFile) {
+            @Valid  @RequestPart(value = "gameData") String gameDataString,
+            @RequestPart(value = "file", required = false) MultipartFile newFile,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
         ObjectMapper mapper = new ObjectMapper();
         GameUpdateRequestDto requestDto;
@@ -115,15 +114,16 @@ public class GameController {
             throw new RuntimeException("Invalid JSON format", e);
         }
 
-        gameService.updateGame(id, requestDto, newFile);
+        gameService.updateGame(id, requestDto, newFile, customUserDetails.getUser());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGame(
-            @PathVariable Long id) {
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        gameService.deleteGame(id);
+        gameService.deleteGame(id, customUserDetails.getUser());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

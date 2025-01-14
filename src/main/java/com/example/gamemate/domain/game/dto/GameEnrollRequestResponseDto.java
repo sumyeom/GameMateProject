@@ -16,6 +16,7 @@ public class GameEnrollRequestResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private boolean isAccepted;
+    private Long userId;
 
     public GameEnrollRequestResponseDto(GamaEnrollRequest gameEnrollRequest ) {
         // game 객체의 필드들을 이용해 DTO의 필드들을 초기화
@@ -28,6 +29,7 @@ public class GameEnrollRequestResponseDto {
         this.createdAt = gameEnrollRequest.getCreatedAt();
         this.modifiedAt = gameEnrollRequest.getModifiedAt();
         this.isAccepted = gameEnrollRequest.getIsAccepted();
+        this.userId = gameEnrollRequest.getUser().getId();
 
     }
 }
