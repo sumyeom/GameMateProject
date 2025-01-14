@@ -21,8 +21,8 @@ public class JwtTokenProvider {
     @Value("${spring.jwt.secret}")
     private String secretKey;
 
-    private final long accessTokenExpirationMs = 1000 * 60 * 60; //60분
-    private final long refreshTokenExpirationMs = 1000 * 60 * 60 * 24 * 3; //3일
+    private final int accessTokenExpirationMs = 1000 * 60 * 60; //60분
+    private final int refreshTokenExpirationMs = 1000 * 60 * 60 * 24 * 3; //3일
 
     public String createAccessToken(String email, Role role) {
         Claims claims = Jwts.claims().setSubject(email);
