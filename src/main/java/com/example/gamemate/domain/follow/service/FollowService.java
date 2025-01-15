@@ -10,42 +10,39 @@ import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FollowService {
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
 
     // 팔로우하기
-    // todo: 현재 로그인이 구현되지 않아 1번유저가 팔로우 하는것으로 구현했으니 추후 로그인이 구현되면 follower 는 로그인한 유저로 설정
     @Transactional
-    public FollowResponseDto createFollow(FollowCreateRequestDto dto) {
+    public FollowResponseDto createFollow(FollowCreateRequestDto dto, User loginUser) {
 
-        User follower = userRepository.findById(1L)
-                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
         User followee = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         if (followee.getUserStatus() == UserStatus.WITHDRAW) {
             throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
-        }
+        } // 탈퇴한 유저일때 예외처리
 
-        if (followRepository.existsByFollowerAndFollowee(follower, followee)) {
+        if (followRepository.existsByFollowerAndFollowee(loginUser, followee)) {
             throw new ApiException(ErrorCode.IS_ALREADY_FOLLOWED);
-        }
+        } // 이미 팔로우를 했을때 예외처리
 
-        if (Objects.equals(follower.getEmail(), dto.getEmail())) {
+        if (Objects.equals(loginUser.getEmail(), dto.getEmail())) {
             throw new ApiException(ErrorCode.INVALID_INPUT);
-        }
+        } // 자기 자신을 팔로우 할때 예외처리
 
-        Follow follow = new Follow(follower, followee);
+        Follow follow = new Follow(loginUser, followee);
         followRepository.save(follow);
 
         return new FollowResponseDto(
@@ -57,46 +54,42 @@ public class FollowService {
     }
 
     // 팔로우 취소하기
-    // todo: 현재 로그인이 구현되지 않아 1번유저가 팔로우를 취소 하는것으로 구현했으니 추후 로그인이 구현되면 follower 는 로그인한 유저로 설정
     @Transactional
-    public void deleteFollow(Long id) {
+    public void deleteFollow(Long id, User loginUser) {
 
         Follow findFollow = followRepository.findById(id)
                 .orElseThrow(() -> new ApiException(ErrorCode.FOLLOW_NOT_FOUND));
-        User follower = userRepository.findById(1L)
-                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
-        if (findFollow.getFollower() != follower) {
+        log.info("사용자 email : {}" , loginUser.getEmail());
+
+        if (findFollow.getFollower() != loginUser) {
             throw new ApiException(ErrorCode.INVALID_INPUT);
-        }
+        } // 본인의 팔로우가 아닐때 예외처리
 
         followRepository.delete(findFollow);
     }
 
     // 팔로우 상태 확인
-    // todo : 로그인한 유저(follower) 기준으로 상대 유저(followee)가 팔로우 되어 있는지 확인이 필요한 것이므로, 로그인 구현시 코드 수정해야함.
-    public FollowBooleanResponseDto findFollow(String followerEmail, String followeeEmail) {
+    public FollowBooleanResponseDto findFollow(User loginUser, String email) {
 
-        User follower = userRepository.findByEmail(followerEmail)
-                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
-        User followee = userRepository.findByEmail(followeeEmail)
+        User followee = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         if (followee.getUserStatus() == UserStatus.WITHDRAW) {
             throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
-        }
+        } // 확인할 상대방이 탈퇴한 회원일때 예외처리
 
-        if (!followRepository.existsByFollowerAndFollowee(follower, followee)) {
+        if (!followRepository.existsByFollowerAndFollowee(loginUser, followee)) {
             return new FollowBooleanResponseDto(
                     false,
-                    follower.getId(),
+                    loginUser.getId(),
                     followee.getId()
             );
         }
 
         return new FollowBooleanResponseDto(
                 true,
-                follower.getId(),
+                loginUser.getId(),
                 followee.getId()
         );
     }
@@ -109,7 +102,7 @@ public class FollowService {
 
         if (followee.getUserStatus() == UserStatus.WITHDRAW) {
             throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
-        }
+        } // 확인할 상대방이 탈퇴한 회원일때 예외처리
 
         List<Follow> followListByFollowee = followRepository.findByFollowee(followee);
 
@@ -132,7 +125,7 @@ public class FollowService {
 
         if (follower.getUserStatus() == UserStatus.WITHDRAW) {
             throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
-        }
+        } // 확인할 상대방이 탈퇴한 회원일때 예외처리
 
         List<Follow> followListByFollower = followRepository.findByFollower(follower);
 
