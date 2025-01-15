@@ -1,7 +1,6 @@
 package com.example.gamemate.global.config;
 
-import com.example.gamemate.global.config.auth.DelegatedAccessDeniedHandler;
-import com.example.gamemate.global.config.auth.DelegatedAuthenticationEntryPoint;
+import com.example.gamemate.global.config.auth.*;
 import com.example.gamemate.global.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +32,9 @@ public class SecurityConfig {
     private final DelegatedAccessDeniedHandler accessDeniedHandler;
     private final UserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final OAuth2FailureHandler oAuth2FailureHandler;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -42,11 +44,17 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v3/api-docs/**", "/swagger-resources/**" ,"/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/auth/signup", "/auth/login", "auth/refresh").permitAll()
+                        .requestMatchers("/auth/signup", "/auth/login", "auth/refresh", "auth/email/**").permitAll()
+                        .requestMatchers("/oauth2/**", "/login/oauth2/code/**").permitAll()
                         //Todo 관리자 접근 가능 url 수정
                         .requestMatchers("/관리자관련url").hasRole("admin")
                         .anyRequest().authenticated()
                 )
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService))
+                        .successHandler(oAuth2SuccessHandler)
+                        .failureHandler(oAuth2FailureHandler))
                 .exceptionHandling(hanling-> hanling
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
