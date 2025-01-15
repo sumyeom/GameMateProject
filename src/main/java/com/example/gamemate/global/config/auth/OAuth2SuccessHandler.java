@@ -69,7 +69,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.addCookie(cookie);
     }
 
-    @Value("${oauth2.redirect-uri}")
+    @Value("${oauth2.redirect.uri}")
     private String redirectUri;
 
     private String determineTargetUrl(String token) {
