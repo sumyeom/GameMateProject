@@ -25,7 +25,7 @@ public class GameCreateResponseDto {
         this.platform = game.getPlatform();
         this.description = game.getDescription();
         this.createdAt = game.getCreatedAt();
-        this.modifiedAt =game.getModifiedAt();
+        this.modifiedAt = game.getModifiedAt();
         this.fileName = game.getImages().isEmpty() ? null :
                 game.getImages().get(0).getFileName();
         this.imageUrl = game.getImages().isEmpty() ? null :

@@ -25,7 +25,6 @@ public class GameController {
     private final GameService gameService;
 
     /**
-     *
      * @param gameDataString
      * @param file
      * @param customUserDetails
@@ -51,6 +50,7 @@ public class GameController {
 
     /**
      * 게임 전체 조회
+     *
      * @param page
      * @param size
      * @return
@@ -84,16 +84,14 @@ public class GameController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<GameFindByIdResponseDto> findGameById(
-            @PathVariable Long id,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+            @PathVariable Long id) {
 
-        GameFindByIdResponseDto gameById = gameService.findGameById(customUserDetails.getUser(), id);
+        GameFindByIdResponseDto gameById = gameService.findGameById(id);
         return new ResponseEntity<>(gameById, HttpStatus.OK);
 
     }
 
     /**
-     *
      * @param id
      * @param gameDataString
      * @param newFile
@@ -102,7 +100,7 @@ public class GameController {
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateGame(
             @PathVariable Long id,
-            @Valid  @RequestPart(value = "gameData") String gameDataString,
+            @Valid @RequestPart(value = "gameData") String gameDataString,
             @RequestPart(value = "file", required = false) MultipartFile newFile,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 

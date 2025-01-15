@@ -1,6 +1,9 @@
 package com.example.gamemate.domain.like.service;
 
 import com.example.gamemate.domain.board.repository.BoardRepository;
+import com.example.gamemate.domain.like.dto.BoardLikeResponseDto;
+import com.example.gamemate.domain.like.dto.ReviewLikeCountResponseDto;
+import com.example.gamemate.domain.like.dto.ReviewLikeResponseDto;
 import com.example.gamemate.domain.like.entity.BoardLike;
 import com.example.gamemate.domain.like.entity.ReviewLike;
 import com.example.gamemate.domain.like.repository.BoardLikeRepository;
@@ -24,7 +27,7 @@ public class LikeService {
     private final BoardRepository boardRepository;
 
     @Transactional
-    public void reviewLikeUp(Long reviewId, Integer status, User loginUser) {
+    public ReviewLikeResponseDto reviewLikeUp(Long reviewId, Integer status, User loginUser) {
 
         ReviewLike reviewLike = reviewLikeRepository.findByReviewIdAndUserId(reviewId, loginUser.getId()).
                 orElse(new ReviewLike(
@@ -40,10 +43,12 @@ public class LikeService {
         } else {
             reviewLike.changeStatus(status);
         }
+
+        return new ReviewLikeResponseDto(reviewLike);
     }
 
     @Transactional
-    public void boardLikeUp(Long boardId, Integer status, User loginUser) {
+    public BoardLikeResponseDto boardLikeUp(Long boardId, Integer status, User loginUser) {
 
         BoardLike boardLike = boardLikeRepository.findByBoardIdAndUserId(boardId, loginUser.getId()).
                 orElse(new BoardLike(
@@ -59,11 +64,14 @@ public class LikeService {
         } else {
             boardLike.changeStatus(status);
         }
+
+        return new BoardLikeResponseDto(boardLike);
     }
 
     public Long getBoardLikeCount(Long boardId) {
         return boardLikeRepository.countByBoardBoardIdAndStatus(boardId, 1);
     }
+
     public Long getReivewLikeCount(Long reviewId) {
         return reviewLikeRepository.countByReviewIdAndStatus(reviewId, 1);
     }

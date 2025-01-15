@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 import java.time.LocalDateTime;
 
 @Getter
-@JsonPropertyOrder({ "id", "title", "genre", "platform", "description", "createdAt","fileName","imageUrl", "modifiedAt" })
+@JsonPropertyOrder({"id", "title", "genre", "platform", "description", "createdAt", "fileName", "imageUrl", "modifiedAt"})
 public class GameFindByIdResponseDto {
     private final Long id;
     private final String title;
@@ -22,7 +22,7 @@ public class GameFindByIdResponseDto {
     private final String imageUrl;
 //    private final List<ReviewFindByAllResponseDto> reviews;
 
-    public GameFindByIdResponseDto(Game game ) {
+    public GameFindByIdResponseDto(Game game) {
         // game 객체의 필드들을 이용해 DTO의 필드들을 초기화
         this.id = game.getId();
         this.title = game.getTitle();

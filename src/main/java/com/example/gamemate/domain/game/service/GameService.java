@@ -79,7 +79,7 @@ public class GameService {
     }
 
     @Transactional
-    public GameFindByIdResponseDto findGameById(User loginUser, Long id) {
+    public GameFindByIdResponseDto findGameById(Long id) {
 
         Game game = gameRepository.findGameById(id)
                 .orElseThrow(() -> new ApiException(ErrorCode.GAME_NOT_FOUND));

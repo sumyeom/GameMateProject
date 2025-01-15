@@ -94,7 +94,7 @@ public class ReviewService {
 
     }
 
-    public Page<ReviewFindByAllResponseDto> ReviewFindAllByGameId(Long gameId, User loginUser ){
+    public Page<ReviewFindByAllResponseDto> ReviewFindAllByGameId(Long gameId, User loginUser) {
 
         Game game = gameRepository.findGameById(gameId)
                 .orElseThrow(() -> new ApiException(ErrorCode.GAME_NOT_FOUND));

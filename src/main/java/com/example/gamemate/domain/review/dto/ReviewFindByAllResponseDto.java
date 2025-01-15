@@ -7,12 +7,12 @@ import java.time.LocalDateTime;
 
 @Getter
 public class ReviewFindByAllResponseDto {
-    private  Long id;
-    private  String content;
-    private  Integer star;
-    private  Long gameId;
-    private  Long userId;
-    private  LocalDateTime createdAt;
+    private Long id;
+    private String content;
+    private Integer star;
+    private Long gameId;
+    private Long userId;
+    private LocalDateTime createdAt;
     private String nickName;
     private Long likeCount;
 

@@ -11,8 +11,7 @@ public class GameEnrollRequestCreateRequestDto {
     private String description;
 
 
-
-    public GameEnrollRequestCreateRequestDto(String title, String genre, String platform , String description  ) {
+    public GameEnrollRequestCreateRequestDto(String title, String genre, String platform, String description) {
         this.title = title;
         this.genre = genre;
         this.platform = platform;
