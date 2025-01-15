@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum GameRank {
+    DONT_MIND("dont_mind", "상관없음"),
     IRON("iron", "아이언"),
     BRONZE("bronze", "브론즈"),
     SILVER("silver", "실버"),

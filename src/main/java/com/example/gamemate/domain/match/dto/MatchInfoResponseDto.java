@@ -7,8 +7,9 @@ import lombok.Getter;
 import java.util.Set;
 
 @Getter
-public class CreateMyInfoResponseDto {
+public class MatchInfoResponseDto {
     private Long id;
+    private String nickname;
     private Gender gender;
     private Set<Lane> lanes;
     private Set<Purpose> purposes;
@@ -18,8 +19,10 @@ public class CreateMyInfoResponseDto {
     private Boolean micUsage;
     private String message;
 
-    public CreateMyInfoResponseDto(
-            Long id, Gender gender,
+    public MatchInfoResponseDto(
+            Long id,
+            String nickname,
+            Gender gender,
             Set<Lane> lanes,
             Set<Purpose> purposes,
             GameRank gameRank,
@@ -29,6 +32,7 @@ public class CreateMyInfoResponseDto {
             String message
     ) {
         this.id = id;
+        this.nickname = nickname;
         this.gender = gender;
         this.lanes = lanes;
         this.purposes = purposes;
@@ -39,9 +43,10 @@ public class CreateMyInfoResponseDto {
         this.message = message;
     }
 
-    public static CreateMyInfoResponseDto toDto(MatchUserInfo matchUserInfo) {
-        return new CreateMyInfoResponseDto(
+    public static MatchInfoResponseDto toDto(MatchUserInfo matchUserInfo) {
+        return new MatchInfoResponseDto(
                 matchUserInfo.getId(),
+                matchUserInfo.getUser().getNickname(),
                 matchUserInfo.getGender(),
                 matchUserInfo.getLanes(),
                 matchUserInfo.getPurposes(),

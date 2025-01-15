@@ -1,6 +1,5 @@
 package com.example.gamemate.domain.match.dto;
 
-import com.example.gamemate.domain.match.entity.MatchUserInfo;
 import com.example.gamemate.domain.match.enums.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -11,7 +10,7 @@ import lombok.Getter;
 import java.util.Set;
 
 @Getter
-public class CreateMyInfoRequestDto {
+public class MatchSearchConditionDto {
     @NotNull(message = "성별은 필수 입력값입니다.")
     private Gender gender;
 
@@ -38,10 +37,9 @@ public class CreateMyInfoRequestDto {
     @NotNull(message = "마이크 사용 여부는 필수 입력값입니다.")
     private Boolean micUsage;
 
-    @Size(max = 200, message = "메시지는 200자를 초과할 수 없습니다.")
-    private String message;
+    private String priority;
 
-    public CreateMyInfoRequestDto(
+    public MatchSearchConditionDto(
             Gender gender,
             Set<Lane> lanes,
             Set<Purpose> purposes,
@@ -49,7 +47,7 @@ public class CreateMyInfoRequestDto {
             Set<PlayTimeRange> playTimeRanges,
             Integer skillLevel,
             Boolean micUsage,
-            String message
+            String priority
     ) {
         this.gender = gender;
         this.lanes = lanes;
@@ -58,6 +56,6 @@ public class CreateMyInfoRequestDto {
         this.playTimeRanges = playTimeRanges;
         this.skillLevel = skillLevel;
         this.micUsage = micUsage;
-        this.message = message;
+        this.priority = priority;
     }
 }

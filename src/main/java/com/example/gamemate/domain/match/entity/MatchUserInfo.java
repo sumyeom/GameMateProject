@@ -49,6 +49,9 @@ public class MatchUserInfo {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Transient // DB에 저장하지 않고 런타임에만 사용
+    private int matchScore;
+
     public MatchUserInfo() {
     }
 
@@ -72,5 +75,9 @@ public class MatchUserInfo {
         this.micUsage = micUsage;
         this.message = message;
         this.user = user;
+    }
+
+    public void updateMatchScore(int matchScore) {
+        this.matchScore = matchScore;
     }
 }
