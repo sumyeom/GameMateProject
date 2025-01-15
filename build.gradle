@@ -56,6 +56,11 @@ dependencies {
     // test
     testImplementation 'org.mockito:mockito-core'
     testImplementation 'org.assertj:assertj-core'
+
+    //S3
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
 }
 
 tasks.named('test') {
