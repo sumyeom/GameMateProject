@@ -24,8 +24,10 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final EmailService emailService;
 
     public SignupResponseDto signup(SignupRequestDto requestDto) {
+        // 기존 사용자 중복 체크
         Optional<User> findUser = userRepository.findByEmail(requestDto.getEmail());
         if(findUser.isPresent()) {
             if(findUser.get().getUserStatus() == UserStatus.WITHDRAW) {
@@ -34,11 +36,18 @@ public class AuthService {
             throw new ApiException(ErrorCode.DUPLICATE_EMAIL);
         }
 
+        // 이메일 인증 여부 확인
+        if (!emailService.isEmailVerified(requestDto.getEmail())) {
+            throw new ApiException(ErrorCode.EMAIL_NOT_VERIFIED);
+        }
+
+        // 비밀번호 암호화
         String rawPassword = requestDto.getPassword();
         String encodedPassword = passwordEncoder.encode(rawPassword);
 
-        User user = new User(requestDto.getEmail(), requestDto.getName(), requestDto.getNickname(), encodedPassword);
-        User savedUser = userRepository.save(user);
+        // 새로운 사용자 생성 및 저장
+        User newUser = new User(requestDto.getEmail(), requestDto.getName(), requestDto.getNickname(), encodedPassword);
+        User savedUser = userRepository.save(newUser);
 
         return new SignupResponseDto(savedUser);
     }

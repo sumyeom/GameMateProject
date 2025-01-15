@@ -51,22 +51,44 @@ public class EmailService {
         }
     }
 
-    public void verifyEmail(String email, String code) {
+    public boolean verifyEmail(String email, String code) {
+        // 인증 정보 확인
         VerificationInfo verificationInfo = getVerificationInfo(email);
+
+        //인증 정보가 없는 경우
         if (verificationInfo == null) {
             throw new ApiException(ErrorCode.VERIFICATION_TIME_EXPIRED);
         }
 
+        // 인증 정보가 만료된 경우
         if (LocalDateTime.now().isAfter(verificationInfo.getExpiryTime())) {
             verificationMap.remove(email);
             throw new ApiException(ErrorCode.VERIFICATION_TIME_EXPIRED);
         }
 
+        // 인증 코드 불일치
         if (!verificationInfo.getCode().equals(code)) {
             throw new ApiException(ErrorCode.INVALID_VERIFICATION_CODE);
         }
 
-        verificationMap.remove(email);
+        // 인증 성공 시 상태 변경
+        verificationInfo.markAsVerified();
+        verificationMap.put(email, verificationInfo);
+
+        // 만료된 모든 인증 정보 제거
+        verificationMap.entrySet().removeIf(entry ->
+                LocalDateTime.now().isAfter(entry.getValue().getExpiryTime())
+        );
+
+        return true;
+    }
+
+    public boolean isEmailVerified(String email) {
+        VerificationInfo info = verificationMap.get(email);
+
+        return info != null
+                && !LocalDateTime.now().isAfter(info.getExpiryTime())
+                && info.isVerified();
     }
 
     // Todo: 추후 Redis로 수정 예정
@@ -117,6 +139,11 @@ public class EmailService {
     private static class VerificationInfo {
         private final String code;
         private final LocalDateTime expiryTime;
+        private boolean verified = false;
+
+        public void markAsVerified() {
+            this.verified = true;
+        }
     }
 
 }
