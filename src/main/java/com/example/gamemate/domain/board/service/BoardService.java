@@ -11,6 +11,9 @@ import com.example.gamemate.domain.board.repository.BoardRepository;
 import com.example.gamemate.domain.comment.dto.CommentFindResponseDto;
 import com.example.gamemate.domain.comment.entity.Comment;
 import com.example.gamemate.domain.comment.repository.CommentRepository;
+import com.example.gamemate.domain.reply.dto.ReplyFindResponseDto;
+import com.example.gamemate.domain.reply.entity.Reply;
+import com.example.gamemate.domain.reply.repository.ReplyRepository;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
@@ -22,7 +25,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -32,6 +37,7 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
+    private final ReplyRepository replyRepository;
 
     /**
      * 게시글 생성 메서드
@@ -95,19 +101,15 @@ public class BoardService {
         Page<Comment> comments = commentRepository.findByBoard(findBoard,pageable);
 
         List<CommentFindResponseDto> commentDtos = comments.stream()
-                        .map(comment-> new CommentFindResponseDto(
-                                comment.getCommentId(),
-                                comment.getContent(),
-                                comment.getCreatedAt(),
-                                comment.getModifiedAt()
-                        ))
-                        .collect(Collectors.toList());
+                .map(this::convertCommentDto)
+                .collect(Collectors.toList());
 
         return new BoardFindOneResponseDto(
                 findBoard.getBoardId(),
                 findBoard.getCategory(),
                 findBoard.getTitle(),
                 findBoard.getContent(),
+                findBoard.getUser().getNickname(),
                 findBoard.getCreatedAt(),
                 findBoard.getModifiedAt(),
                 commentDtos
@@ -151,5 +153,32 @@ public class BoardService {
         }
 
         boardRepository.delete(findBoard);
+    }
+
+    private CommentFindResponseDto convertCommentDto(Comment comment) {
+        List<ReplyFindResponseDto> replyDtos = Optional.ofNullable(replyRepository.findByComment(comment))
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(this::convertReplyDto)
+                .collect(Collectors.toList());
+        return new CommentFindResponseDto(
+                comment.getCommentId(),
+                comment.getContent(),
+                comment.getUser().getNickname(),
+                comment.getCreatedAt(),
+                comment.getModifiedAt(),
+                replyDtos
+        );
+    }
+
+    private ReplyFindResponseDto convertReplyDto(Reply reply) {
+        String findUserName = reply.getParentReply() == null ? null : reply.getParentReply().getUser().getNickname();
+        return new ReplyFindResponseDto(
+                reply.getReplyId(),
+                findUserName,
+                reply.getContent(),
+                reply.getCreatedAt(),
+                reply.getModifiedAt()
+        );
     }
 }
