@@ -78,7 +78,7 @@ public class GameService {
         return gameRepository.findAll(pageable).map(GameFindAllResponseDto::new);
     }
 
-    @Transactional
+
     public GameFindByIdResponseDto findGameById(Long id) {
 
         Game game = gameRepository.findGameById(id)

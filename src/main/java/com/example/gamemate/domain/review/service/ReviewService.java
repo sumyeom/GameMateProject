@@ -59,6 +59,7 @@ public class ReviewService {
         return new ReviewCreateResponseDto(saveReview);
     }
 
+    @Transactional
     public void updateReview(User loginUser, Long gameId, Long id, ReviewUpdateRequestDto requestDto) {
 
         Long userId = loginUser.getId();
@@ -79,6 +80,7 @@ public class ReviewService {
         reviewRepository.save(review);
     }
 
+    @Transactional
     public void deleteReview(User loginUser, Long id) {
 
         Long userId = loginUser.getId();
@@ -102,12 +104,6 @@ public class ReviewService {
         Pageable pageable = PageRequest.of(0, 5, Sort.by("createdAt").descending());
         Page<Review> reviewPage = reviewRepository.findAllByGame(game, pageable);
 
-        // Review를 ReviewFindByAllResponseDto로 변환하면서 닉네임 추가
-//        Page<ReviewFindByAllResponseDto> reviews = reviewPage.map(review ->
-//                new ReviewFindByAllResponseDto(review, loginUser.getNickname())
-//        );
-//
-//        return reviewPage.map(review -> new ReviewFindByAllResponseDto(review, loginUser.getNickname()));
         return reviewPage.map(review -> {
             Long likeCount = reviewLikeRepository.countByReviewIdAndStatus(review.getId(), 1);
             return new ReviewFindByAllResponseDto(review, loginUser.getNickname(), likeCount);
