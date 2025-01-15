@@ -6,7 +6,6 @@ import com.example.gamemate.domain.auth.service.EmailService;
 import com.example.gamemate.domain.auth.service.OAuth2Service;
 import com.example.gamemate.domain.auth.service.TokenService;
 import com.example.gamemate.domain.user.entity.User;
-import com.example.gamemate.domain.user.enums.AuthProvider;
 import com.example.gamemate.global.config.auth.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,7 +32,7 @@ public class AuthController {
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
-    @PostMapping("/email/verification-request")
+    @PostMapping("/email")
     public ResponseEntity<Void> sendVerificationEmail(
             @Valid @RequestBody EmailVerificationCodeRequestDto requestDto
     ) {
