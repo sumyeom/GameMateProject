@@ -1,11 +1,12 @@
 package com.example.gamemate.domain.match.service;
 
-import com.example.gamemate.domain.match.dto.MatchResponseDto;
-import com.example.gamemate.domain.match.dto.MatchUpdateRequestDto;
+import com.example.gamemate.domain.match.dto.*;
 import com.example.gamemate.domain.match.entity.Match;
+import com.example.gamemate.domain.match.entity.MatchUserInfo;
 import com.example.gamemate.domain.match.enums.MatchStatus;
-import com.example.gamemate.domain.match.dto.MatchCreateRequestDto;
+import com.example.gamemate.domain.match.repository.MatchDesiredInfoRepository;
 import com.example.gamemate.domain.match.repository.MatchRepository;
+import com.example.gamemate.domain.match.repository.MatchUserInfoRepository;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.domain.user.enums.UserStatus;
 import com.example.gamemate.domain.user.repository.UserRepository;
@@ -24,6 +25,8 @@ public class MatchService {
 
     private final UserRepository userRepository;
     private final MatchRepository matchRepository;
+    private final MatchUserInfoRepository matchUserInfoRepository;
+    private final MatchDesiredInfoRepository matchDesiredInfoRepository;
 
     // 매칭 요청 생성
     @Transactional
@@ -98,5 +101,26 @@ public class MatchService {
         }
 
         matchRepository.delete(findMatch);
+    }
+
+    // 내 정보 입력
+    @Transactional
+    public CreateMyInfoResponseDto createMyInfo(CreateMyInfoRequestDto dto, User loginUser) {
+
+        MatchUserInfo matchUserInfo = new MatchUserInfo(
+                dto.getGender(),
+                dto.getLanes(),
+                dto.getPurposes(),
+                dto.getPlayTimeRanges(),
+                dto.getGameRank(),
+                dto.getSkillLevel(),
+                dto.getMicUsage(),
+                dto.getMessage(),
+                loginUser
+        );
+
+        matchUserInfoRepository.save(matchUserInfo);
+
+        return CreateMyInfoResponseDto.toDto(matchUserInfo);
     }
 }

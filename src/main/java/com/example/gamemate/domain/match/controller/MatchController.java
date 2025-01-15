@@ -1,9 +1,7 @@
 package com.example.gamemate.domain.match.controller;
 
-import com.example.gamemate.domain.match.dto.MatchResponseDto;
-import com.example.gamemate.domain.match.dto.MatchUpdateRequestDto;
+import com.example.gamemate.domain.match.dto.*;
 import com.example.gamemate.domain.match.service.MatchService;
-import com.example.gamemate.domain.match.dto.MatchCreateRequestDto;
 import com.example.gamemate.global.config.auth.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,7 +20,7 @@ public class MatchController {
     /**
      * 매칭 요청 생성
      * @param dto MatchCreateRequestDto 상대 유저 id, 상대방에게 전할 메세지
-     * @return message = "매칭이 요청되었습니다."
+     * @return matchCreateResponseDto
      */
     @PostMapping
     public ResponseEntity<MatchResponseDto> createMatch(
@@ -55,7 +53,7 @@ public class MatchController {
      * 받은 매칭 전체 조회
      * @return matchFindResponseDtoList
      */
-    @GetMapping("/received-match")
+    @GetMapping("/received-matches")
     public ResponseEntity<List<MatchResponseDto>> findAllReceivedMatch(
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
@@ -68,7 +66,7 @@ public class MatchController {
      * 보낸 매칭 전체 조회
      * @return matchFindResponseDtoList
      */
-    @GetMapping("/sent-match")
+    @GetMapping("/sent-matches")
     public ResponseEntity<List<MatchResponseDto>> findAllSentMatch(
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
@@ -90,5 +88,20 @@ public class MatchController {
 
         matchService.deleteMatch(id, customUserDetails.getUser());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     * 내 매칭 정보 입력
+     * @param dto CreateMyInfoRequestDto
+     * @return createMyInfoRequestDto
+     */
+    @PostMapping("/my-info")
+    public ResponseEntity<CreateMyInfoResponseDto> createMyInfo(
+            CreateMyInfoRequestDto dto,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+
+        CreateMyInfoResponseDto createMyInfoResponseDto = matchService.createMyInfo(dto, customUserDetails.getUser());
+        return new ResponseEntity<>(createMyInfoResponseDto, HttpStatus.CREATED);
     }
 }
