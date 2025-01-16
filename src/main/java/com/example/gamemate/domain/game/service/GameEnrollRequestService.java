@@ -28,6 +28,7 @@ public class GameEnrollRequestService {
     private final GameRepository gameRepository;
     private final GameEnrollRequestRepository gameEnrollRequestRepository;
 
+    @Transactional
     public GameEnrollRequestResponseDto createGameEnrollRequest(GameEnrollRequestCreateRequestDto requestDto, User userId) {
         GamaEnrollRequest gameEnrollRequest = new GamaEnrollRequest(
                 requestDto.getTitle(),
@@ -52,7 +53,7 @@ public class GameEnrollRequestService {
         return gameEnrollRequestRepository.findAll(pageable).map(GameEnrollRequestResponseDto::new);
     }
 
-    @Transactional
+
     public GameEnrollRequestResponseDto findGameEnrollRequestById(Long id, User loginUser) {
 
         //관리자만 게임등록요청 조회 가능함(조회)
@@ -100,6 +101,7 @@ public class GameEnrollRequestService {
         }
     }
 
+    @Transactional
     public void deleteGameEnroll(Long id, User loginUser) {
 
         //관리자만 게임등록요청 삭제 가능함(삭제)

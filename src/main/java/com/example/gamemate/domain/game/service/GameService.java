@@ -78,7 +78,7 @@ public class GameService {
         return gameRepository.findAll(pageable).map(GameFindAllResponseDto::new);
     }
 
-    @Transactional
+
     public GameFindByIdResponseDto findGameById(Long id) {
 
         Game game = gameRepository.findGameById(id)
@@ -89,29 +89,39 @@ public class GameService {
 
     @Transactional
     public void updateGame(Long id, GameUpdateRequestDto requestDto, MultipartFile newFile, User loginUser) {
-
-        //관리자만 가능함(수정)
-        if (!loginUser.getRole().equals(Role.ADMIN)) {
+        if (loginUser == null || !loginUser.getRole().equals(Role.ADMIN)) {
             throw new ApiException(ErrorCode.FORBIDDEN);
         }
 
         Game game = gameRepository.findGameById(id)
                 .orElseThrow(() -> new ApiException(ErrorCode.GAME_NOT_FOUND));
 
-        // 기존 파일이 있고 새 파일이 업로드된 경우
-        // 1. 기존 S3 파일 삭제
-        if (!game.getImages().isEmpty()) {
-            for (GameImage image : game.getImages()) {
+        deleteExistingImages(game);
+        uploadNewImage(game, newFile);
+
+        game.updateGame(
+                requestDto.getTitle(),
+                requestDto.getGenre(),
+                requestDto.getPlatform(),
+                requestDto.getDescription()
+        );
+
+         gameRepository.save(game);
+    }
+
+    private void deleteExistingImages(Game game) {
+        for (GameImage image : game.getImages()) {
+            try {
                 s3Service.deleteFile(image.getFilePath());
+            } catch (Exception e) {
+                // 로그 기록 후 계속 진행
+                log.error("Failed to delete file: {}", image.getFilePath(), e);
             }
         }
+        game.getImages().clear();
+    }
 
-        List<GameImage> gameImages = gameImageRepository.findGameImagesByGameId(id);
-        if (!gameImages.isEmpty()) {
-            gameImageRepository.deleteAll(gameImages);
-        }
-
-        // 2. 새 파일 업로드
+    private void uploadNewImage(Game game, MultipartFile newFile) {
         if (newFile != null && !newFile.isEmpty()) {
             try {
                 String fileUrl = s3Service.uploadFile(newFile);
@@ -123,18 +133,11 @@ public class GameService {
                 );
                 game.addImage(gameImage);
             } catch (IOException e) {
-                throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.", e);
+                throw new ApiException(ErrorCode.FILE_UPLOAD_ERROR);
             }
         }
-
-        game.updateGame(
-                requestDto.getTitle(),
-                requestDto.getGenre(),
-                requestDto.getPlatform(),
-                requestDto.getDescription()
-        );
-        gameRepository.save(game);
     }
+
 
     @Transactional
     public void deleteGame(Long id, User loginUser) {
