@@ -14,6 +14,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 게임 등록 요청 관련 API를 처리하는 컨트롤러 클래스입니다.
+ * 게임 등록 요청의 생성, 조회, 수정, 삭제 기능을 제공합니다.
+ */
 @RestController
 @RequestMapping("/games/requests")
 @RequiredArgsConstructor
@@ -21,10 +25,11 @@ public class GameEnrollRequestController {
     private final GameEnrollRequestService gameEnrollRequestService;
 
     /**
-     * 게임등록 요청
+     * 새로운 게임 등록 요청을 생성합니다.
      *
-     * @param requestDto
-     * @return
+     * @param requestDto 게임 등록 요청 데이터
+     * @param customUserDetails 인증된 사용자 정보
+     * @return 생성된 게임 등록 요청 정보를 포함한 ResponseEntity
      */
     @PostMapping
     public ResponseEntity<GameEnrollRequestResponseDto> CreateGameEnrollRequest(
@@ -36,9 +41,10 @@ public class GameEnrollRequestController {
     }
 
     /**
-     * 게임등록 요청 전체 조회
+     * 모든 게임 등록 요청을 조회합니다.
      *
-     * @return
+     * @param customUserDetails 인증된 사용자 정보
+     * @return 게임 등록 요청 목록을 포함한 ResponseEntity
      */
     @GetMapping
     public ResponseEntity<Page<GameEnrollRequestResponseDto>> findAllGameEnrollRequest(
@@ -50,10 +56,10 @@ public class GameEnrollRequestController {
     }
 
     /**
-     * 게임등록 요청 단건 조회
+     * 모든 게임 등록 요청을 조회합니다.
      *
-     * @param id
-     * @return
+     * @param customUserDetails 인증된 사용자 정보
+     * @return 게임 등록 요청 목록을 포함한 ResponseEntity
      */
     @GetMapping("/{id}")
     public ResponseEntity<GameEnrollRequestResponseDto> findGameEnrollRequestById(
@@ -65,11 +71,12 @@ public class GameEnrollRequestController {
     }
 
     /**
-     * 게임등록 요청 수정 & 게임등록 기능 연계
+     * 특정 ID의 게임 등록 요청을 수정하고, 필요시 게임 등록 기능과 연계합니다.
      *
-     * @param id
-     * @param requestDto
-     * @return
+     * @param id 수정할 게임 등록 요청의 ID
+     * @param requestDto 수정할 게임 등록 요청 데이터
+     * @param customUserDetails 인증된 사용자 정보
+     * @return 수정 결과를 나타내는 ResponseEntity
      */
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateGameEnroll(
@@ -81,6 +88,13 @@ public class GameEnrollRequestController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    /**
+     * 특정 ID의 게임 등록 요청을 삭제합니다.
+     *
+     * @param id 삭제할 게임 등록 요청의 ID
+     * @param customUserDetails 인증된 사용자 정보
+     * @return 삭제 결과를 나타내는 ResponseEntity
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGameEnroll(
             @PathVariable Long id,

@@ -17,6 +17,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * 게임 관련 API를 처리하는 컨트롤러 클래스입니다.
+ * 게임의 생성, 조회, 수정, 삭제 기능을 제공합니다.
+ */
 @RestController
 @RequestMapping("/games")
 @Slf4j
@@ -25,10 +29,13 @@ public class GameController {
     private final GameService gameService;
 
     /**
-     * @param gameDataString
-     * @param file
-     * @param customUserDetails
-     * @return
+     * 새로운 게임을 생성합니다.
+     *
+     * @param gameDataString 게임 데이터를 포함한 JSON 문자열
+     * @param file 게임 관련 이미지 파일 (선택적)
+     * @param customUserDetails 인증된 사용자 정보
+     * @return 생성된 게임 정보를 포함한 ResponseEntity
+     * @throws RuntimeException JSON 파싱 오류 시 발생
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<GameCreateResponseDto> createGame(
@@ -49,11 +56,14 @@ public class GameController {
     }
 
     /**
-     * 게임 전체 조회
+     * 모든 게임을 페이지네이션하여 조회하거나 검색합니다.
      *
-     * @param page
-     * @param size
-     * @return
+     * @param keyword 검색 키워드 (선택적)
+     * @param genre 게임 장르 (선택적)
+     * @param platform 게임 플랫폼 (선택적)
+     * @param page 페이지 번호 (기본값: 0)
+     * @param size 페이지 크기 (기본값: 10)
+     * @return 게임 목록을 포함한 ResponseEntity
      */
     @GetMapping
     public ResponseEntity<Page<GameFindAllResponseDto>> findAllGame(
@@ -77,10 +87,14 @@ public class GameController {
     }
 
     /**
-     * 게임 단건 조회
+     * 특정 ID의 게임 정보를 수정합니다.
      *
-     * @param id
-     * @return
+     * @param id 수정할 게임의 ID
+     * @param gameDataString 수정할 게임 데이터를 포함한 JSON 문자열
+     * @param newFile 새로운 게임 이미지 파일 (선택적)
+     * @param customUserDetails 인증된 사용자 정보
+     * @return 수정 결과를 나타내는 ResponseEntity
+     * @throws RuntimeException JSON 파싱 오류 시 발생
      */
     @GetMapping("/{id}")
     public ResponseEntity<GameFindByIdResponseDto> findGameById(
@@ -92,10 +106,11 @@ public class GameController {
     }
 
     /**
-     * @param id
-     * @param gameDataString
-     * @param newFile
-     * @return
+     * 특정 ID의 게임을 삭제합니다.
+     *
+     * @param id 삭제할 게임의 ID
+     * @param customUserDetails 인증된 사용자 정보
+     * @return 삭제 결과를 나타내는 ResponseEntity
      */
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateGame(
