@@ -59,8 +59,8 @@ public class MatchController {
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
 
-        List<MatchResponseDto> MatchResponseDtoList = matchService.findAllReceivedMatch(customUserDetails.getUser());
-        return new ResponseEntity<>(MatchResponseDtoList, HttpStatus.OK);
+        List<MatchResponseDto> matchResponseDtoList = matchService.findAllReceivedMatch(customUserDetails.getUser());
+        return new ResponseEntity<>(matchResponseDtoList, HttpStatus.OK);
     }
 
     /**
@@ -72,8 +72,8 @@ public class MatchController {
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
 
-        List<MatchResponseDto> MatchResponseDtoList = matchService.findAllSentMatch(customUserDetails.getUser());
-        return new ResponseEntity<>(MatchResponseDtoList, HttpStatus.OK);
+        List<MatchResponseDto> matchResponseDtoList = matchService.findAllSentMatch(customUserDetails.getUser());
+        return new ResponseEntity<>(matchResponseDtoList, HttpStatus.OK);
     }
 
     /**
