@@ -25,7 +25,7 @@ public class MatchController {
      */
     @PostMapping
     public ResponseEntity<MatchResponseDto> createMatch(
-            @RequestBody MatchCreateRequestDto dto,
+            @Valid @RequestBody MatchCreateRequestDto dto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
 
@@ -42,7 +42,7 @@ public class MatchController {
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateMatch(
             @PathVariable Long id,
-            @RequestBody MatchUpdateRequestDto dto,
+            @Valid @RequestBody MatchUpdateRequestDto dto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
 
@@ -98,7 +98,7 @@ public class MatchController {
      */
     @PostMapping("/my-info")
     public ResponseEntity<MatchInfoResponseDto> createMyInfo(
-            @RequestBody MatchInfoCreateRequestDto dto,
+            @Valid @RequestBody MatchInfoCreateRequestDto dto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
 
