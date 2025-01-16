@@ -7,14 +7,12 @@ import com.example.gamemate.domain.user.repository.UserRepository;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import com.example.gamemate.global.provider.JwtTokenProvider;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Optional;
 
 @Service
@@ -24,9 +22,12 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TokenService tokenService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final EmailService emailService;
 
     public SignupResponseDto signup(SignupRequestDto requestDto) {
+        // 기존 사용자 중복 체크
         Optional<User> findUser = userRepository.findByEmail(requestDto.getEmail());
         if(findUser.isPresent()) {
             if(findUser.get().getUserStatus() == UserStatus.WITHDRAW) {
@@ -35,11 +36,18 @@ public class AuthService {
             throw new ApiException(ErrorCode.DUPLICATE_EMAIL);
         }
 
+        // 이메일 인증 여부 확인
+        if (!emailService.isEmailVerified(requestDto.getEmail())) {
+            throw new ApiException(ErrorCode.EMAIL_NOT_VERIFIED);
+        }
+
+        // 비밀번호 암호화
         String rawPassword = requestDto.getPassword();
         String encodedPassword = passwordEncoder.encode(rawPassword);
 
-        User user = new User(requestDto.getEmail(), requestDto.getName(), requestDto.getNickname(), encodedPassword);
-        User savedUser = userRepository.save(user);
+        // 새로운 사용자 생성 및 저장
+        User newUser = new User(requestDto.getEmail(), requestDto.getName(), requestDto.getNickname(), encodedPassword);
+        User savedUser = userRepository.save(newUser);
 
         return new SignupResponseDto(savedUser);
     }
@@ -56,16 +64,7 @@ public class AuthService {
         if(!passwordEncoder.matches(requestDto.getPassword(), findUser.getPassword())) {
             throw new ApiException(ErrorCode.INVALID_PASSWORD);
         }
-
-        String accessToken = jwtTokenProvider.createAccessToken(findUser.getEmail(), findUser.getRole());
-        String refreshToken = jwtTokenProvider.createRefreshToken(findUser.getEmail());
-
-        findUser.updateRefreshToken(refreshToken);
-        userRepository.save(findUser);
-
-        addRefreshTokenToCookie(response, refreshToken);
-
-        return new EmailLoginResponseDto(accessToken);
+        return tokenService.generateLoginTokens(findUser, response);
     }
 
     public TokenRefreshResponseDto refreshAccessToken(String refreshToken) {
@@ -85,40 +84,13 @@ public class AuthService {
         return new TokenRefreshResponseDto(newAccessToken);
     }
 
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = extractRefreshTokenFromCookie(request);
+    public void logout(User user, HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = tokenService.extractRefreshTokenFromCookie(request);
         if(refreshToken != null) {
-            String email = jwtTokenProvider.getEmailFromToken(refreshToken);
-            userRepository.findByEmail(email).ifPresent(user -> {
-                user.removeRefreshToken();
-                userRepository.save(user);
-            });
-
-            Cookie cookie = new Cookie("refresh_token", null);
-            cookie.setMaxAge(0);
-            cookie.setPath("/");
-            response.addCookie(cookie);
+            user.removeRefreshToken();
+            userRepository.save(user);
+            tokenService.removeRefreshTokenCookie(response);
         }
     }
 
-    private void addRefreshTokenToCookie(HttpServletResponse response, String refreshToken) {
-        Cookie cookie = new Cookie("refresh_token", refreshToken);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true); // HTTPS에서만 전송
-        cookie.setPath("/");
-        cookie.setMaxAge(3 * 24 * 60 * 60); // 3일
-        response.addCookie(cookie);
-    }
-
-    private String extractRefreshTokenFromCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("refresh_token".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
-    }
 }
