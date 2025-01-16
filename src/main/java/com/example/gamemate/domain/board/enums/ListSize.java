@@ -4,7 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum ListSize {
-    LIST_SIZE(15);
+    BOARD_LIST_SIZE(15),
+    COMMENT_LIST_SIZE(25),;
+
 
     private final int size;
     ListSize(int size) {

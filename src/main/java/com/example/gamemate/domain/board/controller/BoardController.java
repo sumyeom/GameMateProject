@@ -12,9 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -67,17 +65,15 @@ public class BoardController {
 
     /**
      * 게시글 단건 조회 API
-     * @param page
      * @param id
      * @return
      */
     @GetMapping("/{id}")
     public ResponseEntity<BoardFindOneResponseDto> findBoardById(
-            @RequestParam(required = false, defaultValue = "0") int page,
             @PathVariable Long id
     ){
 
-        BoardFindOneResponseDto dto = boardService.findBoardById(page,id);
+        BoardFindOneResponseDto dto = boardService.findBoardById(id);
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
