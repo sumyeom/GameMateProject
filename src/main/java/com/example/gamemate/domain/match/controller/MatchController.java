@@ -1,7 +1,6 @@
 package com.example.gamemate.domain.match.controller;
 
 import com.example.gamemate.domain.match.dto.*;
-import com.example.gamemate.domain.match.enums.*;
 import com.example.gamemate.domain.match.service.MatchService;
 import com.example.gamemate.global.config.auth.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -12,7 +11,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -99,7 +97,7 @@ public class MatchController {
     }
 
     /**
-     * 매칭을 위해 내 정보 입력하기
+     * 매칭을 위해 내 정보 입력하기, 매칭 정보 입력시 매칭추천에서 검색됨
      * @param dto MatchInfoCreateRequestDto
      * @return matchInfoResponseDto
      */
@@ -111,6 +109,19 @@ public class MatchController {
 
         MatchInfoResponseDto matchInfoResponseDto = matchService.createMyInfo(dto, customUserDetails.getUser());
         return new ResponseEntity<>(matchInfoResponseDto, HttpStatus.CREATED);
+    }
+
+    /**
+     * 내 정보 삭제, 내 정보 삭제시 더이상 매칭에서 검색되지 않음
+     * @return 204 NO_CONTENT
+     */
+    @DeleteMapping("/info")
+    public ResponseEntity<Void> deleteMyInfo(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+
+        matchService.deleteMyInfo(customUserDetails.getUser());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
