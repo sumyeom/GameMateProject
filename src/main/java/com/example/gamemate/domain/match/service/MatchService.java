@@ -14,7 +14,6 @@ import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -37,6 +36,12 @@ public class MatchService {
 
         User receiver = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+
+        MatchUserInfo loginUserInfo = matchUserInfoRepository.findByUser(loginUser)
+                .orElseThrow(() -> new ApiException(ErrorCode.MATCH_USER_INFO_NOT_FOUND));
+
+        MatchUserInfo receiverInfo = matchUserInfoRepository.findByUser(receiver)
+                .orElseThrow(() -> new ApiException(ErrorCode.MATCH_USER_INFO_NOT_FOUND));
 
         if (receiver.getUserStatus() == UserStatus.WITHDRAW) {
             throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
@@ -75,8 +80,7 @@ public class MatchService {
 
         List<Match> matchList = matchRepository.findAllByReceiverId(loginUser.getId());
 
-        return matchList
-                .stream()
+        return matchList.stream()
                 .map(MatchResponseDto::toDto)
                 .toList();
     }
@@ -86,8 +90,7 @@ public class MatchService {
 
         List<Match> matchList = matchRepository.findAllBySenderId(loginUser.getId());
 
-        return matchList
-                .stream()
+        return matchList.stream()
                 .map(MatchResponseDto::toDto)
                 .toList();
     }
@@ -133,6 +136,24 @@ public class MatchService {
                 .orElseThrow(() -> new ApiException(ErrorCode.MATCH_USER_INFO_NOT_FOUND));
 
         return MatchInfoResponseDto.toDto(matchUserInfo);
+    }
+
+    // 내 정보 수정
+    @Transactional
+    public void updateMyInfo(MatchInfoUpdateRequestDto dto, User loginUser) {
+        MatchUserInfo matchUserInfo = matchUserInfoRepository.findByUser(loginUser)
+                .orElseThrow(() -> new ApiException(ErrorCode.MATCH_USER_INFO_NOT_FOUND));
+
+        matchUserInfo.updateMatchUserInfo(
+                dto.getGender(),
+                dto.getLanes(),
+                dto.getPurposes(),
+                dto.getPlayTimeRanges(),
+                dto.getGameRank(),
+                dto.getSkillLevel(),
+                dto.getMicUsage(),
+                dto.getMessage()
+        );
     }
 
     // 내 정보 삭제, 내정보 삭제시 매칭 추천에서 더이상 검색되지 않음

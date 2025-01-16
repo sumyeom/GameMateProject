@@ -20,7 +20,6 @@ public class MatchController {
 
     /**
      * 매칭 요청 생성
-     *
      * @param dto MatchCreateRequestDto 상대 유저 id, 상대방에게 전할 메세지
      * @return matchCreateResponseDto
      */
@@ -30,13 +29,12 @@ public class MatchController {
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
 
-        MatchResponseDto matchCreateResponseDto = matchService.createMatch(dto, customUserDetails.getUser());
-        return new ResponseEntity<>(matchCreateResponseDto, HttpStatus.CREATED);
+        MatchResponseDto matchResponseDto = matchService.createMatch(dto, customUserDetails.getUser());
+        return new ResponseEntity<>(matchResponseDto, HttpStatus.CREATED);
     }
 
     /**
      * 매칭 수락/거절하기
-     *
      * @param id  매칭 id
      * @param dto MatchUpdateRequestDto 수락/거절
      * @return 204 NO CONTENT
@@ -54,35 +52,32 @@ public class MatchController {
 
     /**
      * 받은 매칭 전체 조회
-     *
-     * @return matchFindResponseDtoList
+     * @return MatchResponseDtoList
      */
     @GetMapping("/received-matches")
     public ResponseEntity<List<MatchResponseDto>> findAllReceivedMatch(
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
 
-        List<MatchResponseDto> matchResponseDtoList = matchService.findAllReceivedMatch(customUserDetails.getUser());
-        return new ResponseEntity<>(matchResponseDtoList, HttpStatus.OK);
+        List<MatchResponseDto> MatchResponseDtoList = matchService.findAllReceivedMatch(customUserDetails.getUser());
+        return new ResponseEntity<>(MatchResponseDtoList, HttpStatus.OK);
     }
 
     /**
      * 보낸 매칭 전체 조회
-     *
-     * @return matchFindResponseDtoList
+     * @return MatchResponseDtoList
      */
     @GetMapping("/sent-matches")
     public ResponseEntity<List<MatchResponseDto>> findAllSentMatch(
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
 
-        List<MatchResponseDto> matchResponseDtoList = matchService.findAllSentMatch(customUserDetails.getUser());
-        return new ResponseEntity<>(matchResponseDtoList, HttpStatus.OK);
+        List<MatchResponseDto> MatchResponseDtoList = matchService.findAllSentMatch(customUserDetails.getUser());
+        return new ResponseEntity<>(MatchResponseDtoList, HttpStatus.OK);
     }
 
     /**
      * 매칭 삭제(취소)
-     *
      * @param id 매칭 id
      * @return NO_CONTENT
      */
@@ -111,6 +106,10 @@ public class MatchController {
         return new ResponseEntity<>(matchInfoResponseDto, HttpStatus.CREATED);
     }
 
+    /**
+     * 매칭 내정보 조회하기
+     * @return MatchInfoResponseDto
+     */
     @GetMapping("/info")
     public ResponseEntity<MatchInfoResponseDto> findMyInfo(
             @AuthenticationPrincipal CustomUserDetails customUserDetails
@@ -119,6 +118,22 @@ public class MatchController {
         MatchInfoResponseDto matchInfoResponseDto = matchService.findMyInfo(customUserDetails.getUser());
         return new ResponseEntity<>(matchInfoResponseDto, HttpStatus.OK);
     }
+
+    /**
+     * 매칭 내정보 수정하기
+     * @param dto MatchInfoUpdateRequestDto
+     * @return 204 NO_CONTENT
+     */
+    @PutMapping("/info")
+    public ResponseEntity<Void> updateMyInfo(
+            @Valid @RequestBody MatchInfoUpdateRequestDto dto,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+
+        matchService.updateMyInfo(dto, customUserDetails.getUser());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
 
     /**
      * 내 정보 삭제, 내 정보 삭제시 더이상 매칭에서 검색되지 않음

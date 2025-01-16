@@ -2,6 +2,7 @@ package com.example.gamemate.domain.match.entity;
 
 import com.example.gamemate.domain.match.enums.*;
 import com.example.gamemate.domain.user.entity.User;
+import com.example.gamemate.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -10,7 +11,7 @@ import java.util.Set;
 
 @Getter
 @Entity
-public class MatchUserInfo {
+public class MatchUserInfo extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -75,6 +76,26 @@ public class MatchUserInfo {
         this.micUsage = micUsage;
         this.message = message;
         this.user = user;
+    }
+
+    public void updateMatchUserInfo(
+            Gender gender,
+            Set<Lane> lanes,
+            Set<Purpose> purposes,
+            Set<PlayTimeRange> playTimeRanges,
+            GameRank gameRank,
+            Integer skillLevel,
+            Boolean micUsage,
+            String message
+    ) {
+        this.gender = gender;
+        this.lanes = lanes;
+        this.purposes = purposes;
+        this.playTimeRanges = playTimeRanges;
+        this.gameRank = gameRank;
+        this.skillLevel = skillLevel;
+        this.micUsage = micUsage;
+        this.message = message;
     }
 
     public void updateMatchScore(int matchScore) {
