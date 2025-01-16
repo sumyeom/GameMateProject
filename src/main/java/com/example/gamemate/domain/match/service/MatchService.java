@@ -38,19 +38,21 @@ public class MatchService {
         User receiver = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
-        MatchUserInfo loginUserInfo = matchUserInfoRepository.findByUser(loginUser)
-                .orElseThrow(() -> new ApiException(ErrorCode.MATCH_USER_INFO_NOT_FOUND));
+        if (!matchUserInfoRepository.existsByUser(receiver)) {
+            throw new ApiException(ErrorCode.MATCH_USER_INFO_NOT_FOUND);
+        } // 받는 사람의 매칭 유저 정보가 없을때 예외처리
 
-        MatchUserInfo receiverInfo = matchUserInfoRepository.findByUser(receiver)
-                .orElseThrow(() -> new ApiException(ErrorCode.MATCH_USER_INFO_NOT_FOUND));
+        if (!matchUserInfoRepository.existsByUser(loginUser)) {
+            throw new ApiException(ErrorCode.MATCH_USER_INFO_NOT_WRITTEN);
+        } // 로그인 한 유저의 매칭 유저 정보가 없을때 예외처리
 
         if (receiver.getUserStatus() == UserStatus.WITHDRAW) {
             throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
-        }
+        } // 받는 사람의 유저 상태가 탈퇴 상태일때 예외처리
 
         if (matchRepository.existsBySenderAndReceiverAndStatus(loginUser, receiver, MatchStatus.PENDING)) {
             throw new ApiException(ErrorCode.IS_ALREADY_PENDING);
-        }
+        } // 이미 보낸 요청이 있을때 예외처리
 
         Match match = new Match(dto.getMessage(), loginUser, receiver);
         matchRepository.save(match);
@@ -67,11 +69,11 @@ public class MatchService {
 
         if (findMatch.getStatus() != MatchStatus.PENDING) {
             throw new ApiException(ErrorCode.IS_ALREADY_PROCESSED);
-        }
+        } // 매칭의 상태가 보류중이 아닐때 예외처리
 
         if (!Objects.equals(loginUser.getId(), findMatch.getReceiver().getId())) {
             throw new ApiException(ErrorCode.FORBIDDEN);
-        }
+        } // 로그인한 유저가 매칭의 받는 사람이 아닐때 예외처리
 
         findMatch.updateStatus(dto.getStatus());
     }
@@ -105,7 +107,7 @@ public class MatchService {
 
         if (!Objects.equals(findMatch.getSender().getId(), loginUser.getId())) {
             throw new ApiException(ErrorCode.FORBIDDEN);
-        }
+        } // 로그인한 유저가 매칭의 보낸사람이 아닐때 예외처리
 
         matchRepository.delete(findMatch);
     }
@@ -147,7 +149,7 @@ public class MatchService {
         if (!Objects.equals(findMatch.getReceiver().getId(), loginUser.getId())
                 && !Objects.equals(findMatch.getSender().getId(), loginUser.getId())) {
             throw new ApiException(ErrorCode.FORBIDDEN);
-        }
+        } // 매칭의 상대방을 검색할때, 로그인한 유저가 검색할 매칭과 연관이 없을때 예외처리
 
         return (Objects.equals(findMatch.getReceiver().getId(), loginUser.getId()))
                 ? getMatchInfoResponseDto(findMatch.getSender())
