@@ -68,7 +68,7 @@ public class BoardService {
      */
     public List<BoardFindAllResponseDto> findAllBoards(int page, BoardCategory category, String title, String content) {
 
-        Pageable pageable = PageRequest.of(page, ListSize.LIST_SIZE.getSize(), Sort.by(Sort.Order.desc("createdAt")));
+        Pageable pageable = PageRequest.of(page, ListSize.BOARD_LIST_SIZE.getSize(), Sort.by(Sort.Order.desc("createdAt")));
 
         Page<Board> boardPage = boardRepository.searchBoardQuerydsl(category, title, content, pageable);
 
@@ -86,23 +86,13 @@ public class BoardService {
 
     /**
      * 게시글 단건 조회 메서드
-     * @param page
      * @param id
      * @return
      */
-    public BoardFindOneResponseDto findBoardById(int page, Long id) {
-        // page는 댓글 페이지네이션을 위해 필요
-        Pageable pageable = PageRequest.of(page, ListSize.LIST_SIZE.getSize(), Sort.by(Sort.Order.asc("createdAt")));
+    public BoardFindOneResponseDto findBoardById(Long id) {
         // 게시글 조회
         Board findBoard = boardRepository.findById(id)
                 .orElseThrow(()->new ApiException(ErrorCode.BOARD_NOT_FOUND));
-
-        // 댓글 조회
-        Page<Comment> comments = commentRepository.findByBoard(findBoard,pageable);
-
-        List<CommentFindResponseDto> commentDtos = comments.stream()
-                .map(this::convertCommentDto)
-                .collect(Collectors.toList());
 
         return new BoardFindOneResponseDto(
                 findBoard.getBoardId(),
@@ -111,8 +101,7 @@ public class BoardService {
                 findBoard.getContent(),
                 findBoard.getUser().getNickname(),
                 findBoard.getCreatedAt(),
-                findBoard.getModifiedAt(),
-                commentDtos
+                findBoard.getModifiedAt()
         );
     }
 
@@ -153,32 +142,5 @@ public class BoardService {
         }
 
         boardRepository.delete(findBoard);
-    }
-
-    private CommentFindResponseDto convertCommentDto(Comment comment) {
-        List<ReplyFindResponseDto> replyDtos = Optional.ofNullable(replyRepository.findByComment(comment))
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(this::convertReplyDto)
-                .collect(Collectors.toList());
-        return new CommentFindResponseDto(
-                comment.getCommentId(),
-                comment.getContent(),
-                comment.getUser().getNickname(),
-                comment.getCreatedAt(),
-                comment.getModifiedAt(),
-                replyDtos
-        );
-    }
-
-    private ReplyFindResponseDto convertReplyDto(Reply reply) {
-        String findUserName = reply.getParentReply() == null ? null : reply.getParentReply().getUser().getNickname();
-        return new ReplyFindResponseDto(
-                reply.getReplyId(),
-                findUserName,
-                reply.getContent(),
-                reply.getCreatedAt(),
-                reply.getModifiedAt()
-        );
     }
 }

@@ -17,9 +17,8 @@ public class BoardFindOneResponseDto {
     private final String nickname;
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
-    private final List<CommentFindResponseDto> comments;
 
-    public BoardFindOneResponseDto(Long id, BoardCategory category, String title, String content, String nickname, LocalDateTime createdAt, LocalDateTime modifiedAt, List<CommentFindResponseDto> comments) {
+    public BoardFindOneResponseDto(Long id, BoardCategory category, String title, String content, String nickname, LocalDateTime createdAt, LocalDateTime modifiedAt) {
         this.id = id;
         this.category = category;
         this.title = title;
@@ -27,6 +26,5 @@ public class BoardFindOneResponseDto {
         this.nickname = nickname;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
-        this.comments = comments;
     }
 }
