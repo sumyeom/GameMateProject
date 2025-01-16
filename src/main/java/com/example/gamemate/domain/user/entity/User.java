@@ -31,6 +31,7 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String nickname;
 
+    @Column(nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -73,6 +74,7 @@ public class User extends BaseEntity {
         this.email = email;
         this.name = name;
         this.nickname = nickname;
+        this.password = "OAUTH2_USER";
         this.provider = provider;
         this.providerId = providerId;
         this.role = Role.USER;
