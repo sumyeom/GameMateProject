@@ -37,7 +37,7 @@ public class MatchSearchConditionDto {
     @NotNull(message = "마이크 사용 여부는 필수 입력값입니다.")
     private Boolean micUsage;
 
-    private String priority;
+    private Priority priority;
 
     public MatchSearchConditionDto(
             Gender gender,
@@ -47,7 +47,7 @@ public class MatchSearchConditionDto {
             Set<PlayTimeRange> playTimeRanges,
             Integer skillLevel,
             Boolean micUsage,
-            String priority
+            Priority priority
     ) {
         this.gender = gender;
         this.lanes = lanes;

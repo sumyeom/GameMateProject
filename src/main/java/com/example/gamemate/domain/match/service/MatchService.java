@@ -5,12 +5,12 @@ import com.example.gamemate.domain.match.entity.Match;
 import com.example.gamemate.domain.match.entity.MatchUserInfo;
 import com.example.gamemate.domain.match.enums.GameRank;
 import com.example.gamemate.domain.match.enums.MatchStatus;
+import com.example.gamemate.domain.match.enums.Priority;
 import com.example.gamemate.domain.match.repository.MatchRepository;
 import com.example.gamemate.domain.match.repository.MatchUserInfoRepository;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.domain.user.enums.UserStatus;
 import com.example.gamemate.domain.user.repository.UserRepository;
-import com.example.gamemate.global.config.auth.CustomUserDetails;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import jakarta.transaction.Transactional;
@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.example.gamemate.domain.match.enums.Priority.*;
 
 @Service
 @RequiredArgsConstructor
@@ -219,41 +221,41 @@ public class MatchService {
         int normalScorePerMatch = 5; // 매칭되는 항목당 점수
         int priorityWeight = 2; // 우선순위 가중치
 
-        String priority = condition.getPriority();
+        Priority priority = condition.getPriority();
 
         // 우선순위 항목 점수 계산 및 가중치 적용
         if (priority != null) {
             switch (priority) {
-                case "lanes":
+                case LANES:
                     int matchedLanes = (int) condition.getLanes().stream()
                             .filter(userInfo.getLanes()::contains)
                             .count();
                     score += matchedLanes * normalScorePerMatch * priorityWeight;
                     break;
-                case "purposes":
+                case PURPOSES:
                     int matchedPurposes = (int) condition.getPurposes().stream()
                             .filter(userInfo.getPurposes()::contains)
                             .count();
                     score += matchedPurposes * normalScorePerMatch * priorityWeight;
                     break;
-                case "playTimeRanges":
+                case PLAY_TIME_RANGES:
                     int matchedPlayTimeRanges = (int) condition.getPlayTimeRanges().stream()
                             .filter(userInfo.getPlayTimeRanges()::contains)
                             .count();
                     score += matchedPlayTimeRanges * normalScorePerMatch * priorityWeight;
                     break;
-                case "gameRank":
+                case GAME_RANK:
                     if (condition.getGameRank().equals(userInfo.getGameRank())) {
                         score += normalScorePerMatch * priorityWeight * 2;
                     } else if (isRankSimilar(condition.getGameRank(), userInfo.getGameRank())) {
                         score += normalScorePerMatch * priorityWeight;
                     }
                     break;
-                case "skillLevel":
+                case SKILL_LEVEL:
                     int skillLevelDifference = Math.abs(condition.getSkillLevel() - userInfo.getSkillLevel());
                     score += (normalScorePerMatch - skillLevelDifference) * priorityWeight;
                     break;
-                case "micUsage":
+                case MIC_USAGE:
                     if (condition.getMicUsage().equals(userInfo.getMicUsage())) {
                         score += normalScorePerMatch * priorityWeight * 2;
                     }
@@ -262,28 +264,28 @@ public class MatchService {
         }
 
         // 우선순위가 아닌 조건의 점수 계산 방식
-        if (priority == null || !priority.equals("lanes")) {
+        if (priority == null || !priority.equals(LANES)) {
             int matchedLanes = (int) condition.getLanes().stream()
                     .filter(userInfo.getLanes()::contains)
                     .count();
             score += matchedLanes * normalScorePerMatch;
         }
 
-        if (priority == null || !priority.equals("purposes")) {
+        if (priority == null || !priority.equals(PURPOSES)) {
             int matchedPurposes = (int) condition.getPurposes().stream()
                     .filter(userInfo.getPurposes()::contains)
                     .count();
             score += matchedPurposes * normalScorePerMatch;
         }
 
-        if (priority == null || !priority.equals("playTimeRanges")) {
+        if (priority == null || !priority.equals(PLAY_TIME_RANGES)) {
             int matchedPlayTimeRanges = (int) condition.getPlayTimeRanges().stream()
                     .filter(userInfo.getPlayTimeRanges()::contains)
                     .count();
             score += matchedPlayTimeRanges * normalScorePerMatch;
         }
 
-        if (priority == null || !priority.equals("gameRank")) {
+        if (priority == null || !priority.equals(GAME_RANK)) {
             if (condition.getGameRank().equals(userInfo.getGameRank())) {
                 score += normalScorePerMatch * 2;
             } else if (isRankSimilar(condition.getGameRank(), userInfo.getGameRank())) {
@@ -291,12 +293,12 @@ public class MatchService {
             }
         }
 
-        if (priority == null || !priority.equals("skillLevel")) {
+        if (priority == null || !priority.equals(SKILL_LEVEL)) {
             int skillLevelDifference = Math.abs(condition.getSkillLevel() - userInfo.getSkillLevel());
             score += (normalScorePerMatch - skillLevelDifference);
         }
 
-        if (priority == null || !priority.equals("micUsage")) {
+        if (priority == null || !priority.equals(MIC_USAGE)) {
             if (condition.getMicUsage().equals(userInfo.getMicUsage())) {
                 score += normalScorePerMatch * 2;
             }
