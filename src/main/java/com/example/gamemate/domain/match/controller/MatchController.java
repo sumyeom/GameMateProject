@@ -111,6 +111,15 @@ public class MatchController {
         return new ResponseEntity<>(matchInfoResponseDto, HttpStatus.CREATED);
     }
 
+    @GetMapping("/info")
+    public ResponseEntity<MatchInfoResponseDto> findMyInfo(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+
+        MatchInfoResponseDto matchInfoResponseDto = matchService.findMyInfo(customUserDetails.getUser());
+        return new ResponseEntity<>(matchInfoResponseDto, HttpStatus.OK);
+    }
+
     /**
      * 내 정보 삭제, 내 정보 삭제시 더이상 매칭에서 검색되지 않음
      * @return 204 NO_CONTENT

@@ -127,6 +127,14 @@ public class MatchService {
         return MatchInfoResponseDto.toDto(matchUserInfo);
     }
 
+    // 내 정보 조회
+    public MatchInfoResponseDto findMyInfo(User loginUser) {
+        MatchUserInfo matchUserInfo = matchUserInfoRepository.findByUser(loginUser)
+                .orElseThrow(() -> new ApiException(ErrorCode.MATCH_USER_INFO_NOT_FOUND));
+
+        return MatchInfoResponseDto.toDto(matchUserInfo);
+    }
+
     // 내 정보 삭제, 내정보 삭제시 매칭 추천에서 더이상 검색되지 않음
     @Transactional
     public void deleteMyInfo(User loginUser) {
