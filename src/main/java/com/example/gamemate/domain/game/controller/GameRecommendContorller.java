@@ -25,7 +25,8 @@ public class GameRecommendContorller {
     @PostMapping
     public ResponseEntity<UserGamePreferenceResponseDto> createUserGamePreference(
             @RequestBody UserGamePreferenceRequestDto requestDto,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
 
         UserGamePreferenceResponseDto responseDto = gameRecommendService.createUserGamePreference(requestDto, customUserDetails.getUser());
 
