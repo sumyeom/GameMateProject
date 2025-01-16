@@ -7,5 +7,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
+
     Page<Review> findAllByGame(Game game, Pageable pageable);
+
+    boolean existsByUserIdAndGameId(Long userId, Long gameId);
+
 }

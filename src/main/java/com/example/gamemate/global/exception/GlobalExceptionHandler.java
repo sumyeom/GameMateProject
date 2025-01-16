@@ -109,6 +109,14 @@ public class GlobalExceptionHandler {
         return handleExceptionInternal(errorCode);
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleException(Exception e) {
+        log.error("Unhandled exception occurred", e);
+        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+        return handleExceptionInternal(errorCode);
+    }
+
+
     private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode) {
         return ResponseEntity.status(errorCode.getStatus())
                 .body(makeErrorResponse(errorCode));

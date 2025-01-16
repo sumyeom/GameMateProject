@@ -12,7 +12,7 @@ public class GameEnrollRequestUpdateRequestDto {
     private Boolean isAccepted;
 
 
-    public GameEnrollRequestUpdateRequestDto(String title, String genre, String platform , String description,Boolean isAccepted  ) {
+    public GameEnrollRequestUpdateRequestDto(String title, String genre, String platform, String description, Boolean isAccepted) {
         this.title = title;
         this.genre = genre;
         this.platform = platform;

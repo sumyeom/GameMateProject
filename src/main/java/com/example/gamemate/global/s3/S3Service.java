@@ -31,7 +31,7 @@ public class S3Service {
         amazonS3Client.putObject(new PutObjectRequest(bucket, fileName,
                 file.getInputStream(), metadata));
 
-        return amazonS3Client.getUrl(bucket, fileName).toString();
+        return String.format("https://%s.s3.%s.amazonaws.com/%s", bucket, amazonS3Client.getRegionName() ,fileName);
     }
 
     private String createFileName(String originalFileName) {
