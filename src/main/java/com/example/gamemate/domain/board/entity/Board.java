@@ -1,12 +1,14 @@
 package com.example.gamemate.domain.board.entity;
 
 import com.example.gamemate.domain.board.enums.BoardCategory;
+import com.example.gamemate.domain.boardImage.entity.BoardImage;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.context.annotation.EnableMBeanExport;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -32,6 +34,9 @@ public class Board extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "board")
+    private List<BoardImage> boardImages;
 
     public Board(BoardCategory category, String title, String content, User user) {
         this.category = category;
