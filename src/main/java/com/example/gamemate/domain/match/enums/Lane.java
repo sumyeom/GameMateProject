@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum Lane {
     TOP("top", "탑"),
     JUNGLE("jungle", "정글"),
-    MID("mid","정글"),
+    MID("mid","미드"),
     BOTTOM_AD("bottom_ad", "원딜"),
     BOTTOM_SUPPORTER("bottom_supporter", "서포터");
 
