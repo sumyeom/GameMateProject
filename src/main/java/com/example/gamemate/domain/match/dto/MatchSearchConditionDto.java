@@ -31,7 +31,7 @@ public class MatchSearchConditionDto {
 
     @NotNull(message = "스킬 레벨은 필수 입력값입니다.")
     @Min(value = 1, message = "스킬 레벨은 1 이상이어야 합니다.")
-    @Max(value = 10, message = "스킬 레벨은 10 이하여야 합니다.")
+    @Max(value = 5, message = "스킬 레벨은 5 이하여야 합니다.")
     private Integer skillLevel;
 
     @NotNull(message = "마이크 사용 여부는 필수 입력값입니다.")

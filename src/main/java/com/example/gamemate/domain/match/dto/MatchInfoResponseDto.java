@@ -8,7 +8,7 @@ import java.util.Set;
 
 @Getter
 public class MatchInfoResponseDto {
-    private Long id;
+    private Long matchUserInfoId;
     private String nickname;
     private Gender gender;
     private Set<Lane> lanes;
@@ -20,7 +20,7 @@ public class MatchInfoResponseDto {
     private String message;
 
     public MatchInfoResponseDto(
-            Long id,
+            Long matchUserInfoId,
             String nickname,
             Gender gender,
             Set<Lane> lanes,
@@ -31,7 +31,7 @@ public class MatchInfoResponseDto {
             Boolean micUsage,
             String message
     ) {
-        this.id = id;
+        this.matchUserInfoId = matchUserInfoId;
         this.nickname = nickname;
         this.gender = gender;
         this.lanes = lanes;

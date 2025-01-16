@@ -251,7 +251,7 @@ public class MatchService {
                     break;
                 case "skillLevel":
                     int skillLevelDifference = Math.abs(condition.getSkillLevel() - userInfo.getSkillLevel());
-                    score += (normalScorePerMatch * 2 - skillLevelDifference) * priorityWeight;
+                    score += (normalScorePerMatch - skillLevelDifference) * priorityWeight;
                     break;
                 case "micUsage":
                     if (condition.getMicUsage().equals(userInfo.getMicUsage())) {
@@ -293,7 +293,7 @@ public class MatchService {
 
         if (priority == null || !priority.equals("skillLevel")) {
             int skillLevelDifference = Math.abs(condition.getSkillLevel() - userInfo.getSkillLevel());
-            score += (normalScorePerMatch * 2 - skillLevelDifference);
+            score += (normalScorePerMatch - skillLevelDifference);
         }
 
         if (priority == null || !priority.equals("micUsage")) {
