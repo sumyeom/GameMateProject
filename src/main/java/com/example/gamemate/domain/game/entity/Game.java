@@ -3,8 +3,6 @@ package com.example.gamemate.domain.game.entity;
 import com.example.gamemate.domain.review.entity.Review;
 import com.example.gamemate.global.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

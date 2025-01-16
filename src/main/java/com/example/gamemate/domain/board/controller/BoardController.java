@@ -6,10 +6,12 @@ import com.example.gamemate.domain.board.dto.BoardFindAllResponseDto;
 import com.example.gamemate.domain.board.dto.BoardFindOneResponseDto;
 import com.example.gamemate.domain.board.enums.BoardCategory;
 import com.example.gamemate.domain.board.service.BoardService;
+import com.example.gamemate.global.config.auth.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,10 +30,11 @@ public class BoardController {
      */
     @PostMapping
     public ResponseEntity<BoardResponseDto> createBoard(
-            @Valid @RequestBody BoardRequestDto dto
+            @Valid @RequestBody BoardRequestDto dto,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
     ){
 
-        BoardResponseDto responseDto = boardService.createBoard(dto);
+        BoardResponseDto responseDto = boardService.createBoard(customUserDetails.getUser(), dto);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
@@ -61,17 +64,15 @@ public class BoardController {
 
     /**
      * 게시글 단건 조회 API
-     * @param page
      * @param id
      * @return
      */
     @GetMapping("/{id}")
     public ResponseEntity<BoardFindOneResponseDto> findBoardById(
-            @RequestParam(required = false, defaultValue = "0") int page,
             @PathVariable Long id
     ){
 
-        BoardFindOneResponseDto dto = boardService.findBoardById(page,id);
+        BoardFindOneResponseDto dto = boardService.findBoardById(id);
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
@@ -83,13 +84,14 @@ public class BoardController {
      * @return
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<String> updateBoard(
+    public ResponseEntity<Void> updateBoard(
             @PathVariable Long id,
-            @Valid @RequestBody BoardRequestDto dto
+            @Valid @RequestBody BoardRequestDto dto,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
     ){
 
-        boardService.updateBoard(id, dto);
-        return new ResponseEntity<>("업데이트 되었습니다.", HttpStatus.NO_CONTENT);
+        boardService.updateBoard(customUserDetails.getUser(), id, dto);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -98,11 +100,12 @@ public class BoardController {
      * @return
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteBoard(
-            @PathVariable Long id
+    public ResponseEntity<Void> deleteBoard(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
     ){
 
-        boardService.deleteBoard(id);
-        return new ResponseEntity<>("삭제 되었습니다", HttpStatus.NO_CONTENT);
+        boardService.deleteBoard(customUserDetails.getUser(), id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
