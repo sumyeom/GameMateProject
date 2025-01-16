@@ -96,7 +96,7 @@ public class MatchController {
      * @param dto MatchInfoCreateRequestDto
      * @return matchInfoResponseDto
      */
-    @PostMapping("/info")
+    @PostMapping("/my-info")
     public ResponseEntity<MatchInfoResponseDto> createMyInfo(
             @RequestBody MatchInfoCreateRequestDto dto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
@@ -110,7 +110,7 @@ public class MatchController {
      * 매칭 내정보 조회하기
      * @return MatchInfoResponseDto
      */
-    @GetMapping("/info")
+    @GetMapping("/my-info")
     public ResponseEntity<MatchInfoResponseDto> findMyInfo(
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
@@ -120,11 +120,26 @@ public class MatchController {
     }
 
     /**
+     * 매칭 상대방 정보 조회하기
+     * @param id 매치 id
+     * @return MatchInfoResponseDto 상대방 정보
+     */
+    @GetMapping("/{id}/opponent-info")
+    public ResponseEntity<MatchInfoResponseDto> findOpponentInfo(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+
+        MatchInfoResponseDto matchInfoResponseDto = matchService.findOpponentInfo(id, customUserDetails.getUser());
+        return new ResponseEntity<>(matchInfoResponseDto, HttpStatus.OK);
+    }
+
+    /**
      * 매칭 내정보 수정하기
      * @param dto MatchInfoUpdateRequestDto
      * @return 204 NO_CONTENT
      */
-    @PutMapping("/info")
+    @PutMapping("/my-info")
     public ResponseEntity<Void> updateMyInfo(
             @Valid @RequestBody MatchInfoUpdateRequestDto dto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
@@ -134,12 +149,11 @@ public class MatchController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-
     /**
      * 내 정보 삭제, 내 정보 삭제시 더이상 매칭에서 검색되지 않음
      * @return 204 NO_CONTENT
      */
-    @DeleteMapping("/info")
+    @DeleteMapping("/my-info")
     public ResponseEntity<Void> deleteMyInfo(
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {

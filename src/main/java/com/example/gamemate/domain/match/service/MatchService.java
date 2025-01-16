@@ -10,6 +10,7 @@ import com.example.gamemate.domain.match.repository.MatchUserInfoRepository;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.domain.user.enums.UserStatus;
 import com.example.gamemate.domain.user.repository.UserRepository;
+import com.example.gamemate.global.config.auth.CustomUserDetails;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import jakarta.transaction.Transactional;
@@ -136,6 +137,21 @@ public class MatchService {
                 .orElseThrow(() -> new ApiException(ErrorCode.MATCH_USER_INFO_NOT_FOUND));
 
         return MatchInfoResponseDto.toDto(matchUserInfo);
+    }
+
+    // 상대방 정보 조회
+    public MatchInfoResponseDto findOpponentInfo(Long id, User loginUser) {
+        Match findMatch = matchRepository.findById(id)
+                .orElseThrow(() -> new ApiException(ErrorCode.MATCH_NOT_FOUND));
+
+        if (!Objects.equals(findMatch.getReceiver().getId(), loginUser.getId())
+                && !Objects.equals(findMatch.getSender().getId(), loginUser.getId())) {
+            throw new ApiException(ErrorCode.FORBIDDEN);
+        }
+
+        return (Objects.equals(findMatch.getReceiver().getId(), loginUser.getId()))
+                ? getMatchInfoResponseDto(findMatch.getSender())
+                : getMatchInfoResponseDto(findMatch.getReceiver());
     }
 
     // 내 정보 수정
@@ -273,12 +289,12 @@ public class MatchService {
             }
         }
 
-        if (priority == null || !priority.equals("skillLevel")){
+        if (priority == null || !priority.equals("skillLevel")) {
             int skillLevelDifference = Math.abs(condition.getSkillLevel() - userInfo.getSkillLevel());
             score += (normalScorePerMatch * 2 - skillLevelDifference);
         }
 
-        if(priority == null || !priority.equals("micUsage")){
+        if (priority == null || !priority.equals("micUsage")) {
             if (condition.getMicUsage().equals(userInfo.getMicUsage())) {
                 score += normalScorePerMatch * 2;
             }
@@ -328,6 +344,13 @@ public class MatchService {
         resultList.addAll(tieGroup); //마지막 그룹 추가
 
         return resultList;
+    }
+
+    // 매칭 상대방 정보 찾아서 dto 로 변환
+    private MatchInfoResponseDto getMatchInfoResponseDto(User user) {
+        MatchUserInfo matchUserInfo = matchUserInfoRepository.findByUser(user)
+                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+        return MatchInfoResponseDto.toDto(matchUserInfo);
     }
 }
 
