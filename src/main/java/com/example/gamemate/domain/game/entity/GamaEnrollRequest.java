@@ -1,5 +1,6 @@
 package com.example.gamemate.domain.game.entity;
 
+import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -28,17 +29,19 @@ public class GamaEnrollRequest extends BaseEntity {
     @Column(name = "platform", length = 20)
     private String platform;
 
-//    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL)
-//    private List<GameImage> gameImages = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "is_accepted", columnDefinition = "BOOLEAN DEFAULT false")
     private Boolean isAccepted = false;
 
-    public GamaEnrollRequest(String title, String genre, String platform, String description ) {
+    public GamaEnrollRequest(String title, String genre, String platform, String description, User userId ) {
         this.title = title;
         this.genre = genre;
         this.platform = platform;
         this.description = description;
+        this.user = userId;
 
     }
 

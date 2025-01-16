@@ -64,17 +64,15 @@ public class BoardController {
 
     /**
      * 게시글 단건 조회 API
-     * @param page
      * @param id
      * @return
      */
     @GetMapping("/{id}")
     public ResponseEntity<BoardFindOneResponseDto> findBoardById(
-            @RequestParam(required = false, defaultValue = "0") int page,
             @PathVariable Long id
     ){
 
-        BoardFindOneResponseDto dto = boardService.findBoardById(page,id);
+        BoardFindOneResponseDto dto = boardService.findBoardById(id);
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 

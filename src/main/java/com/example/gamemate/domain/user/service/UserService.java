@@ -24,9 +24,7 @@ public class UserService {
     private final AuthService authService;
 
     @Transactional(readOnly = true)
-    public ProfileResponseDto findProfile(Long id, String token) {
-
-        validateToken(token);
+    public ProfileResponseDto findProfile(Long id, User loginUser) {
 
         User findUser = userRepository.findById(id)
                 .orElseThrow(()-> new ApiException(ErrorCode.USER_NOT_FOUND));
@@ -37,28 +35,24 @@ public class UserService {
         return new ProfileResponseDto(findUser);
     }
 
-    public void updateProfile(Long id, String newNickname, String token) {
-
-        validateToken(token);
+    public void updateProfile(Long id, String newNickname, User loginUser) {
 
         User findUser = userRepository.findById(id)
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
-        validateOwner(findUser, token);
+        validateOwner(findUser, loginUser);
 
         findUser.updateProfile(newNickname);
         User savedUser = userRepository.save(findUser);
 
     }
 
-    public void updatePassword(Long id, String oldPassword, String newPassword, String token) {
-
-       validateToken(token);
+    public void updatePassword(Long id, String oldPassword, String newPassword, User loginUser) {
 
         User findUser = userRepository.findById(id)
                 .orElseThrow(()-> new ApiException(ErrorCode.USER_NOT_FOUND));
 
-        validateOwner(findUser, token);
+        validateOwner(findUser, loginUser);
 
         if(!passwordEncoder.matches(oldPassword, findUser.getPassword())) {
             throw new ApiException(ErrorCode.INVALID_PASSWORD);
@@ -69,35 +63,24 @@ public class UserService {
         userRepository.save(findUser);
     }
 
-    public void withdrawUser(String token) {
+    public void withdrawUser(User loginUser) {
 
-        validateToken(token);
+        loginUser.deleteSoftly();
+        loginUser.updateUserStatus(UserStatus.WITHDRAW);
+        loginUser.removeRefreshToken();
 
-        String email = jwtTokenProvider.getEmailFromToken(token);
-        User findUser = userRepository.findByEmail(email)
-                .orElseThrow(()-> new ApiException(ErrorCode.USER_NOT_FOUND));
-
-        if(UserStatus.WITHDRAW.equals(findUser.getUserStatus())) {
-            throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
-        }
-
-        findUser.deleteSoftly();
-        findUser.updateUserStatus(UserStatus.WITHDRAW);
-        findUser.removeRefreshToken();
-
-        userRepository.save(findUser);
+        userRepository.save(loginUser);
 
     }
 
-    private void validateToken(String token) {
-        if(!jwtTokenProvider.validateToken(token)) {
-            throw new ApiException(ErrorCode.INVALID_TOKEN);
-        }
-    }
+//    private void validateToken(String token) {
+//        if(!jwtTokenProvider.validateToken(token)) {
+//            throw new ApiException(ErrorCode.INVALID_TOKEN);
+//        }
+//    }
 
-    private void validateOwner(User user, String token) {
-        String emailFromToken = jwtTokenProvider.getEmailFromToken(token);
-        if(!user.getEmail().equals(emailFromToken)) {
+    private void validateOwner(User user, User loginUser) {
+        if(!user.getEmail().equals(loginUser.getEmail())) {
             throw new ApiException(ErrorCode.FORBIDDEN);
         }
     }

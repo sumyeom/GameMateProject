@@ -2,6 +2,7 @@ package com.example.gamemate.domain.review.service;
 
 import com.example.gamemate.domain.game.entity.Game;
 import com.example.gamemate.domain.game.repository.GameRepository;
+import com.example.gamemate.domain.like.repository.ReviewLikeRepository;
 import com.example.gamemate.domain.review.dto.ReviewCreateRequestDto;
 import com.example.gamemate.domain.review.dto.ReviewCreateResponseDto;
 import com.example.gamemate.domain.review.dto.ReviewFindByAllResponseDto;
@@ -28,6 +29,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
+    private final ReviewLikeRepository reviewLikeRepository;
 
     @Transactional
     public ReviewCreateResponseDto createReview(User loginUser, Long gameId, ReviewCreateRequestDto requestDto) {
@@ -57,6 +59,7 @@ public class ReviewService {
         return new ReviewCreateResponseDto(saveReview);
     }
 
+    @Transactional
     public void updateReview(User loginUser, Long gameId, Long id, ReviewUpdateRequestDto requestDto) {
 
         Long userId = loginUser.getId();
@@ -77,6 +80,7 @@ public class ReviewService {
         reviewRepository.save(review);
     }
 
+    @Transactional
     public void deleteReview(User loginUser, Long id) {
 
         Long userId = loginUser.getId();
@@ -92,7 +96,7 @@ public class ReviewService {
 
     }
 
-    public Page<ReviewFindByAllResponseDto> ReviewFindAllByGameId(Long gameId, User loginUser ){
+    public Page<ReviewFindByAllResponseDto> ReviewFindAllByGameId(Long gameId, User loginUser) {
 
         Game game = gameRepository.findGameById(gameId)
                 .orElseThrow(() -> new ApiException(ErrorCode.GAME_NOT_FOUND));
@@ -100,12 +104,10 @@ public class ReviewService {
         Pageable pageable = PageRequest.of(0, 5, Sort.by("createdAt").descending());
         Page<Review> reviewPage = reviewRepository.findAllByGame(game, pageable);
 
-        // Review를 ReviewFindByAllResponseDto로 변환하면서 닉네임 추가
-        Page<ReviewFindByAllResponseDto> reviews = reviewPage.map(review ->
-                new ReviewFindByAllResponseDto(review, loginUser.getNickname())
-        );
-
-        return reviewPage.map(review -> new ReviewFindByAllResponseDto(review, loginUser.getNickname()));
+        return reviewPage.map(review -> {
+            Long likeCount = reviewLikeRepository.countByReviewIdAndStatus(review.getId(), 1);
+            return new ReviewFindByAllResponseDto(review, loginUser.getNickname(), likeCount);
+        });
     }
 
 

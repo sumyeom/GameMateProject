@@ -25,6 +25,10 @@ import org.springframework.web.bind.annotation.*;
 
 import static com.example.gamemate.global.constant.ErrorCode.USER_NOT_FOUND;
 
+/**
+ * 게임 리뷰 관련 API를 처리하는 컨트롤러 클래스입니다.
+ * 이 컨트롤러는 리뷰의 생성, 수정, 삭제 및 조회 기능을 제공합니다.
+ */
 @RestController
 @RequestMapping("/games/{gameId}/reviews")
 @Slf4j
@@ -33,14 +37,13 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-
     /**
-     * 리뷰등록
+     * 새로운 게임 리뷰를 생성합니다.
      *
-     * @param gameId
-     * @param requestDto
-     * @param customUserDetails
-     * @return
+     * @param gameId 리뷰를 작성할 게임의 ID
+     * @param requestDto 리뷰 생성 요청 데이터
+     * @param customUserDetails 인증된 사용자 정보
+     * @return 생성된 리뷰 정보를 포함한 ResponseEntity
      */
     @PostMapping
     public ResponseEntity<ReviewCreateResponseDto> createReview(
@@ -53,13 +56,13 @@ public class ReviewController {
     }
 
     /**
-     * 리뷰수정
+     * 기존 게임 리뷰를 수정합니다.
      *
-     * @param gameId
-     * @param id
-     * @param requestDto
-     * @param customUserDetails
-     * @return
+     * @param gameId 리뷰가 속한 게임의 ID
+     * @param id 수정할 리뷰의 ID
+     * @param requestDto 리뷰 수정 요청 데이터
+     * @param customUserDetails 인증된 사용자 정보
+     * @return 수정 결과를 나타내는 ResponseEntity
      */
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateReview(
@@ -73,12 +76,12 @@ public class ReviewController {
     }
 
     /**
-     * 리뷰삭제
+     * 게임 리뷰를 삭제합니다.
      *
-     * @param gameId
-     * @param id
-     * @param customUserDetails
-     * @return
+     * @param gameId 리뷰가 속한 게임의 ID
+     * @param id 삭제할 리뷰의 ID
+     * @param customUserDetails 인증된 사용자 정보
+     * @return 삭제 결과를 나타내는 ResponseEntity
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReview(
@@ -90,6 +93,13 @@ public class ReviewController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    /**
+     * 특정 게임의 모든 리뷰를 조회합니다.
+     *
+     * @param gameId 리뷰를 조회할 게임의 ID
+     * @param customUserDetails 인증된 사용자 정보
+     * @return 게임의 모든 리뷰 목록을 포함한 ResponseEntity
+     */
     @GetMapping
     public ResponseEntity<Page<ReviewFindByAllResponseDto>> ReviewFindAllByGameId(
             @PathVariable Long gameId,

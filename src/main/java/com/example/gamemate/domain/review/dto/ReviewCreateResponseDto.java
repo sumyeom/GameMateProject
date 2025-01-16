@@ -7,12 +7,12 @@ import java.time.LocalDateTime;
 
 @Getter
 public class ReviewCreateResponseDto {
-    private  Long id;
-    private  String content;
-    private  Integer star;
-    private  Long gameId;
-    private  Long userId;
-    private  LocalDateTime createdAt;
+    private Long id;
+    private String content;
+    private Integer star;
+    private Long gameId;
+    private Long userId;
+    private LocalDateTime createdAt;
 
     public ReviewCreateResponseDto(Review review) {
         this.id = review.getId();

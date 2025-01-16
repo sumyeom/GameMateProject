@@ -11,6 +11,9 @@ import com.example.gamemate.domain.board.repository.BoardRepository;
 import com.example.gamemate.domain.comment.dto.CommentFindResponseDto;
 import com.example.gamemate.domain.comment.entity.Comment;
 import com.example.gamemate.domain.comment.repository.CommentRepository;
+import com.example.gamemate.domain.reply.dto.ReplyFindResponseDto;
+import com.example.gamemate.domain.reply.entity.Reply;
+import com.example.gamemate.domain.reply.repository.ReplyRepository;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
@@ -22,7 +25,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -32,6 +37,7 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
+    private final ReplyRepository replyRepository;
 
     /**
      * 게시글 생성 메서드
@@ -62,7 +68,7 @@ public class BoardService {
      */
     public List<BoardFindAllResponseDto> findAllBoards(int page, BoardCategory category, String title, String content) {
 
-        Pageable pageable = PageRequest.of(page, ListSize.LIST_SIZE.getSize(), Sort.by(Sort.Order.desc("createdAt")));
+        Pageable pageable = PageRequest.of(page, ListSize.BOARD_LIST_SIZE.getSize(), Sort.by(Sort.Order.desc("createdAt")));
 
         Page<Board> boardPage = boardRepository.searchBoardQuerydsl(category, title, content, pageable);
 
@@ -80,37 +86,22 @@ public class BoardService {
 
     /**
      * 게시글 단건 조회 메서드
-     * @param page
      * @param id
      * @return
      */
-    public BoardFindOneResponseDto findBoardById(int page, Long id) {
-        // page는 댓글 페이지네이션을 위해 필요
-        Pageable pageable = PageRequest.of(page, ListSize.LIST_SIZE.getSize(), Sort.by(Sort.Order.asc("createdAt")));
+    public BoardFindOneResponseDto findBoardById(Long id) {
         // 게시글 조회
         Board findBoard = boardRepository.findById(id)
                 .orElseThrow(()->new ApiException(ErrorCode.BOARD_NOT_FOUND));
-
-        // 댓글 조회
-        Page<Comment> comments = commentRepository.findByBoard(findBoard,pageable);
-
-        List<CommentFindResponseDto> commentDtos = comments.stream()
-                        .map(comment-> new CommentFindResponseDto(
-                                comment.getCommentId(),
-                                comment.getContent(),
-                                comment.getCreatedAt(),
-                                comment.getModifiedAt()
-                        ))
-                        .collect(Collectors.toList());
 
         return new BoardFindOneResponseDto(
                 findBoard.getBoardId(),
                 findBoard.getCategory(),
                 findBoard.getTitle(),
                 findBoard.getContent(),
+                findBoard.getUser().getNickname(),
                 findBoard.getCreatedAt(),
-                findBoard.getModifiedAt(),
-                commentDtos
+                findBoard.getModifiedAt()
         );
     }
 

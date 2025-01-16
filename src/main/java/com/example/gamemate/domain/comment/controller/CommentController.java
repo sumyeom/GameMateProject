@@ -1,5 +1,6 @@
 package com.example.gamemate.domain.comment.controller;
 
+import com.example.gamemate.domain.comment.dto.CommentFindResponseDto;
 import com.example.gamemate.domain.comment.dto.CommentRequestDto;
 import com.example.gamemate.domain.comment.dto.CommentResponseDto;
 import com.example.gamemate.domain.comment.service.CommentService;
@@ -9,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -31,6 +34,21 @@ public class CommentController {
     ){
         CommentResponseDto dto = commentService.createComment(customUserDetails.getUser(),boardId, requestDto);
         return new ResponseEntity<>(dto, HttpStatus.CREATED);
+    }
+
+    /**
+     * 댓글/대댓글 조회
+     * @param boardId
+     * @param page
+     * @return
+     */
+    @GetMapping
+    public ResponseEntity<List<CommentFindResponseDto>> getComments(
+            @PathVariable Long boardId,
+            @RequestParam(defaultValue = "0") int page
+    ){
+        List<CommentFindResponseDto> dtos = commentService.getComments(boardId, page);
+        return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
 
     /**
