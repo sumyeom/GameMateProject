@@ -44,7 +44,7 @@ public class NotificationService {
     }
 
     // 알림 발송 (이메일)
-    @Scheduled(cron = "0 0/3 * * * *")
+    @Scheduled(cron = "0 0/10 * * * *")
     public void scheduleNotificationEmail() {
         log.info("스케쥴링 활성화");
 
