@@ -8,6 +8,8 @@ import com.example.gamemate.domain.like.entity.BoardLike;
 import com.example.gamemate.domain.like.entity.ReviewLike;
 import com.example.gamemate.domain.like.repository.BoardLikeRepository;
 import com.example.gamemate.domain.like.repository.ReviewLikeRepository;
+import com.example.gamemate.domain.notification.enums.NotificationType;
+import com.example.gamemate.domain.notification.service.NotificationService;
 import com.example.gamemate.domain.review.repository.ReviewRepository;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.domain.user.repository.UserRepository;
@@ -25,6 +27,7 @@ public class LikeService {
     private final ReviewRepository reviewRepository;
     private final BoardLikeRepository boardLikeRepository;
     private final BoardRepository boardRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public ReviewLikeResponseDto reviewLikeUp(Long reviewId, Integer status, User loginUser) {
@@ -40,6 +43,7 @@ public class LikeService {
 
         if (reviewLike.getId() == null) {
             reviewLikeRepository.save(reviewLike);
+            notificationService.createNotification(reviewLike.getReview().getUser(), NotificationType.NEW_LIKE);
         } else {
             reviewLike.changeStatus(status);
         }
@@ -61,6 +65,7 @@ public class LikeService {
 
         if (boardLike.getId() == null) {
             boardLikeRepository.save(boardLike);
+            notificationService.createNotification(boardLike.getBoard().getUser(), NotificationType.NEW_LIKE);
         } else {
             boardLike.changeStatus(status);
         }
