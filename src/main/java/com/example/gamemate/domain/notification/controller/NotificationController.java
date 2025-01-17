@@ -28,7 +28,7 @@ public class NotificationController {
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
 
-        List<NotificationResponseDto> NotificationResponseDtoList = notificationService.findAllNotification(customUserDetails.getUser());
-        return new ResponseEntity<>(NotificationResponseDtoList, HttpStatus.OK);
+        List<NotificationResponseDto> notificationResponseDtoList = notificationService.findAllNotification(customUserDetails.getUser());
+        return new ResponseEntity<>(notificationResponseDtoList, HttpStatus.OK);
     }
 }
