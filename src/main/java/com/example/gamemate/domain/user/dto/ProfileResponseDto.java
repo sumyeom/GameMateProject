@@ -6,11 +6,11 @@ import lombok.Getter;
 @Getter
 public class ProfileResponseDto {
 
-    private Long id;
-    private String email;
-    private String name;
-    private String nickname;
-    private Boolean is_premium;
+    private final Long id;
+    private final String email;
+    private final String name;
+    private final String nickname;
+    private final Boolean is_premium;
 
     public ProfileResponseDto(User user) {
         this.id = user.getId();

@@ -1,3 +1,15 @@
+cloud:
+  aws:
+    credentials:
+      access-key: YOUR_ACCESS_KEY
+      secret-key: YOUR_SECRET_KEY
+    s3:
+      bucket: YOUR_BUCKET_NAME
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+
 spring:
   mail:
     host: smtp.gmail.com
