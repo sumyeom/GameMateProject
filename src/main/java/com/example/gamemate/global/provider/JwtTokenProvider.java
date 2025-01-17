@@ -71,6 +71,10 @@ public class JwtTokenProvider {
         return getTokenClaims(token).getSubject();
     }
 
+    public long getExpirationFromToken(String token) {
+        return getTokenClaims(token).getExpiration().getTime();
+    }
+
     private Key generateSigningKey() {
         return new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), SignatureAlgorithm.HS256.getJcaName());
     }
