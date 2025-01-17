@@ -32,10 +32,9 @@ public class NotificationService {
     }
 
     // 알림 전체 보기
-    // todo 현재 로그인이 구현되어 있지 않아 1번 유저의 알림 목록을 불러오게 설정, 추후 로그인 구현시 로그인한 유저의 id값을 넣도록 변경
-    public List<NotificationResponseDto> findAllNotification() {
+    public List<NotificationResponseDto> findAllNotification(User loginUser) {
 
-        List<Notification> notificationList = notificationRepository.findAllByUserId(1L);
+        List<Notification> notificationList = notificationRepository.findAllByUserId(loginUser.getId());
 
         return notificationList
                 .stream()
