@@ -44,7 +44,7 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v3/api-docs/**", "/swagger-resources/**" ,"/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/auth/signup", "/auth/login", "auth/refresh").permitAll()
+                        .requestMatchers("/auth/signup", "/auth/login", "auth/refresh", "auth/email/**").permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/code/**").permitAll()
                         //Todo 관리자 접근 가능 url 수정
                         .requestMatchers("/관리자관련url").hasRole("admin")
@@ -75,7 +75,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setUserDetailsService(userDetailsService); // 여기서 CustomUserDetailsService가 주입됨
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }

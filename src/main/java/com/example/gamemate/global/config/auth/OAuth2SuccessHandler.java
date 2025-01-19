@@ -23,7 +23,6 @@ import java.io.IOException;
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final AuthService authService;  // UserRepository 대신 AuthService 사용
     private final UserRepository userRepository;
     private int refreshTokenMaxAge = 1000 * 60 * 60 * 24 * 3; //3일
 
@@ -42,7 +41,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRole());
             String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail());
 
-            // AuthService에 토큰 저장 처리 위임
             user.updateRefreshToken(refreshToken);
             userRepository.save(user);
 
@@ -69,7 +67,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.addCookie(cookie);
     }
 
-    @Value("${oauth2.redirect.uri}")
+    @Value("${oauth2.redirect-uri}")
     private String redirectUri;
 
     private String determineTargetUrl(String token) {

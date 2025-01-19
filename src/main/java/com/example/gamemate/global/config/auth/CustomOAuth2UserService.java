@@ -2,6 +2,7 @@ package com.example.gamemate.global.config.auth;
 
 import com.example.gamemate.domain.auth.dto.OAuth2LoginResponseDto;
 import com.example.gamemate.domain.auth.service.AuthService;
+import com.example.gamemate.domain.auth.service.OAuth2Service;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.domain.user.enums.AuthProvider;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private final AuthService authService;
+    private final OAuth2Service oAuth2Service;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -26,12 +27,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     userRequest.getClientRegistration().getRegistrationId().toUpperCase()
             );
 
-            OAuth2LoginResponseDto attributes = authService.extractOAuth2Attributes(
+            OAuth2LoginResponseDto attributes = oAuth2Service.extractOAuth2Attributes(
                     provider,
                     oauth2User.getAttributes()
             );
 
-            User user = authService.registerOAuth2User(attributes);
+            User user = oAuth2Service.registerOAuth2User(attributes);
 
             return new CustomUserDetails(user, oauth2User.getAttributes());
 

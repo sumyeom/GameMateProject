@@ -2,9 +2,11 @@ package com.example.gamemate.domain.follow.controller;
 
 import com.example.gamemate.domain.follow.service.FollowService;
 import com.example.gamemate.domain.follow.dto.*;
+import com.example.gamemate.global.config.auth.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,10 +25,11 @@ public class FollowController {
      */
     @PostMapping
     public ResponseEntity<FollowResponseDto> createFollow(
-            @RequestBody FollowCreateRequestDto dto
+            @RequestBody FollowCreateRequestDto dto,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
 
-        FollowResponseDto followResponseDto = followService.createFollow(dto);
+        FollowResponseDto followResponseDto = followService.createFollow(dto, customUserDetails.getUser());
         return new ResponseEntity<>(followResponseDto, HttpStatus.CREATED);
     }
 
@@ -37,26 +40,27 @@ public class FollowController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFollow(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
 
-        followService.deleteFollow(id);
+        followService.deleteFollow(id, customUserDetails.getUser());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
-     * 팔로우 상태 확인 (follower 가 followee 를 팔로우 했는지 확인)
-     * @param followerEmail
-     * @param followeeEmail
+     * 팔로우 상태 확인 (loginUser 가 followee 를 팔로우 했는지 확인)
+     * @param customUserDetails 로그인한 유저
+     * @param email 팔로우 상태를 확인할 상대방 이메일
      * @return followBooleanResponseDto
      */
     @GetMapping("/status")
     public ResponseEntity<FollowBooleanResponseDto> findFollow(
-            @RequestParam String followerEmail,
-            @RequestParam String followeeEmail
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @RequestParam String email
     ) {
 
-        FollowBooleanResponseDto followBooleanResponseDto = followService.findFollow(followerEmail, followeeEmail);
+        FollowBooleanResponseDto followBooleanResponseDto = followService.findFollow(customUserDetails.getUser(), email);
         return new ResponseEntity<>(followBooleanResponseDto, HttpStatus.OK);
     }
 
