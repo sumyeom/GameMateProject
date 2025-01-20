@@ -31,6 +31,7 @@ public class AuthService {
     public SignupResponseDto signup(SignupRequestDto requestDto) {
         // 기존 사용자 중복 체크
         Optional<User> findUser = userRepository.findByEmail(requestDto.getEmail());
+
         if(findUser.isPresent()) {
             if(findUser.get().getUserStatus() == UserStatus.WITHDRAW) {
                 throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);

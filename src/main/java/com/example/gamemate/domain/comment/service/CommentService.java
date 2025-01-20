@@ -8,6 +8,8 @@ import com.example.gamemate.domain.comment.dto.CommentRequestDto;
 import com.example.gamemate.domain.comment.dto.CommentResponseDto;
 import com.example.gamemate.domain.comment.entity.Comment;
 import com.example.gamemate.domain.comment.repository.CommentRepository;
+import com.example.gamemate.domain.notification.enums.NotificationType;
+import com.example.gamemate.domain.notification.service.NotificationService;
 import com.example.gamemate.domain.reply.dto.ReplyFindResponseDto;
 import com.example.gamemate.domain.reply.entity.Reply;
 import com.example.gamemate.domain.reply.repository.ReplyRepository;
@@ -34,6 +36,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
     private final BoardRepository boardRepository;
+    private final NotificationService notificationService;
 
     /**
      * 댓글 생성 메서드
@@ -49,6 +52,7 @@ public class CommentService {
 
         Comment comment = new Comment(requestDto.getContent(), findBoard, loginUser);
         Comment createComment = commentRepository.save(comment);
+        notificationService.createNotification(findBoard.getUser(), NotificationType.NEW_COMMENT);
 
         return new CommentResponseDto(
                 createComment.getCommentId(),

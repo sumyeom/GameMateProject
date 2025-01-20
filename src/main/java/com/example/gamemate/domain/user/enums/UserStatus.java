@@ -8,7 +8,7 @@ public enum UserStatus {
     ACTIVE("active"),
     WITHDRAW("withdraw");
 
-    private String name;
+    private final String name;
 
     UserStatus(String name) {
         this.name = name;

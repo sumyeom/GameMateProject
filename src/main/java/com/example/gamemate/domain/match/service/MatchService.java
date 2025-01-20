@@ -8,6 +8,8 @@ import com.example.gamemate.domain.match.enums.MatchStatus;
 import com.example.gamemate.domain.match.enums.Priority;
 import com.example.gamemate.domain.match.repository.MatchRepository;
 import com.example.gamemate.domain.match.repository.MatchUserInfoRepository;
+import com.example.gamemate.domain.notification.enums.NotificationType;
+import com.example.gamemate.domain.notification.service.NotificationService;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.domain.user.enums.UserStatus;
 import com.example.gamemate.domain.user.repository.UserRepository;
@@ -32,6 +34,7 @@ public class MatchService {
     private final UserRepository userRepository;
     private final MatchRepository matchRepository;
     private final MatchUserInfoRepository matchUserInfoRepository;
+    private final NotificationService notificationService;
 
     // 매칭 요청 생성
     @Transactional
@@ -58,6 +61,7 @@ public class MatchService {
 
         Match match = new Match(dto.getMessage(), loginUser, receiver);
         matchRepository.save(match);
+        notificationService.createNotification(receiver, NotificationType.NEW_MATCH);
 
         return MatchResponseDto.toDto(match);
     }
@@ -76,6 +80,14 @@ public class MatchService {
         if (!Objects.equals(loginUser.getId(), findMatch.getReceiver().getId())) {
             throw new ApiException(ErrorCode.FORBIDDEN);
         } // 로그인한 유저가 매칭의 받는 사람이 아닐때 예외처리
+
+        if (dto.getStatus() == MatchStatus.ACCEPTED) {
+            notificationService.createNotification(findMatch.getSender(), NotificationType.MATCH_ACCEPTED);
+        } // 매칭 보낸 사람에게 매칭이 수락되었다는 알림 전송
+
+        if (dto.getStatus() == MatchStatus.REJECTED) {
+            notificationService.createNotification(findMatch.getSender(), NotificationType.MATCH_REJECTED);
+        } // 매칭 보낸 사람에게 매칭이 거절되었다는 알림 전송
 
         findMatch.updateStatus(dto.getStatus());
     }

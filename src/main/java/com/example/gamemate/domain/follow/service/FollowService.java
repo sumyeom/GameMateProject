@@ -3,6 +3,8 @@ package com.example.gamemate.domain.follow.service;
 import com.example.gamemate.domain.follow.dto.*;
 import com.example.gamemate.domain.follow.entity.Follow;
 import com.example.gamemate.domain.follow.repository.FollowRepository;
+import com.example.gamemate.domain.notification.enums.NotificationType;
+import com.example.gamemate.domain.notification.service.NotificationService;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.domain.user.enums.UserStatus;
 import com.example.gamemate.domain.user.repository.UserRepository;
@@ -22,6 +24,7 @@ import java.util.Objects;
 public class FollowService {
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
+    private final NotificationService notificationService;
 
     // 팔로우하기
     @Transactional
@@ -44,6 +47,7 @@ public class FollowService {
 
         Follow follow = new Follow(loginUser, followee);
         followRepository.save(follow);
+        notificationService.createNotification(followee, NotificationType.NEW_FOLLOWER);
 
         return new FollowResponseDto(
                 follow.getId(),

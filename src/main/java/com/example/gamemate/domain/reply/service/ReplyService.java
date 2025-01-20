@@ -2,6 +2,8 @@ package com.example.gamemate.domain.reply.service;
 
 import com.example.gamemate.domain.comment.entity.Comment;
 import com.example.gamemate.domain.comment.repository.CommentRepository;
+import com.example.gamemate.domain.notification.enums.NotificationType;
+import com.example.gamemate.domain.notification.service.NotificationService;
 import com.example.gamemate.domain.reply.dto.ReplyRequestDto;
 import com.example.gamemate.domain.reply.dto.ReplyResponseDto;
 import com.example.gamemate.domain.reply.entity.Reply;
@@ -21,6 +23,7 @@ public class ReplyService {
 
     private final ReplyRepository replyRepository;
     private final CommentRepository commentRepository;
+    private final NotificationService notificationService;
 
     /**
      * 대댓글 생성 메서드
@@ -39,6 +42,7 @@ public class ReplyService {
         if(requestDto.getParentReplyId()==null){
             newReply = new Reply(requestDto.getContent(), findComment, loginUser);
             Reply createReply = replyRepository.save(newReply);
+            createCommentNotification(findComment.getBoard().getUser(), findComment.getUser());
 
             return new ReplyResponseDto(
                     createReply.getReplyId(),
@@ -51,8 +55,9 @@ public class ReplyService {
             //대댓글 조회
             Reply findParentReply = replyRepository.findById(requestDto.getParentReplyId())
                     .orElseThrow(()-> new ApiException(ErrorCode.COMMENT_NOT_FOUND));
-            newReply = new Reply(requestDto.getContent(), findComment,loginUser, findParentReply);
+            newReply = new Reply(requestDto.getContent(), findComment, loginUser, findParentReply);
             Reply createReply = replyRepository.save(newReply);
+            createCommentNotification(findComment.getBoard().getUser(), findComment.getUser(), findParentReply.getUser());
 
             return new ReplyResponseDto(
                     createReply.getReplyId(),
@@ -101,5 +106,18 @@ public class ReplyService {
         }
 
         replyRepository.delete(findReply);
+    }
+
+    // 대댓글 알림 전송
+    private void createCommentNotification(User board, User comment) {
+        notificationService.createNotification(board, NotificationType.NEW_COMMENT);
+        notificationService.createNotification(comment, NotificationType.NEW_COMMENT);
+    }
+
+    // 대댓글 알림 전송
+    private void createCommentNotification(User board, User comment, User reply) {
+        notificationService.createNotification(board, NotificationType.NEW_COMMENT);
+        notificationService.createNotification(comment, NotificationType.NEW_COMMENT);
+        notificationService.createNotification(reply, NotificationType.NEW_COMMENT);
     }
 }

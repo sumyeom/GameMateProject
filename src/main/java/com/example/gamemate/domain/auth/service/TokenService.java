@@ -52,11 +52,11 @@ public class TokenService {
 
     private void addRefreshTokenToCookie(HttpServletResponse response, String refreshToken) {
         Cookie cookie = new Cookie("refresh_token", refreshToken);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/");
+        cookie.setHttpOnly(true); // 자바 스크립트에서 접근 불가
+        cookie.setSecure(true); // HTTPS에서만 동작
+        cookie.setPath("/"); // 모든 경로에서 유효
         cookie.setMaxAge(3 * 24 * 60 * 60); // 3일
-        response.addCookie(cookie);
+        response.addCookie(cookie); // 쿠키를 응답에 추가
     }
 
     public void removeRefreshTokenCookie(HttpServletResponse response) {
