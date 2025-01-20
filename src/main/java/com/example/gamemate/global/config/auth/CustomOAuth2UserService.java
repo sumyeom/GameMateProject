@@ -1,7 +1,6 @@
 package com.example.gamemate.global.config.auth;
 
 import com.example.gamemate.domain.auth.dto.OAuth2LoginResponseDto;
-import com.example.gamemate.domain.auth.service.AuthService;
 import com.example.gamemate.domain.auth.service.OAuth2Service;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.domain.user.enums.AuthProvider;
@@ -32,7 +31,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     oauth2User.getAttributes()
             );
 
-            User user = oAuth2Service.registerOAuth2User(attributes);
+            User user = oAuth2Service.processOAuth2User(attributes);
 
             return new CustomUserDetails(user, oauth2User.getAttributes());
 

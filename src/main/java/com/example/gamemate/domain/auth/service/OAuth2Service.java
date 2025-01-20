@@ -8,17 +8,27 @@ import com.example.gamemate.domain.user.repository.UserRepository;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class OAuth2Service {
 
     private final UserRepository userRepository;
+    private final OAuth2ClientProperties clientProperties;
 
     public OAuth2LoginResponseDto extractOAuth2Attributes(AuthProvider provider, Map<String, Object> attributes) {
         if(provider == AuthProvider.GOOGLE) {
@@ -29,27 +39,85 @@ public class OAuth2Service {
         throw new ApiException(ErrorCode.INVALID_PROVIDER_TYPE);
     }
 
-    public User registerOAuth2User(OAuth2LoginResponseDto responseDto) {
-        User findUser = userRepository.findByEmail(responseDto.getEmail())
-                .orElseGet(() -> {
-                    User newUser = new User(
-                            responseDto.getEmail(),
-                            responseDto.getName(),
-                            responseDto.getName(),
-                            responseDto.getProvider(),
-                            responseDto.getProviderId()
-                    );
-                    return userRepository.save(newUser);
-                });
+    public User processOAuth2User(OAuth2LoginResponseDto responseDto) {
+        // 기존 사용자 조회
+        Optional<User> findUser = userRepository.findByEmail(responseDto.getEmail());
 
-        if (findUser.getUserStatus() == UserStatus.WITHDRAW) {
-            throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
+        // 기존 사용자 존재하는 경우
+        if (findUser.isPresent()) {
+            User existingUser = findUser.get();
+
+            // 탈퇴한 사용자 체크
+            if (existingUser.getUserStatus() == UserStatus.WITHDRAW) {
+                throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
+            }
+
+            // 다른 OAuth 제공자로 로그인 시도한 경우
+            if (!existingUser.getProvider().equals(responseDto.getProvider())) {
+                throw new ApiException(ErrorCode.INVALID_PROVIDER_TYPE);
+            }
+
+            return existingUser;
         }
-        if (!findUser.getProvider().equals(responseDto.getProvider())) {
-            throw new ApiException(ErrorCode.INVALID_PROVIDER_TYPE);
-        }
-        return findUser;
+
+        // 새로운 사용자 생성
+        User newUser = new User(
+                responseDto.getEmail(),
+                responseDto.getName(),
+                responseDto.getName(),
+                responseDto.getProvider(),
+                responseDto.getProviderId()
+        );
+        return userRepository.save(newUser);
     }
+
+//    public String generateAuthorizationUrl(String providerName, String redirectUri) {
+//
+//        AuthProvider provider = AuthProvider.fromString(providerName);
+//        ClientRegistration clientRegistration = getClientRegistration(provider);
+//        String state = UUID.randomUUID().toString();
+//        log.info("Generated OAuth2 State for provider {}: {}", providerName, state);
+//
+//        String authorizationUrl = UriComponentsBuilder
+//                .fromUriString(clientRegistration.getProviderDetails().getAuthorizationUri())
+//                .queryParam("client_id", clientRegistration.getClientId())
+//                .queryParam("redirect_uri", redirectUri != null ? redirectUri : clientRegistration.getRedirectUri())
+//                .queryParam("response_type", "code")
+//                .queryParam("scope", String.join(" ", clientRegistration.getScopes()))
+//                .queryParam("state", state)
+//                .build()
+//                .toUriString();
+//        log.info("Generated Authorization URL for provider {}: {}", providerName, authorizationUrl);
+//        return authorizationUrl;
+//    }
+
+//    private ClientRegistration getClientRegistration(AuthProvider provider) {
+//        String registrationId = provider.name().toLowerCase();
+//
+//        OAuth2ClientProperties.Registration registration =
+//                clientProperties.getRegistration().get(registrationId);
+//        OAuth2ClientProperties.Provider providerConfig =
+//                clientProperties.getProvider().get(registrationId);
+//
+//        if (registration == null || providerConfig == null) {
+//            throw new ApiException(ErrorCode.INVALID_PROVIDER_TYPE);
+//        }
+//
+//        return ClientRegistration.withRegistrationId(registrationId)
+//                .clientId(registration.getClientId())
+//                .clientSecret(registration.getClientSecret())
+//                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+//                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+//                .redirectUri(registration.getRedirectUri())
+//                .scope(registration.getScope())
+//                .authorizationUri(providerConfig.getAuthorizationUri())
+//                .tokenUri(providerConfig.getTokenUri())
+//                .userInfoUri(providerConfig.getUserInfoUri())
+//                .userNameAttributeName(providerConfig.getUserNameAttribute())
+//                .clientName(registrationId)
+//                .build();
+//    }
+
 
     private OAuth2LoginResponseDto extractGoogleAttributes(Map<String, Object> attributes) {
         return new OAuth2LoginResponseDto(
