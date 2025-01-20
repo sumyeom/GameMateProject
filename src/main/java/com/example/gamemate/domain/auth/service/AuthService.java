@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
 import java.util.Optional;
 
 @Service
@@ -86,12 +88,25 @@ public class AuthService {
     }
 
     public void logout(User user, HttpServletRequest request, HttpServletResponse response) {
+        String accessToken = extractToken(request);
+        if(accessToken != null) {
+            tokenService.blacklistToken(accessToken);
+        }
+
         String refreshToken = tokenService.extractRefreshTokenFromCookie(request);
         if(refreshToken != null) {
             user.removeRefreshToken();
             userRepository.save(user);
             tokenService.removeRefreshTokenCookie(response);
         }
+    }
+
+    private String extractToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
     }
 
 }

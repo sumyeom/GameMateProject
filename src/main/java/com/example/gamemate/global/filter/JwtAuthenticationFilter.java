@@ -1,6 +1,7 @@
 package com.example.gamemate.global.filter;
 
 import ch.qos.logback.core.util.StringUtil;
+import com.example.gamemate.domain.auth.service.TokenService;
 import com.example.gamemate.global.config.auth.CustomUserDetails;
 import com.example.gamemate.global.provider.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
@@ -34,6 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
+    private final TokenService tokenService;
 
 
     @Override
@@ -53,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = extractToken(request);
 
         // 토큰이 유효한 경우에만 인증 처리
-        if (token != null && jwtTokenProvider.validateToken(token)) {
+        if (token != null && tokenService.validateToken(token)) {
             String email = jwtTokenProvider.getEmailFromToken(token);
             Authentication authentication = createAuthentication(email);
             SecurityContextHolder.getContext().setAuthentication(authentication);

@@ -11,6 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -18,6 +22,10 @@ public class TokenService {
 
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+
+    // 블랙리스트 저장
+    private final Set<String> blacklist = new ConcurrentHashMap<String, Boolean>().newKeySet();
+    private final Map<String, Long> tokenExpirations = new ConcurrentHashMap<>();
 
     public EmailLoginResponseDto generateLoginTokens(User user, HttpServletResponse response) {
         String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRole());
@@ -56,6 +64,36 @@ public class TokenService {
         cookie.setMaxAge(0);
         cookie.setPath("/");
         response.addCookie(cookie);
+    }
+
+    public void blacklistToken(String token) {
+        long expirationTime = jwtTokenProvider.getExpirationFromToken(token);
+        blacklist.add(token);
+        tokenExpirations.put(token, expirationTime);
+        removeExpiredTokens();
+    }
+
+    public boolean isBlacklisted(String token) {
+        removeExpiredTokens();
+        return blacklist.contains(token);
+    }
+
+    public boolean validateToken(String token) {
+        if (isBlacklisted(token)) {
+            return false;
+        }
+        return jwtTokenProvider.validateToken(token);
+    }
+
+    private void removeExpiredTokens() {
+        long currentTime = System.currentTimeMillis();
+        tokenExpirations.entrySet().removeIf(entry -> {
+            if (entry.getValue() < currentTime) {
+                blacklist.remove(entry.getKey());
+                return true;
+            }
+            return false;
+        });
     }
 
 }
