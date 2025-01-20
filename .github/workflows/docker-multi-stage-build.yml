@@ -1,0 +1,89 @@
+name: docker multi-stage build
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  docker-build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          file: ./Dockerfile
+          push: true
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKER_IMAGE_TAG_NAME }}:latest
+
+  deploy-to-ec2:
+    needs: docker-build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            # 기존 컨테이너 정리
+            echo "Stopping and removing existing containers..."
+            sudo docker-compose down || true
+
+            # docker-compose.yml 파일 생성
+            echo "Creating docker-compose.yml..."
+            cat <<EOF > docker-compose.yml
+            services:
+              app:
+                image: "${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKER_IMAGE_TAG_NAME }}:latest"
+                platform: linux/amd64
+                container_name: app
+                ports:
+                  - "8080:8080"
+                environment:
+                  MYSQL_USERNAME: "${{ secrets.MYSQL_USERNAME }}"
+                  MYSQL_PASSWORD: "${{ secrets.MYSQL_PASSWORD }}"
+                  MYSQL_URL: "${{ secrets.MYSQL_URL }}"
+                  JPA_HIBERNATE_DDL: "${{ secrets.JPA_HIBERNATE_DDL }}"
+                  JWT_SECRET: "${{ secrets.JWT_SECRET }}"
+                  YOUR_ACCESS_KEY: "${{ secrets.YOUR_ACCESS_KEY }}"
+                  YOUR_SECRET_KEY: "${{ secrets.YOUR_SECRET_KEY }}"
+                  YOUR_BUCKET_NAME: "${{ secrets.YOUR_BUCKET_NAME }}"
+                  OAUTH2_GOOGLE_CLIENT_ID: "${{ secrets.OAUTH2_GOOGLE_CLIENT_ID }}"
+                  OAUTH2_GOOGLE_CLIENT_SECRET: "${{ secrets.OAUTH2_GOOGLE_CLIENT_SECRET }}"
+                  OAUTH2_KAKAO_CLIENT_ID: "${{ secrets.OAUTH2_KAKAO_CLIENT_ID }}"
+                  OAUTH2_KAKAO_CLIENT_SECRET: "${{ secrets.OAUTH2_KAKAO_CLIENT_SECRET }}"
+                  EMAIL_USERNAME: "${{ secrets.EMAIL_USERNAME }}"
+                  EMAIL_APP_PASSWORD: "${{ secrets.EMAIL_APP_PASSWORD }}"
+                  GEMINI_URL: "${{ secrets.GEMINI_URL }}"
+                  GEMINI_KEY: "${{ secrets.GEMINI_KEY }}"
+                depends_on:
+                  - db
+
+              db:
+                image: mysql:8.0
+                container_name: db
+                environment:
+                  MYSQL_ROOT_PASSWORD: "${{ secrets.MYSQL_PASSWORD }}"
+                volumes:
+                  - db-data:/var/lib/mysql
+                ports:
+                  - "3306:3306"
+
+            volumes:
+              db-data:
+            EOF
+
+            # docker-compose 실행
+            echo "Starting services with docker-compose..."
+            sudo docker-compose up -d
