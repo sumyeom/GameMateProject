@@ -72,6 +72,9 @@
 ![image](https://github.com/user-attachments/assets/bbb0be82-e50b-4d66-800f-bdd7ebc01266)
 
 
+## 📆 일정 관리 (WBS)
+![image](https://github.com/user-attachments/assets/3cbe94f2-3236-470e-8e43-31ceacb65367)
+
 
 <br>
 
