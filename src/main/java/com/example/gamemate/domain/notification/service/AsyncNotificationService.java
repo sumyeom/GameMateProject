@@ -22,6 +22,7 @@ public class AsyncNotificationService {
     private final JavaMailSender javaMailSender;
     private final NotificationRepository notificationRepository;
 
+    // 알림 메일 전송
     @Async
     public void sendNotificationMail(User user, List<Notification> notifications) {
         try {
