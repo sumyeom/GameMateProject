@@ -65,7 +65,6 @@ public class UserService {
 
     public void withdrawUser(User loginUser) {
 
-        loginUser.deleteSoftly();
         loginUser.updateUserStatus(UserStatus.WITHDRAW);
         loginUser.removeRefreshToken();
 
