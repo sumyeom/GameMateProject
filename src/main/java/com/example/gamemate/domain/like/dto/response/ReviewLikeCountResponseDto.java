@@ -1,4 +1,4 @@
-package com.example.gamemate.domain.like.dto;
+package com.example.gamemate.domain.like.dto.response;
 
 import lombok.Getter;
 

@@ -1,9 +1,8 @@
 package com.example.gamemate.domain.like.service;
 
 import com.example.gamemate.domain.board.repository.BoardRepository;
-import com.example.gamemate.domain.like.dto.BoardLikeResponseDto;
-import com.example.gamemate.domain.like.dto.ReviewLikeCountResponseDto;
-import com.example.gamemate.domain.like.dto.ReviewLikeResponseDto;
+import com.example.gamemate.domain.like.dto.response.BoardLikeResponseDto;
+import com.example.gamemate.domain.like.dto.response.ReviewLikeResponseDto;
 import com.example.gamemate.domain.like.entity.BoardLike;
 import com.example.gamemate.domain.like.entity.ReviewLike;
 import com.example.gamemate.domain.like.repository.BoardLikeRepository;
@@ -29,6 +28,7 @@ public class LikeService {
     private final BoardRepository boardRepository;
     private final NotificationService notificationService;
 
+    //리뷰 좋아요 생성 취소 수정
     @Transactional
     public ReviewLikeResponseDto reviewLikeUp(Long reviewId, Integer status, User loginUser) {
 
@@ -51,6 +51,7 @@ public class LikeService {
         return new ReviewLikeResponseDto(reviewLike);
     }
 
+    //게시물 좋아요 생성 취소 수정
     @Transactional
     public BoardLikeResponseDto boardLikeUp(Long boardId, Integer status, User loginUser) {
 
@@ -74,10 +75,17 @@ public class LikeService {
     }
 
     public Long getBoardLikeCount(Long boardId) {
+
+        boardRepository.findById(boardId)
+                .orElseThrow(() -> new ApiException(ErrorCode.BOARD_NOT_FOUND));
         return boardLikeRepository.countByBoardBoardIdAndStatus(boardId, 1);
     }
 
     public Long getReivewLikeCount(Long reviewId) {
+
+        reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ApiException(ErrorCode.REVIEW_NOT_FOUND));
+
         return reviewLikeRepository.countByReviewIdAndStatus(reviewId, 1);
     }
 }

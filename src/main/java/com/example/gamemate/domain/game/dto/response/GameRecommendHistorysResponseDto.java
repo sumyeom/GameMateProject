@@ -1,7 +1,6 @@
-package com.example.gamemate.domain.game.dto;
+package com.example.gamemate.domain.game.dto.response;
 
 import com.example.gamemate.domain.game.entity.GameRecommendHistory;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

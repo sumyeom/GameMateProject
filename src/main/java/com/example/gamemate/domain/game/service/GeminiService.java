@@ -1,7 +1,7 @@
 package com.example.gamemate.domain.game.service;
 
-import com.example.gamemate.domain.game.dto.ChatRequestDto;
-import com.example.gamemate.domain.game.dto.ChatResponseDto;
+import com.example.gamemate.domain.game.dto.request.ChatRequestDto;
+import com.example.gamemate.domain.game.dto.response.ChatResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,9 +23,10 @@ public class GeminiService {
     @Value("${gemini.api.key}")
     private String geminiApiKey;
 
+    // Gemini에 요청 전송
     public String getContents(String prompt) {
 
-        // Gemini에 요청 전송
+
         String requestUrl = apiUrl + "?key=" + geminiApiKey;
 
         ChatRequestDto request = new ChatRequestDto(prompt);

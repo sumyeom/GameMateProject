@@ -1,4 +1,4 @@
-package com.example.gamemate.domain.game.dto;
+package com.example.gamemate.domain.game.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,4 +14,5 @@ public class GameRecommendationResponseDto {
     private Double star;
     private Double matchingScore;
     private String reasonForRecommendation;
+    private Double metacriticScore;
 }

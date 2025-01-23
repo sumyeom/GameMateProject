@@ -37,7 +37,6 @@ public class GameRecommendHistory extends BaseEntity {
     @JoinColumn(name = "preferences_id")
     private UserGamePreference userGamePreference;
 
-    // 새로운 생성자 추가
     public GameRecommendHistory(User user, String title, String description, Double matchingScore, String reasonForRecommendation, Double star, UserGamePreference userGamePreference) {
         this.user = user;
         this.title = title;
@@ -46,6 +45,7 @@ public class GameRecommendHistory extends BaseEntity {
         this.reasonForRecommendation = reasonForRecommendation;
         this.star = star;
         this.userGamePreference = userGamePreference;
+
     }
 }
 

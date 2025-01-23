@@ -1,9 +1,9 @@
 package com.example.gamemate.domain.like.controller;
 
-import com.example.gamemate.domain.like.dto.BoardLikeCountResponseDto;
-import com.example.gamemate.domain.like.dto.BoardLikeResponseDto;
-import com.example.gamemate.domain.like.dto.ReviewLikeCountResponseDto;
-import com.example.gamemate.domain.like.dto.ReviewLikeResponseDto;
+import com.example.gamemate.domain.like.dto.response.BoardLikeCountResponseDto;
+import com.example.gamemate.domain.like.dto.response.BoardLikeResponseDto;
+import com.example.gamemate.domain.like.dto.response.ReviewLikeCountResponseDto;
+import com.example.gamemate.domain.like.dto.response.ReviewLikeResponseDto;
 import com.example.gamemate.domain.like.service.LikeService;
 import com.example.gamemate.global.config.auth.CustomUserDetails;
 
@@ -28,7 +28,7 @@ public class LikeController {
      * 리뷰에 대한 좋아요를 처리합니다.
      *
      * @param reviewId 좋아요를 누를 리뷰의 ID
-     * @param status 좋아요 상태 (1: 좋아요, 0: 좋아요 취소)
+     * @param status 좋아요 상태 (1: 좋아요, 0: 좋아요 취소, -1:싫어요)
      * @param customUserDetails 현재 인증된 사용자 정보
      * @return 좋아요 처리 결과를 담은 ResponseEntity
      */
@@ -46,7 +46,7 @@ public class LikeController {
      * 게시글에 대한 좋아요를 처리합니다.
      *
      * @param boardId 좋아요를 누를 게시글의 ID
-     * @param status 좋아요 상태 (1: 좋아요, 0: 좋아요 취소)
+     * @param status 좋아요 상태 (1: 좋아요, 0: 좋아요 취소, -1:싫어요)
      * @param customUserDetails 현재 인증된 사용자 정보
      * @return 좋아요 처리 결과를 담은 ResponseEntity
      */

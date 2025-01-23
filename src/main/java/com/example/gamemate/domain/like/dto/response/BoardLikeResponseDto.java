@@ -1,7 +1,6 @@
-package com.example.gamemate.domain.like.dto;
+package com.example.gamemate.domain.like.dto.response;
 
 import com.example.gamemate.domain.like.entity.BoardLike;
-import com.example.gamemate.domain.like.entity.ReviewLike;
 import lombok.Getter;
 
 @Getter

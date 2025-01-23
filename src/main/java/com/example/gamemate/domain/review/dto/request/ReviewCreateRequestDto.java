@@ -1,4 +1,4 @@
-package com.example.gamemate.domain.review.dto;
+package com.example.gamemate.domain.review.dto.request;
 
 import lombok.Getter;
 
