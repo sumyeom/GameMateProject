@@ -1,5 +1,8 @@
 package com.example.gamemate.domain.like.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum LikeStatus {
     LIKE("like"),
     DISLIKE("disLike"),
@@ -11,13 +14,18 @@ public enum LikeStatus {
         this.value = value;
     }
 
+    @JsonValue
     public String getValue() {
         return value;
     }
 
+    @JsonCreator
     public static LikeStatus fromValue(String value) {
+        if (value == null) {
+            return null;
+        }
         for (LikeStatus status : values()) {
-            if (status.equals(value)) {
+            if (status.value.equalsIgnoreCase(value)) {
                 return status;
             }
         }

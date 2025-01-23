@@ -1,5 +1,6 @@
 package com.example.gamemate.domain.like.controller;
 
+import com.example.gamemate.domain.like.dto.request.LikeRequestDto;
 import com.example.gamemate.domain.like.dto.response.BoardLikeCountResponseDto;
 import com.example.gamemate.domain.like.dto.response.BoardLikeResponseDto;
 import com.example.gamemate.domain.like.dto.response.ReviewLikeCountResponseDto;
@@ -36,10 +37,10 @@ public class LikeController {
     @PostMapping("/reviews/{reviewId}")
     public ResponseEntity<ReviewLikeResponseDto> reviewLikeUp(
             @PathVariable Long reviewId,
-            @RequestBody LikeStatus status,
+            @RequestBody LikeRequestDto requestDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        ReviewLikeResponseDto responseDto = likeService.reviewLikeUp(reviewId, status, customUserDetails.getUser());
+        ReviewLikeResponseDto responseDto = likeService.reviewLikeUp(reviewId, requestDto.getStatus(), customUserDetails.getUser());
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
@@ -54,10 +55,10 @@ public class LikeController {
     @PostMapping("/boards/{boardId}")
     public ResponseEntity<BoardLikeResponseDto> boardLikeUp(
             @PathVariable Long boardId,
-            @RequestBody LikeStatus status,
+            @RequestBody LikeRequestDto requestDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        BoardLikeResponseDto responseDto = likeService.boardLikeUp(boardId, status, customUserDetails.getUser());
+        BoardLikeResponseDto responseDto = likeService.boardLikeUp(boardId, requestDto.getStatus(), customUserDetails.getUser());
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
