@@ -10,8 +10,8 @@ public class GameRecommendHistorysResponseDto {
     private Long userId;
     private String title;
     private String description;
-    private Double star;
-    private Double matchingScore;
+    private Double metacriticScore;
+    //private Double matchingScore;
     private String reasonForRecommendation;
 
     public GameRecommendHistorysResponseDto(GameRecommendHistory gameRecommendHistory) {
@@ -19,8 +19,8 @@ public class GameRecommendHistorysResponseDto {
         this.userId = gameRecommendHistory.getUser().getId();
         this.title = gameRecommendHistory.getTitle();
         this.description = gameRecommendHistory.getDescription();
-        this.star = gameRecommendHistory.getStar();
-        this.matchingScore = gameRecommendHistory.getMatchingScore();
+        this.metacriticScore = gameRecommendHistory.getMetacriticScore();
+        //this.matchingScore = gameRecommendHistory.getMatchingScore();
         this.reasonForRecommendation = gameRecommendHistory.getReasonForRecommendation();
     }
 }

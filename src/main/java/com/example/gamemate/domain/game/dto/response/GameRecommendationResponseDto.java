@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 public class GameRecommendationResponseDto {
     private String title;
     private String description;
-    private Double star;
-    private Double matchingScore;
-    private String reasonForRecommendation;
     private Double metacriticScore;
+    //private Double matchingScore;
+    private String reasonForRecommendation;
 }

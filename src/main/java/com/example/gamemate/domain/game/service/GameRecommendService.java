@@ -59,7 +59,7 @@ public class GameRecommendService {
                         "한글(영어)로 된 제목(title), " +
                         "간단한 내용(description)," +
                         "metacriticScore 점수(metacriticScore)," +
-                        "나와의 매칭점수(matchingScore)," +
+                        //"나와의 매칭점수(matchingScore)," +
                         "추천 이유(reasonForRecommendation)를 적어주고 " +
                         "응답은 순수 JSON 배열로 알려줘",
                 userGamePreference.getPreferredGenres(),
@@ -95,7 +95,7 @@ public class GameRecommendService {
                     loginUser,
                     responseDto.getTitle(),
                     responseDto.getDescription(),
-                    responseDto.getMatchingScore(),
+                    //responseDto.getMatchingScore(),
                     responseDto.getReasonForRecommendation(),
                     responseDto.getMetacriticScore(),
                     saveData
