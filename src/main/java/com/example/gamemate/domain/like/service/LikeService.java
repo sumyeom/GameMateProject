@@ -5,6 +5,7 @@ import com.example.gamemate.domain.like.dto.response.BoardLikeResponseDto;
 import com.example.gamemate.domain.like.dto.response.ReviewLikeResponseDto;
 import com.example.gamemate.domain.like.entity.BoardLike;
 import com.example.gamemate.domain.like.entity.ReviewLike;
+import com.example.gamemate.domain.like.enums.LikeStatus;
 import com.example.gamemate.domain.like.repository.BoardLikeRepository;
 import com.example.gamemate.domain.like.repository.ReviewLikeRepository;
 import com.example.gamemate.domain.notification.enums.NotificationType;
@@ -30,7 +31,7 @@ public class LikeService {
 
     //리뷰 좋아요 생성 취소 수정
     @Transactional
-    public ReviewLikeResponseDto reviewLikeUp(Long reviewId, Integer status, User loginUser) {
+    public ReviewLikeResponseDto reviewLikeUp(Long reviewId, LikeStatus status, User loginUser) {
 
         ReviewLike reviewLike = reviewLikeRepository.findByReviewIdAndUserId(reviewId, loginUser.getId()).
                 orElse(new ReviewLike(
@@ -53,7 +54,7 @@ public class LikeService {
 
     //게시물 좋아요 생성 취소 수정
     @Transactional
-    public BoardLikeResponseDto boardLikeUp(Long boardId, Integer status, User loginUser) {
+    public BoardLikeResponseDto boardLikeUp(Long boardId, LikeStatus status, User loginUser) {
 
         BoardLike boardLike = boardLikeRepository.findByBoardIdAndUserId(boardId, loginUser.getId()).
                 orElse(new BoardLike(
@@ -78,7 +79,7 @@ public class LikeService {
 
         boardRepository.findById(boardId)
                 .orElseThrow(() -> new ApiException(ErrorCode.BOARD_NOT_FOUND));
-        return boardLikeRepository.countByBoardBoardIdAndStatus(boardId, 1);
+        return boardLikeRepository.countByBoardBoardIdAndStatus(boardId, LikeStatus.LIKE);
     }
 
     public Long getReivewLikeCount(Long reviewId) {
@@ -86,6 +87,6 @@ public class LikeService {
         reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ApiException(ErrorCode.REVIEW_NOT_FOUND));
 
-        return reviewLikeRepository.countByReviewIdAndStatus(reviewId, 1);
+        return reviewLikeRepository.countByReviewIdAndStatus(reviewId, LikeStatus.LIKE);
     }
 }

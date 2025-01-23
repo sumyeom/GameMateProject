@@ -2,6 +2,7 @@ package com.example.gamemate.domain.review.service;
 
 import com.example.gamemate.domain.game.entity.Game;
 import com.example.gamemate.domain.game.repository.GameRepository;
+import com.example.gamemate.domain.like.enums.LikeStatus;
 import com.example.gamemate.domain.like.repository.ReviewLikeRepository;
 import com.example.gamemate.domain.review.dto.request.ReviewCreateRequestDto;
 import com.example.gamemate.domain.review.dto.response.ReviewCreateResponseDto;
@@ -107,7 +108,7 @@ public class ReviewService {
         Page<Review> reviewPage = reviewRepository.findAllByGame(game, pageable);
 
         return reviewPage.map(review -> {
-            Long likeCount = reviewLikeRepository.countByReviewIdAndStatus(review.getId(), 1);
+            Long likeCount = reviewLikeRepository.countByReviewIdAndStatus(review.getId(), LikeStatus.LIKE);
             return new ReviewFindByAllResponseDto(review, loginUser.getNickname(), likeCount);
         });
     }
