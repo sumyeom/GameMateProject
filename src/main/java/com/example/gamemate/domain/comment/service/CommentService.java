@@ -52,7 +52,12 @@ public class CommentService {
 
         Comment comment = new Comment(requestDto.getContent(), findBoard, loginUser);
         Comment createComment = commentRepository.save(comment);
-        notificationService.createNotification(findBoard.getUser(), NotificationType.NEW_COMMENT);
+
+        notificationService.sendNotification(
+                findBoard.getUser(),
+                NotificationType.NEW_COMMENT,
+                "/comments/" + createComment.getCommentId()
+        );
 
         return new CommentResponseDto(
                 createComment.getCommentId(),

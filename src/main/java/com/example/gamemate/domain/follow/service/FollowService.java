@@ -47,7 +47,7 @@ public class FollowService {
 
         Follow follow = new Follow(loginUser, followee);
         followRepository.save(follow);
-        notificationService.createNotification(followee, NotificationType.NEW_FOLLOWER);
+        notificationService.sendNotification(followee, NotificationType.NEW_FOLLOWER, "/users/" + loginUser.getId());
 
         return new FollowResponseDto(
                 follow.getId(),

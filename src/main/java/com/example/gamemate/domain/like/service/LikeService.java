@@ -43,7 +43,7 @@ public class LikeService {
 
         if (reviewLike.getId() == null) {
             reviewLikeRepository.save(reviewLike);
-            notificationService.createNotification(reviewLike.getReview().getUser(), NotificationType.NEW_LIKE);
+            notificationService.sendNotification(reviewLike.getReview().getUser(), NotificationType.NEW_LIKE, "/likes/reviews/" + reviewId);
         } else {
             reviewLike.changeStatus(status);
         }
@@ -65,7 +65,7 @@ public class LikeService {
 
         if (boardLike.getId() == null) {
             boardLikeRepository.save(boardLike);
-            notificationService.createNotification(boardLike.getBoard().getUser(), NotificationType.NEW_LIKE);
+            notificationService.sendNotification(boardLike.getBoard().getUser(), NotificationType.NEW_LIKE, "/likes/boards/" + boardId);
         } else {
             boardLike.changeStatus(status);
         }

@@ -22,29 +22,29 @@ public class AsyncNotificationService {
     private final JavaMailSender javaMailSender;
     private final NotificationRepository notificationRepository;
 
-    // 알림 메일 전송
-    @Async
-    public void sendNotificationMail(User user, List<Notification> notifications) {
-        try {
-            SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-            simpleMailMessage.setTo(user.getEmail()); // 보낼 사람
-            simpleMailMessage.setSubject("[GameMate] 새로운 알림이 있습니다."); // 제목
-            simpleMailMessage.setFrom("newbiekk1126@gmail.com"); // 보내는 사람
-            simpleMailMessage.setText("새로운 알림이 " + notifications.size() + "개 있습니다."); // 내용
-
-            javaMailSender.send(simpleMailMessage);
-            log.info("{}님에게 {}개의 알림 메일을 전송했습니다.", user.getEmail(), notifications.size());
-
-            updateNotificationStatus(notifications);
-        } catch (Exception e) {
-            log.error("알림 메일 전송 실패: {}", user.getEmail(), e);
-        }
-    }
-
-    // 알림 전송 후 notified(false -> true) 상태 변경
-    @Transactional
-    public void updateNotificationStatus(List<Notification> notifications) {
-        notifications.forEach(notification -> notification.updateSentStatus(true));
-        notificationRepository.saveAll(notifications);
-    }
+//    // 알림 메일 전송
+//    @Async
+//    public void sendNotificationMail(User user, List<Notification> notifications) {
+//        try {
+//            SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+//            simpleMailMessage.setTo(user.getEmail()); // 보낼 사람
+//            simpleMailMessage.setSubject("[GameMate] 새로운 알림이 있습니다."); // 제목
+//            simpleMailMessage.setFrom("newbiekk1126@gmail.com"); // 보내는 사람
+//            simpleMailMessage.setText("새로운 알림이 " + notifications.size() + "개 있습니다."); // 내용
+//
+//            javaMailSender.send(simpleMailMessage);
+//            log.info("{}님에게 {}개의 알림 메일을 전송했습니다.", user.getEmail(), notifications.size());
+//
+//            updateNotificationStatus(notifications);
+//        } catch (Exception e) {
+//            log.error("알림 메일 전송 실패: {}", user.getEmail(), e);
+//        }
+//    }
+//
+//    // 알림 전송 후 notified(false -> true) 상태 변경
+//    @Transactional
+//    public void updateNotificationStatus(List<Notification> notifications) {
+//        notifications.forEach(notification -> notification.updateIsRead(true));
+//        notificationRepository.saveAll(notifications);
+//    }
 }

@@ -60,8 +60,8 @@ public class MatchService {
         } // 이미 보낸 요청이 있을때 예외처리
 
         Match match = new Match(dto.getMessage(), loginUser, receiver);
-        matchRepository.save(match);
-        notificationService.createNotification(receiver, NotificationType.NEW_MATCH);
+        Match savedMatch = matchRepository.save(match);
+        notificationService.sendNotification(receiver, NotificationType.NEW_MATCH, "/matches/" + savedMatch.getId());
 
         return MatchResponseDto.toDto(match);
     }
@@ -82,11 +82,11 @@ public class MatchService {
         } // 로그인한 유저가 매칭의 받는 사람이 아닐때 예외처리
 
         if (dto.getStatus() == MatchStatus.ACCEPTED) {
-            notificationService.createNotification(findMatch.getSender(), NotificationType.MATCH_ACCEPTED);
+            notificationService.sendNotification(findMatch.getSender(), NotificationType.MATCH_ACCEPTED, "/matches/" + findMatch.getId());
         } // 매칭 보낸 사람에게 매칭이 수락되었다는 알림 전송
 
         if (dto.getStatus() == MatchStatus.REJECTED) {
-            notificationService.createNotification(findMatch.getSender(), NotificationType.MATCH_REJECTED);
+            notificationService.sendNotification(findMatch.getSender(), NotificationType.MATCH_REJECTED, "/matches/" + findMatch.getId());
         } // 매칭 보낸 사람에게 매칭이 거절되었다는 알림 전송
 
         findMatch.updateStatus(dto.getStatus());

@@ -1,5 +1,6 @@
 package com.example.gamemate.domain.reply.service;
 
+import com.example.gamemate.domain.board.entity.Board;
 import com.example.gamemate.domain.comment.entity.Comment;
 import com.example.gamemate.domain.comment.repository.CommentRepository;
 import com.example.gamemate.domain.notification.enums.NotificationType;
@@ -42,7 +43,7 @@ public class ReplyService {
         if(requestDto.getParentReplyId()==null){
             newReply = new Reply(requestDto.getContent(), findComment, loginUser);
             Reply createReply = replyRepository.save(newReply);
-            createCommentNotification(findComment.getBoard().getUser(), findComment.getUser());
+            sendCommentNotification(findComment.getBoard(), findComment, createReply);
 
             return new ReplyResponseDto(
                     createReply.getReplyId(),
@@ -57,7 +58,7 @@ public class ReplyService {
                     .orElseThrow(()-> new ApiException(ErrorCode.COMMENT_NOT_FOUND));
             newReply = new Reply(requestDto.getContent(), findComment, loginUser, findParentReply);
             Reply createReply = replyRepository.save(newReply);
-            createCommentNotification(findComment.getBoard().getUser(), findComment.getUser(), findParentReply.getUser());
+            sendReplyNotification(findComment.getBoard(), findComment, findParentReply);
 
             return new ReplyResponseDto(
                     createReply.getReplyId(),
@@ -109,15 +110,17 @@ public class ReplyService {
     }
 
     // 대댓글 알림 전송
-    private void createCommentNotification(User board, User comment) {
-        notificationService.createNotification(board, NotificationType.NEW_COMMENT);
-        notificationService.createNotification(comment, NotificationType.NEW_COMMENT);
+    @Transactional
+    public void sendCommentNotification(Board board, Comment comment, Reply reply) {
+        notificationService.sendNotification(board.getUser(), NotificationType.NEW_COMMENT, "/boards/" + board.getBoardId() + "/comments/" + comment.getCommentId() + "/replies/" + reply.getReplyId());
+        notificationService.sendNotification(comment.getUser(), NotificationType.NEW_COMMENT, "/boards/" + board.getBoardId() + "/comments/" + comment.getCommentId() + "/replies/" + reply.getReplyId());
     }
 
-    // 대댓글 알림 전송
-    private void createCommentNotification(User board, User comment, User reply) {
-        notificationService.createNotification(board, NotificationType.NEW_COMMENT);
-        notificationService.createNotification(comment, NotificationType.NEW_COMMENT);
-        notificationService.createNotification(reply, NotificationType.NEW_COMMENT);
+    // 대대댓글 알림 전송
+    @Transactional
+    public void sendReplyNotification(Board board, Comment comment, Reply reply) {
+        notificationService.sendNotification(board.getUser(), NotificationType.NEW_COMMENT, "/boards/" + board.getBoardId() + "/comments/" + comment.getCommentId() + "/replies/" + reply.getReplyId());
+        notificationService.sendNotification(comment.getUser(), NotificationType.NEW_COMMENT, "/boards/" + board.getBoardId() + "/comments/" + comment.getCommentId() + "/replies/" + reply.getReplyId());
+        notificationService.sendNotification(reply.getUser(), NotificationType.NEW_COMMENT, "/boards/" + board.getBoardId() + "/comments/" + comment.getCommentId() + "/replies/" + reply.getReplyId());
     }
 }
