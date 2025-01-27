@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class EmailLoginResponseDto {
+public class LocalLoginResponseDto {
 
     private final String accessToken;
 

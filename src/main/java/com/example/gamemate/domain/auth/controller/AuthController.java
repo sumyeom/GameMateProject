@@ -4,8 +4,6 @@ import com.example.gamemate.domain.auth.dto.*;
 import com.example.gamemate.domain.auth.service.AuthService;
 import com.example.gamemate.domain.auth.service.EmailService;
 import com.example.gamemate.domain.auth.service.OAuth2Service;
-import com.example.gamemate.domain.auth.service.TokenService;
-import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.global.config.auth.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -50,12 +48,21 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<EmailLoginResponseDto> emailLogin(
-            @Valid @RequestBody EmailLoginRequestDto requestDto,
+    public ResponseEntity<LocalLoginResponseDto> localLogin(
+            @Valid @RequestBody LocalLoginRequestDto requestDto,
             HttpServletResponse response
     ) {
-        EmailLoginResponseDto responseDto = authService.emailLogin(requestDto, response);
+        LocalLoginResponseDto responseDto = authService.localLogin(requestDto, response);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
+    @PostMapping("/oauth2/set-password")
+    public ResponseEntity<Void> setPassword(
+            @Valid @RequestBody OAuth2PasswordSetRequestDto requestDto,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        authService.setOAuth2Password(customUserDetails.getUser(), requestDto.getPassword());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/logout")

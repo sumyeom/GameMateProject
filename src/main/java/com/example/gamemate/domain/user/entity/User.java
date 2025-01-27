@@ -61,7 +61,7 @@ public class User extends BaseEntity {
         this.name = name;
         this.nickname = nickname;
         this.password = password;
-        this.provider = AuthProvider.EMAIL;
+        this.provider = AuthProvider.LOCAL;
         this.providerId = null;
         this.role = Role.USER;
         this.isPremium = false;
@@ -104,6 +104,10 @@ public class User extends BaseEntity {
 
     public void removeRefreshToken() {
         this.refreshToken = null;
+    }
+
+    public void setOAuthPassword(String password) {
+        this.password = password;
     }
 
 }

@@ -9,12 +9,12 @@ INSERT INTO user (
     user_status,
     provider
 ) VALUES
-      ('user1@test.com', '유저1', '유저닉1', '$2a$10$vY7OYcTQsE8YdrYv4vryzeG0.7LqJHv9LnCVDY7f9QXF0nF.HXK52', 'USER', false, 'ACTIVE', 'EMAIL'),
-      ('user2@test.com', '유저2', '유저닉2', '$2a$10$vY7OYcTQsE8YdrYv4vryzeG0.7LqJHv9LnCVDY7f9QXF0nF.HXK52', 'USER', true, 'ACTIVE', 'EMAIL'),
-      ('user3@test.com', '유저3', '유저닉3', '$2a$10$vY7OYcTQsE8YdrYv4vryzeG0.7LqJHv9LnCVDY7f9QXF0nF.HXK52', 'USER', false, 'ACTIVE', 'EMAIL'),
-      ('user4@test.com', '유저4', '유저닉4', '$2a$10$vY7OYcTQsE8YdrYv4vryzeG0.7LqJHv9LnCVDY7f9QXF0nF.HXK52', 'USER', true, 'ACTIVE', 'EMAIL'),
-      ('admin1@test.com', '관리자1', '관리자닉1', '$2a$10$vY7OYcTQsE8YdrYv4vryzeG0.7LqJHv9LnCVDY7f9QXF0nF.HXK52', 'ADMIN', true, 'ACTIVE', 'EMAIL'),
-      ('admin2@test.com', '관리자2', '관리자닉2', '$2a$10$vY7OYcTQsE8YdrYv4vryzeG0.7LqJHv9LnCVDY7f9QXF0nF.HXK52', 'ADMIN', false, 'ACTIVE', 'EMAIL');
+      ('user1@test.com', '유저1', '유저닉1', '$2a$10$vY7OYcTQsE8YdrYv4vryzeG0.7LqJHv9LnCVDY7f9QXF0nF.HXK52', 'USER', false, 'ACTIVE', 'LOCAL'),
+      ('user2@test.com', '유저2', '유저닉2', '$2a$10$vY7OYcTQsE8YdrYv4vryzeG0.7LqJHv9LnCVDY7f9QXF0nF.HXK52', 'USER', true, 'ACTIVE', 'LOCAL'),
+      ('user3@test.com', '유저3', '유저닉3', '$2a$10$vY7OYcTQsE8YdrYv4vryzeG0.7LqJHv9LnCVDY7f9QXF0nF.HXK52', 'USER', false, 'ACTIVE', 'LOCAL'),
+      ('user4@test.com', '유저4', '유저닉4', '$2a$10$vY7OYcTQsE8YdrYv4vryzeG0.7LqJHv9LnCVDY7f9QXF0nF.HXK52', 'USER', true, 'ACTIVE', 'LOCAL'),
+      ('admin1@test.com', '관리자1', '관리자닉1', '$2a$10$vY7OYcTQsE8YdrYv4vryzeG0.7LqJHv9LnCVDY7f9QXF0nF.HXK52', 'ADMIN', true, 'ACTIVE', 'LOCAL'),
+      ('admin2@test.com', '관리자2', '관리자닉2', '$2a$10$vY7OYcTQsE8YdrYv4vryzeG0.7LqJHv9LnCVDY7f9QXF0nF.HXK52', 'ADMIN', false, 'ACTIVE', 'LOCAL');
 
 -- MatchUserInfo 테이블 데이터
 INSERT INTO match_user_info (

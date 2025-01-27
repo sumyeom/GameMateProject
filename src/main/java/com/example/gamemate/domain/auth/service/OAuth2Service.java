@@ -9,17 +9,13 @@ import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -28,7 +24,6 @@ import java.util.UUID;
 public class OAuth2Service {
 
     private final UserRepository userRepository;
-    private final OAuth2ClientProperties clientProperties;
 
     public OAuth2LoginResponseDto extractOAuth2Attributes(AuthProvider provider, Map<String, Object> attributes) {
         if(provider == AuthProvider.GOOGLE) {
