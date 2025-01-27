@@ -59,7 +59,7 @@ public class UserService {
         validateOwner(findUser, loginUser);
 
         findUser.updateProfile(newNickname);
-        User savedUser = userRepository.save(findUser);
+        userRepository.save(findUser);
 
     }
 
