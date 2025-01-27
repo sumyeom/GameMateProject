@@ -11,6 +11,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.security.sasl.AuthenticationException;
@@ -134,6 +135,13 @@ public class GlobalExceptionHandler {
                 .code(errorCode.name())
                 .message(message)
                 .build();
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Object> handleMaxSizeException(MaxUploadSizeExceededException exc) {
+        log.warn("File size limit exceeded", exc);
+        ErrorCode errorCode = ErrorCode.FILE_SIZE_EXCEEDED;
+        return handleExceptionInternal(errorCode);
     }
 
 }

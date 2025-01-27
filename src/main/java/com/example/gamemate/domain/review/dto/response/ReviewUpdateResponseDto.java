@@ -1,4 +1,4 @@
-package com.example.gamemate.domain.review.dto;
+package com.example.gamemate.domain.review.dto.response;
 
 import com.example.gamemate.domain.review.entity.Review;
 import lombok.Getter;

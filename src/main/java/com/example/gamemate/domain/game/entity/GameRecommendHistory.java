@@ -26,26 +26,26 @@ public class GameRecommendHistory extends BaseEntity {
     @Column(length = 255)
     private String description;
 
-    private Double matchingScore;
+    //private Double matchingScore;
 
     @Column(length = 255)
     private String reasonForRecommendation;
 
-    private Double star;
+    private Double metacriticScore;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "preferences_id")
     private UserGamePreference userGamePreference;
 
-    // 새로운 생성자 추가
-    public GameRecommendHistory(User user, String title, String description, Double matchingScore, String reasonForRecommendation, Double star, UserGamePreference userGamePreference) {
+    public GameRecommendHistory(User user, String title, String description, String reasonForRecommendation, Double metacriticScore, UserGamePreference userGamePreference) {
         this.user = user;
         this.title = title;
         this.description = description;
-        this.matchingScore = matchingScore;
+        //this.matchingScore = matchingScore;
         this.reasonForRecommendation = reasonForRecommendation;
-        this.star = star;
+        this.metacriticScore = metacriticScore;
         this.userGamePreference = userGamePreference;
+
     }
 }
 
