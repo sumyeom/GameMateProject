@@ -79,7 +79,7 @@ public class LikeService {
 
         boardRepository.findById(boardId)
                 .orElseThrow(() -> new ApiException(ErrorCode.BOARD_NOT_FOUND));
-        return boardLikeRepository.countByBoardBoardIdAndStatus(boardId, LikeStatus.LIKE);
+        return boardLikeRepository.countByBoardIdAndStatus(boardId, LikeStatus.LIKE);
     }
 
     public Long getReivewLikeCount(Long reviewId) {

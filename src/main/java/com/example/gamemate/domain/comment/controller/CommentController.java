@@ -22,9 +22,9 @@ public class CommentController {
 
     /**
      * 댓글 생성 API
-     * @param boardId
-     * @param requestDto
-     * @return
+     * @param boardId 게시글 식별자
+     * @param requestDto 댓글 요청 Dto
+     * @return 생성된 댓글 정보를 포함한 ResponseEntity
      */
     @PostMapping
     public ResponseEntity<CommentResponseDto> createComment(
@@ -38,9 +38,9 @@ public class CommentController {
 
     /**
      * 댓글/대댓글 조회
-     * @param boardId
-     * @param page
-     * @return
+     * @param boardId 댓글 식별자
+     * @param page 페이지 번호(기본값 : 0)
+     * @return 댓글 리스트 ResponseEntity
      */
     @GetMapping
     public ResponseEntity<List<CommentFindResponseDto>> getComments(
@@ -53,9 +53,10 @@ public class CommentController {
 
     /**
      * 댓글 수정 API
-     * @param id
-     * @param requestDto
-     * @return
+     *
+     * @param id 댓글 식별자
+     * @param requestDto 업데이트할 댓글 Dto
+     * @return Void
      */
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateComment(
@@ -67,6 +68,12 @@ public class CommentController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    /**
+     * 댓글 삭제 API
+     * @param id 댓글 식별자
+     * @param customUserDetails 인증된 사용자 정보
+     * @return Void
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteComment(
             @PathVariable Long id,
