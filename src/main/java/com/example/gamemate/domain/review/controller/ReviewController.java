@@ -1,29 +1,19 @@
 package com.example.gamemate.domain.review.controller;
 
-import com.example.gamemate.domain.review.dto.*;
+import com.example.gamemate.domain.review.dto.request.ReviewCreateRequestDto;
+import com.example.gamemate.domain.review.dto.request.ReviewUpdateRequestDto;
+import com.example.gamemate.domain.review.dto.response.ReviewCreateResponseDto;
+import com.example.gamemate.domain.review.dto.response.ReviewFindByAllResponseDto;
 import com.example.gamemate.domain.review.service.ReviewService;
-import com.example.gamemate.domain.user.entity.User;
-import com.example.gamemate.domain.user.repository.UserRepository;
 import com.example.gamemate.global.config.auth.CustomUserDetails;
-import com.example.gamemate.global.constant.ErrorCode;
-import com.example.gamemate.global.exception.ApiException;
-import com.example.gamemate.global.provider.JwtTokenProvider;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
-
-import static com.example.gamemate.global.constant.ErrorCode.USER_NOT_FOUND;
 
 /**
  * 게임 리뷰 관련 API를 처리하는 컨트롤러 클래스입니다.

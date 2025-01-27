@@ -1,9 +1,11 @@
 package com.example.gamemate.domain.like.controller;
 
-import com.example.gamemate.domain.like.dto.BoardLikeCountResponseDto;
-import com.example.gamemate.domain.like.dto.BoardLikeResponseDto;
-import com.example.gamemate.domain.like.dto.ReviewLikeCountResponseDto;
-import com.example.gamemate.domain.like.dto.ReviewLikeResponseDto;
+import com.example.gamemate.domain.like.dto.request.LikeRequestDto;
+import com.example.gamemate.domain.like.dto.response.BoardLikeCountResponseDto;
+import com.example.gamemate.domain.like.dto.response.BoardLikeResponseDto;
+import com.example.gamemate.domain.like.dto.response.ReviewLikeCountResponseDto;
+import com.example.gamemate.domain.like.dto.response.ReviewLikeResponseDto;
+import com.example.gamemate.domain.like.enums.LikeStatus;
 import com.example.gamemate.domain.like.service.LikeService;
 import com.example.gamemate.global.config.auth.CustomUserDetails;
 
@@ -28,17 +30,17 @@ public class LikeController {
      * 리뷰에 대한 좋아요를 처리합니다.
      *
      * @param reviewId 좋아요를 누를 리뷰의 ID
-     * @param status 좋아요 상태 (1: 좋아요, 0: 좋아요 취소)
+     * @param status 좋아요 상태
      * @param customUserDetails 현재 인증된 사용자 정보
      * @return 좋아요 처리 결과를 담은 ResponseEntity
      */
     @PostMapping("/reviews/{reviewId}")
     public ResponseEntity<ReviewLikeResponseDto> reviewLikeUp(
             @PathVariable Long reviewId,
-            @RequestBody Integer status,
+            @RequestBody LikeRequestDto requestDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        ReviewLikeResponseDto responseDto = likeService.reviewLikeUp(reviewId, status, customUserDetails.getUser());
+        ReviewLikeResponseDto responseDto = likeService.reviewLikeUp(reviewId, requestDto.getStatus(), customUserDetails.getUser());
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
@@ -46,17 +48,17 @@ public class LikeController {
      * 게시글에 대한 좋아요를 처리합니다.
      *
      * @param boardId 좋아요를 누를 게시글의 ID
-     * @param status 좋아요 상태 (1: 좋아요, 0: 좋아요 취소)
+     * @param status 좋아요 상태 (1: 좋아요, 0: 좋아요 취소, -1:싫어요)
      * @param customUserDetails 현재 인증된 사용자 정보
      * @return 좋아요 처리 결과를 담은 ResponseEntity
      */
     @PostMapping("/boards/{boardId}")
     public ResponseEntity<BoardLikeResponseDto> boardLikeUp(
             @PathVariable Long boardId,
-            @RequestBody Integer status,
+            @RequestBody LikeRequestDto requestDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        BoardLikeResponseDto responseDto = likeService.boardLikeUp(boardId, status, customUserDetails.getUser());
+        BoardLikeResponseDto responseDto = likeService.boardLikeUp(boardId, requestDto.getStatus(), customUserDetails.getUser());
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
