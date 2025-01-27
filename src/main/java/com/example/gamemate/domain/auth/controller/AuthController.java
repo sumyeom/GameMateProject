@@ -32,7 +32,7 @@ public class AuthController {
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
-    @PostMapping("/email")
+    @PostMapping("/email/verification-request")
     public ResponseEntity<Void> sendVerificationEmail(
             @Valid @RequestBody EmailVerificationCodeRequestDto requestDto
     ) {
