@@ -4,26 +4,19 @@ import com.example.gamemate.global.constant.ErrorCode;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.security.sasl.AuthenticationException;
 import java.security.SignatureException;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.example.gamemate.global.constant.ErrorCode.NO_SESSION;
 
 @RestControllerAdvice
 @Slf4j
@@ -52,7 +45,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Object> handleIRuntime(RuntimeException e) {
         log.warn("handleIRuntime", e);
-        ErrorCode errorCode = ErrorCode.NO_SESSION;
+        ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
         return handleExceptionInternal(errorCode, errorCode.getMessage());
     }
 
