@@ -106,6 +106,11 @@ public class User extends BaseEntity {
         this.refreshToken = null;
     }
 
+    public void integrateOAuthProvider(AuthProvider provider, String providerId) {
+        this.provider = provider;
+        this.providerId = providerId;
+    }
+
     public void setOAuthPassword(String password) {
         this.password = password;
     }

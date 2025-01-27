@@ -47,6 +47,12 @@ public class OAuth2Service {
                 throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
             }
 
+            // 이메일로 가입한 계정이 소셜 로그인 시도한 경우
+            if (existingUser.getProvider() == AuthProvider.LOCAL) {
+                existingUser.integrateOAuthProvider(responseDto.getProvider(), responseDto.getProviderId());
+                return userRepository.save(existingUser);
+            }
+
             // 다른 OAuth 제공자로 로그인 시도한 경우
             if (!existingUser.getProvider().equals(responseDto.getProvider())) {
                 throw new ApiException(ErrorCode.INVALID_PROVIDER_TYPE);
