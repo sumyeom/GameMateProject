@@ -1,8 +1,8 @@
 package com.example.gamemate.domain.game.service;
 
-import com.example.gamemate.domain.game.dto.GameEnrollRequestCreateRequestDto;
-import com.example.gamemate.domain.game.dto.GameEnrollRequestResponseDto;
-import com.example.gamemate.domain.game.dto.GameEnrollRequestUpdateRequestDto;
+import com.example.gamemate.domain.game.dto.request.GameEnrollRequestCreateRequestDto;
+import com.example.gamemate.domain.game.dto.response.GameEnrollRequestResponseDto;
+import com.example.gamemate.domain.game.dto.request.GameEnrollRequestUpdateRequestDto;
 
 import com.example.gamemate.domain.game.entity.GamaEnrollRequest;
 import com.example.gamemate.domain.game.entity.Game;
@@ -28,6 +28,7 @@ public class GameEnrollRequestService {
     private final GameRepository gameRepository;
     private final GameEnrollRequestRepository gameEnrollRequestRepository;
 
+    //게임등록요청 생성
     @Transactional
     public GameEnrollRequestResponseDto createGameEnrollRequest(GameEnrollRequestCreateRequestDto requestDto, User userId) {
         GamaEnrollRequest gameEnrollRequest = new GamaEnrollRequest(
@@ -41,10 +42,10 @@ public class GameEnrollRequestService {
         return new GameEnrollRequestResponseDto(saveEnrollRequest);
     }
 
+    //게임등록요청 다건조회(only Role.ADMIN)
     public Page<GameEnrollRequestResponseDto> findAllGameEnrollRequest(User loginUser) {
 
-        //관리자만 게임등록요청 조회 가능함(조회)
-        if (!loginUser.getRole().equals(Role.ADMIN)){
+        if (!loginUser.getRole().equals(Role.ADMIN)) {
             throw new ApiException(ErrorCode.FORBIDDEN);
         }
 
@@ -53,11 +54,10 @@ public class GameEnrollRequestService {
         return gameEnrollRequestRepository.findAll(pageable).map(GameEnrollRequestResponseDto::new);
     }
 
-
+    //게임등록요청 단건조회(only Role.ADMIN)
     public GameEnrollRequestResponseDto findGameEnrollRequestById(Long id, User loginUser) {
 
-        //관리자만 게임등록요청 조회 가능함(조회)
-        if (!loginUser.getRole().equals(Role.ADMIN)){
+        if (!loginUser.getRole().equals(Role.ADMIN)) {
             throw new ApiException(ErrorCode.FORBIDDEN);
         }
 
@@ -67,11 +67,11 @@ public class GameEnrollRequestService {
         return new GameEnrollRequestResponseDto(gamaEnrollRequest);
     }
 
+    //게임등록요청 수정 & 게임등록 (only Role.ADMIN)
     @Transactional
     public void updateGameEnroll(Long id, GameEnrollRequestUpdateRequestDto requestDto, User loginUser) {
 
-        //관리자만 게임등록요청 수정 가능함(수정)
-        if (!loginUser.getRole().equals(Role.ADMIN)){
+        if (!loginUser.getRole().equals(Role.ADMIN)) {
             throw new ApiException(ErrorCode.FORBIDDEN);
         }
 
@@ -88,7 +88,7 @@ public class GameEnrollRequestService {
 
         gameEnrollRequestRepository.save(gamaEnrollRequest);
 
-        // 만약에 관리자가 true로 바꾸면 게임등록도 함께 진행됨
+        // IsAccepted = true > 게임등록
         Boolean accepted = requestDto.getIsAccepted();
         if (accepted == true) {
             Game game = new Game(
@@ -101,11 +101,11 @@ public class GameEnrollRequestService {
         }
     }
 
+    //게임등록요청 삭제 (only Role.ADMIN)
     @Transactional
     public void deleteGameEnroll(Long id, User loginUser) {
 
-        //관리자만 게임등록요청 삭제 가능함(삭제)
-        if (!loginUser.getRole().equals(Role.ADMIN)){
+        if (!loginUser.getRole().equals(Role.ADMIN)) {
             throw new ApiException(ErrorCode.FORBIDDEN);
         }
 

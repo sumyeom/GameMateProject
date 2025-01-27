@@ -1,13 +1,14 @@
 package com.example.gamemate.domain.game.service;
 
-import com.example.gamemate.domain.game.dto.*;
-
+import com.example.gamemate.domain.game.dto.request.GameCreateRequestDto;
+import com.example.gamemate.domain.game.dto.request.GameUpdateRequestDto;
+import com.example.gamemate.domain.game.dto.response.GameCreateResponseDto;
+import com.example.gamemate.domain.game.dto.response.GameFindAllResponseDto;
+import com.example.gamemate.domain.game.dto.response.GameFindByIdResponseDto;
 import com.example.gamemate.domain.game.entity.Game;
 import com.example.gamemate.domain.game.entity.GameImage;
 import com.example.gamemate.domain.game.repository.GameImageRepository;
 import com.example.gamemate.domain.game.repository.GameRepository;
-import com.example.gamemate.domain.review.dto.ReviewFindByAllResponseDto;
-import com.example.gamemate.domain.review.entity.Review;
 import com.example.gamemate.domain.review.repository.ReviewRepository;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.domain.user.enums.Role;
@@ -19,13 +20,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -34,18 +35,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GameService {
     private final GameRepository gameRepository;
-    private final ReviewRepository reviewRepository;
     private final S3Service s3Service;
-    private final GameImageRepository gameImageRepository;
 
+    //게임 등록(생성) (only Role.ADMIN)
     @Transactional
     public GameCreateResponseDto createGame(User loginUser, GameCreateRequestDto gameCreateRequestDto, MultipartFile file) {
 
-        //관리자만 가능함(생성)
         if (!loginUser.getRole().equals(Role.ADMIN)) {
             throw new ApiException(ErrorCode.FORBIDDEN);
         }
-        // 게임 엔티티 생성
+
         Game game = new Game(
                 gameCreateRequestDto.getTitle(),
                 gameCreateRequestDto.getGenre(),
@@ -55,6 +54,15 @@ public class GameService {
 
         if (file != null && !file.isEmpty()) {
             try {
+
+                String fileName = file.getOriginalFilename();
+                String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+                List<String> allowedExtensions = Arrays.asList("jpg", "jpeg");
+
+                if (!allowedExtensions.contains(fileExtension)) {
+                    throw new ApiException(ErrorCode.INVALID_FILE_EXTENSION);
+                }
+
                 String fileUrl = s3Service.uploadFile(file);
                 GameImage gameImage = new GameImage(
                         file.getOriginalFilename(),
@@ -62,23 +70,26 @@ public class GameService {
                         fileUrl,
                         game
                 );
+
                 game.addImage(gameImage);
             } catch (IOException e) {
-                throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.", e);
+                throw new ApiException(ErrorCode.FILE_UPLOAD_ERROR);
             }
+
         }
 
         Game savedGame = gameRepository.save(game);
         return new GameCreateResponseDto(savedGame);
     }
 
+    //게임 다건 조회
     public Page<GameFindAllResponseDto> findAllGame(int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size);
         return gameRepository.findAll(pageable).map(GameFindAllResponseDto::new);
     }
 
-
+    //게임 단건 조회
     public GameFindByIdResponseDto findGameById(Long id) {
 
         Game game = gameRepository.findGameById(id)
@@ -87,8 +98,10 @@ public class GameService {
         return new GameFindByIdResponseDto(game);
     }
 
+    //게임 정보 수정 (only Role.ADMIN)
     @Transactional
     public void updateGame(Long id, GameUpdateRequestDto requestDto, MultipartFile newFile, User loginUser) {
+
         if (loginUser == null || !loginUser.getRole().equals(Role.ADMIN)) {
             throw new ApiException(ErrorCode.FORBIDDEN);
         }
@@ -106,24 +119,34 @@ public class GameService {
                 requestDto.getDescription()
         );
 
-         gameRepository.save(game);
+        gameRepository.save(game);
     }
 
+    //게임 이미지 삭제
     private void deleteExistingImages(Game game) {
         for (GameImage image : game.getImages()) {
             try {
                 s3Service.deleteFile(image.getFilePath());
             } catch (Exception e) {
-                // 로그 기록 후 계속 진행
                 log.error("Failed to delete file: {}", image.getFilePath(), e);
             }
         }
         game.getImages().clear();
     }
 
+    //게임 이미지 등록
     private void uploadNewImage(Game game, MultipartFile newFile) {
         if (newFile != null && !newFile.isEmpty()) {
             try {
+
+                String fileName = newFile.getOriginalFilename();
+                String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+                List<String> allowedExtensions = Arrays.asList("jpg", "jpeg");
+
+                if (!allowedExtensions.contains(fileExtension)) {
+                    throw new ApiException(ErrorCode.INVALID_FILE_EXTENSION);
+                }
+
                 String fileUrl = s3Service.uploadFile(newFile);
                 GameImage gameImage = new GameImage(
                         newFile.getOriginalFilename(),
@@ -138,11 +161,10 @@ public class GameService {
         }
     }
 
-
+    //게임 삭제 (only Role.ADMIN)
     @Transactional
     public void deleteGame(Long id, User loginUser) {
 
-        //관리자만 가능함(삭제)
         if (!loginUser.getRole().equals(Role.ADMIN)) {
             throw new ApiException(ErrorCode.FORBIDDEN);
         }
@@ -150,7 +172,6 @@ public class GameService {
         Game game = gameRepository.findGameById(id)
                 .orElseThrow(() -> new ApiException(ErrorCode.GAME_NOT_FOUND));
 
-        // 게임에 연결된 모든 이미지 삭제
         if (!game.getImages().isEmpty()) {
             for (GameImage image : game.getImages()) {
                 s3Service.deleteFile(image.getFilePath());
@@ -160,6 +181,7 @@ public class GameService {
         gameRepository.delete(game);
     }
 
+    //게임 검색
     public Page<GameFindAllResponseDto> searchGame(String keyword, String genre, String platform, int page, int size) {
 
         log.info("Searching games with parameters - keyword: {}, genre: {}, platform: {}",

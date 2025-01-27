@@ -1,4 +1,4 @@
-package com.example.gamemate.domain.game.dto;
+package com.example.gamemate.domain.game.dto.response;
 
 import com.example.gamemate.domain.game.entity.UserGamePreference;
 import lombok.Getter;
