@@ -12,6 +12,8 @@ import com.example.gamemate.domain.user.enums.Role;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class CouponService {
     private final CouponRepository couponRepository;
     private final UserCouponRepository userCouponRepository;
@@ -48,32 +51,37 @@ public class CouponService {
     }
 
     public CouponIssueResponseDto issueCoupon(Long couponId, User loginUser) {
-        Coupon coupon = couponRepository.findById(couponId)
-                .orElseThrow(() -> new ApiException(ErrorCode.COUPON_NOT_FOUND));
+        try {
+            Coupon coupon = couponRepository.findByIdWithPessimisticLock(couponId)
+                    .orElseThrow(() -> new ApiException(ErrorCode.COUPON_NOT_FOUND));
 
-        // 발급 가능 체크
-        if (!coupon.isIssuable()) {
-            throw new ApiException(ErrorCode.COUPON_NOT_ISSUABLE);
+            // 발급 가능 체크
+            if (!coupon.isIssuable()) {
+                throw new ApiException(ErrorCode.COUPON_NOT_ISSUABLE);
+            }
+
+            // 수량 체크
+            if (coupon.isExhausted()) {
+                throw new ApiException(ErrorCode.COUPON_EXHAUSTED);
+            }
+
+            // 중복 발급 체크
+            if (userCouponRepository.existsByUserIdAndCouponId(loginUser.getId(), couponId)) {
+                throw new ApiException(ErrorCode.COUPON_ALREADY_ISSUED);
+            }
+
+            // 쿠폰 발급
+            coupon.incrementIssuedQuantity();
+            UserCoupon userCoupon = new UserCoupon(loginUser, coupon);
+            userCoupon.updateIsUsed(false);
+
+            UserCoupon savedUserCoupon = userCouponRepository.save(userCoupon);
+
+            return new CouponIssueResponseDto(savedUserCoupon);
+        } catch (PessimisticLockingFailureException e) {
+            log.error("쿠폰 발급 동시 요청으로 잠금 획득 실패: {}", couponId, e);
+            throw new ApiException(ErrorCode.COUPON_ISSUE_FAILED);
         }
-
-        // 수량 체크
-        if (coupon.isExhausted()) {
-            throw new ApiException(ErrorCode.COUPON_EXHAUSTED);
-        }
-
-        // 중복 발급 체크
-        if (userCouponRepository.existsByUserIdAndCouponId(loginUser.getId(), couponId)) {
-            throw new ApiException(ErrorCode.COUPON_ALREADY_ISSUED);
-        }
-
-        // 쿠폰 발급
-        coupon.incrementIssuedQuantity();
-        UserCoupon userCoupon = new UserCoupon(loginUser, coupon);
-        userCoupon.updateIsUsed(false);
-
-        UserCoupon savedUserCoupon = userCouponRepository.save(userCoupon);
-
-        return new CouponIssueResponseDto(savedUserCoupon);
     }
 
     @Transactional(readOnly = true)
