@@ -94,10 +94,6 @@ public class User extends BaseEntity {
         this.userStatus = status;
     }
 
-    public void deleteSoftly() {
-        markDeletedAt();
-    }
-
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
