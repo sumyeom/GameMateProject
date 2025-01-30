@@ -39,14 +39,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Object> handleIllegalArgument(IllegalArgumentException e) {
         log.warn("handleIllegalArgument", e);
-        ErrorCode errorCode = ErrorCode.INVALID_PARAMETER;
+        ErrorCode errorCode;
+        if("유효하지 않은 토큰입니다.".equals(e.getMessage())) {
+            errorCode = ErrorCode.INVALID_TOKEN;
+        } else {
+            errorCode = ErrorCode.INVALID_PARAMETER;
+        }
         return handleExceptionInternal(errorCode, errorCode.getMessage());
     }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Object> handleIRuntime(RuntimeException e) {
         log.warn("handleIRuntime", e);
-        ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
+        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
         return handleExceptionInternal(errorCode, errorCode.getMessage());
     }
 
@@ -74,11 +79,17 @@ public class GlobalExceptionHandler {
             ExpiredJwtException.class,
             SignatureException.class,
             MalformedJwtException.class,
-            AuthenticationException.class
     })
     public ResponseEntity<Object> handleJwtException(Exception e) {
         log.warn("handleJwtException", e);
         ErrorCode errorCode = ErrorCode.INVALID_TOKEN;
+        return handleExceptionInternal(errorCode, errorCode.getMessage());
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Object> handleAuthenticationException(AuthenticationException e) {
+        log.warn("Authentication exception", e);
+        ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
         return handleExceptionInternal(errorCode, errorCode.getMessage());
     }
 

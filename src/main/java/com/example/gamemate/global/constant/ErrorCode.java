@@ -32,7 +32,6 @@ public enum ErrorCode {
 
     /* 401 인증 오류 */
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "로그인이 필요합니다."),
-    NO_TOKEN(HttpStatus.UNAUTHORIZED, "NO_TOKEN","로그인이 필요합니다."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "INVALID_TOKEN", "유효하지 않은 토큰입니다."),
 
     /* 403 권한 없음 */
