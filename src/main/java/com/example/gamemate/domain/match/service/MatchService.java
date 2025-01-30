@@ -8,6 +8,7 @@ import com.example.gamemate.domain.match.enums.MatchStatus;
 import com.example.gamemate.domain.match.enums.Priority;
 import com.example.gamemate.domain.match.repository.MatchRepository;
 import com.example.gamemate.domain.match.repository.MatchUserInfoRepository;
+import com.example.gamemate.domain.notification.entity.Notification;
 import com.example.gamemate.domain.notification.enums.NotificationType;
 import com.example.gamemate.domain.notification.service.NotificationService;
 import com.example.gamemate.domain.user.entity.User;
@@ -61,7 +62,8 @@ public class MatchService {
 
         Match match = new Match(dto.getMessage(), loginUser, receiver);
         Match savedMatch = matchRepository.save(match);
-        notificationService.sendNotification(receiver, NotificationType.NEW_MATCH, "/matches/" + savedMatch.getId());
+        Notification notification = notificationService.createNotification(receiver, NotificationType.NEW_MATCH, "/matches/" + savedMatch.getId());
+        notificationService.sendNotification(receiver, notification);
 
         return MatchResponseDto.toDto(match);
     }
@@ -82,11 +84,13 @@ public class MatchService {
         } // 로그인한 유저가 매칭의 받는 사람이 아닐때 예외처리
 
         if (dto.getStatus() == MatchStatus.ACCEPTED) {
-            notificationService.sendNotification(findMatch.getSender(), NotificationType.MATCH_ACCEPTED, "/matches/" + findMatch.getId());
+            Notification notification = notificationService.createNotification(findMatch.getSender(), NotificationType.MATCH_ACCEPTED, "/matches/" + findMatch.getId());
+            notificationService.sendNotification(findMatch.getSender(), notification);
         } // 매칭 보낸 사람에게 매칭이 수락되었다는 알림 전송
 
         if (dto.getStatus() == MatchStatus.REJECTED) {
-            notificationService.sendNotification(findMatch.getSender(), NotificationType.MATCH_REJECTED, "/matches/" + findMatch.getId());
+            Notification notification = notificationService.createNotification(findMatch.getSender(), NotificationType.MATCH_REJECTED, "/matches/" + findMatch.getId());
+            notificationService.sendNotification(findMatch.getSender(), notification);
         } // 매칭 보낸 사람에게 매칭이 거절되었다는 알림 전송
 
         findMatch.updateStatus(dto.getStatus());

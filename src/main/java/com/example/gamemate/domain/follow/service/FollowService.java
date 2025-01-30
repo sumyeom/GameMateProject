@@ -3,6 +3,7 @@ package com.example.gamemate.domain.follow.service;
 import com.example.gamemate.domain.follow.dto.*;
 import com.example.gamemate.domain.follow.entity.Follow;
 import com.example.gamemate.domain.follow.repository.FollowRepository;
+import com.example.gamemate.domain.notification.entity.Notification;
 import com.example.gamemate.domain.notification.enums.NotificationType;
 import com.example.gamemate.domain.notification.service.NotificationService;
 import com.example.gamemate.domain.user.entity.User;
@@ -47,7 +48,8 @@ public class FollowService {
 
         Follow follow = new Follow(loginUser, followee);
         followRepository.save(follow);
-        notificationService.sendNotification(followee, NotificationType.NEW_FOLLOWER, "/users/" + loginUser.getId());
+        Notification notification = notificationService.createNotification(followee, NotificationType.NEW_FOLLOWER, "/users/" + follow.getFollower().getId());
+        notificationService.sendNotification(followee, notification);
 
         return new FollowResponseDto(
                 follow.getId(),

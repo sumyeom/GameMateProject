@@ -8,6 +8,7 @@ import com.example.gamemate.domain.comment.dto.CommentRequestDto;
 import com.example.gamemate.domain.comment.dto.CommentResponseDto;
 import com.example.gamemate.domain.comment.entity.Comment;
 import com.example.gamemate.domain.comment.repository.CommentRepository;
+import com.example.gamemate.domain.notification.entity.Notification;
 import com.example.gamemate.domain.notification.enums.NotificationType;
 import com.example.gamemate.domain.notification.service.NotificationService;
 import com.example.gamemate.domain.reply.dto.ReplyFindResponseDto;
@@ -53,11 +54,8 @@ public class CommentService {
         Comment comment = new Comment(requestDto.getContent(), findBoard, loginUser);
         Comment createComment = commentRepository.save(comment);
 
-        notificationService.sendNotification(
-                findBoard.getUser(),
-                NotificationType.NEW_COMMENT,
-                "/comments/" + createComment.getCommentId()
-        );
+        Notification notification = notificationService.createNotification(findBoard.getUser(), NotificationType.NEW_COMMENT, "/comments/" + createComment.getCommentId());
+        notificationService.sendNotification(findBoard.getUser(), notification);
 
         return new CommentResponseDto(
                 createComment.getCommentId(),

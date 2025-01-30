@@ -2,12 +2,12 @@ package com.example.gamemate.domain.like.service;
 
 import com.example.gamemate.domain.board.repository.BoardRepository;
 import com.example.gamemate.domain.like.dto.BoardLikeResponseDto;
-import com.example.gamemate.domain.like.dto.ReviewLikeCountResponseDto;
 import com.example.gamemate.domain.like.dto.ReviewLikeResponseDto;
 import com.example.gamemate.domain.like.entity.BoardLike;
 import com.example.gamemate.domain.like.entity.ReviewLike;
 import com.example.gamemate.domain.like.repository.BoardLikeRepository;
 import com.example.gamemate.domain.like.repository.ReviewLikeRepository;
+import com.example.gamemate.domain.notification.entity.Notification;
 import com.example.gamemate.domain.notification.enums.NotificationType;
 import com.example.gamemate.domain.notification.service.NotificationService;
 import com.example.gamemate.domain.review.repository.ReviewRepository;
@@ -43,7 +43,8 @@ public class LikeService {
 
         if (reviewLike.getId() == null) {
             reviewLikeRepository.save(reviewLike);
-            notificationService.sendNotification(reviewLike.getReview().getUser(), NotificationType.NEW_LIKE, "/likes/reviews/" + reviewId);
+            Notification notification = notificationService.createNotification(reviewLike.getReview().getUser(), NotificationType.NEW_LIKE, "/reviews/" + reviewLike.getReview().getId());
+            notificationService.sendNotification(reviewLike.getReview().getUser(), notification);
         } else {
             reviewLike.changeStatus(status);
         }
@@ -65,7 +66,8 @@ public class LikeService {
 
         if (boardLike.getId() == null) {
             boardLikeRepository.save(boardLike);
-            notificationService.sendNotification(boardLike.getBoard().getUser(), NotificationType.NEW_LIKE, "/likes/boards/" + boardId);
+            Notification notification = notificationService.createNotification(boardLike.getBoard().getUser(), NotificationType.NEW_LIKE, "/boards/" + boardLike.getBoard().getBoardId());
+            notificationService.sendNotification(boardLike.getBoard().getUser(), notification);
         } else {
             boardLike.changeStatus(status);
         }

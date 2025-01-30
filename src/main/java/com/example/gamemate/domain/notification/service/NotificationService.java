@@ -9,15 +9,11 @@ import com.example.gamemate.domain.user.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,14 +21,14 @@ import java.util.stream.Collectors;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
-    private final AsyncNotificationService asyncNotificationService;
     private final EmitterRepository emitterRepository;
 
     // 알림 생성
     @Transactional
-    public void createNotification(User user, NotificationType type, String relatedUrl) {
+    public Notification createNotification(User user, NotificationType type, String relatedUrl) {
         Notification notification = new Notification(type.getContent(), relatedUrl, type, user);
-        notificationRepository.save(notification);
+        Notification savedNotification = notificationRepository.save(notification);
+        return savedNotification;
     }
 
     // 알림 전체 보기
@@ -45,31 +41,6 @@ public class NotificationService {
                 .map(NotificationResponseDto::toDto)
                 .toList();
     }
-
-//    // 알림 발송 (이메일)
-//    @Scheduled(cron = "0 0/10 * * * *")
-//    public void scheduleNotificationEmail() {
-//        log.info("스케쥴링 활성화");
-//
-//        List<Notification> unnotifiedNotificationList = notificationRepository.findAllByIsRead(false);
-//
-//        if (unnotifiedNotificationList.isEmpty()) {
-//            log.info("전송할 알림이 없습니다.");
-//            return;
-//        }
-//
-//        Map<User, List<Notification>> notificationMap =
-//                unnotifiedNotificationList
-//                        .stream()
-//                        .collect(Collectors.groupingBy(Notification::getReceiver));
-//
-//        for (Map.Entry<User, List<Notification>> entry : notificationMap.entrySet()) {
-//            User user = entry.getKey();
-//            List<Notification> notifications = entry.getValue();
-//
-//            asyncNotificationService.sendNotificationMail(user, notifications);
-//        }
-//    }
 
     public SseEmitter subscribe(User loginUser, String lastEventId) {
         Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
@@ -94,10 +65,9 @@ public class NotificationService {
     }
 
     @Transactional
-    public void sendNotification(User user, NotificationType type, String relatedUrl) {
+    public void sendNotification(User user, Notification notification) {
+        long startTime = System.currentTimeMillis();
         SseEmitter sseEmitter = emitterRepository.findById(user.getId());
-        Notification notification = new Notification(type.getContent(), relatedUrl, type, user);
-        notificationRepository.save(notification);
 
         try {
             sseEmitter.send(
@@ -109,6 +79,10 @@ public class NotificationService {
         } catch (IOException e) {
             emitterRepository.deleteById(user.getId());
             throw new RuntimeException("SSE 연결 오류 발생");
+        } finally {
+            long endTime = System.currentTimeMillis();
+            long elapsedTime = endTime - startTime;
+            log.info("sendNotification 메서드 실행 시간: {}ms", elapsedTime);
         }
     }
 }
