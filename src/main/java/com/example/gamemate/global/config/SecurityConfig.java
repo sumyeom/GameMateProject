@@ -5,6 +5,7 @@ import com.example.gamemate.global.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
@@ -50,10 +51,12 @@ public class SecurityConfig {
                         .requestMatchers("/v3/api-docs/**", "/swagger-resources/**" ,"/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/auth/signup", "/auth/login", "/auth/refresh", "/auth/email/**").permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**", "/auth/oauth2/**").permitAll()
-                        .requestMatchers("/oauth2-login.html", "/oauth2-login-failure.html", "/oauth2-login-success.html").permitAll()
+                        .requestMatchers("/oauth2-login.html", "/oauth2-login-failure.html", "/oauth2-login-success.html", "/oauth2-set-password.html").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/games", "/games/{id}").hasRole("USER")
                         .requestMatchers(HttpMethod.POST,"/games/requests").hasRole("USER")
-                        .requestMatchers("/games", "/games/{id}").hasRole("ADMIN")
+                        .requestMatchers("/games/recommendations/**").hasRole("USER")
                         .requestMatchers("/games/requests/**").hasRole("ADMIN")
+                        .requestMatchers("/games/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
