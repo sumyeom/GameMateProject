@@ -16,6 +16,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -101,8 +103,10 @@ public class GlobalEventListener {
         log.info("새로운 댓글 알림 전송 시작");
         Comment comment = event.getComment();
 
-        Notification notification = notificationService.createNotification(comment.getBoard().getUser(), NotificationType.NEW_COMMENT, "/comments/" + comment.getCommentId());
-        notificationService.sendNotification(comment.getBoard().getUser(), notification);
+        if (!Objects.equals(comment.getUser().getId(), comment.getBoard().getUser().getId())) {
+            Notification notification = notificationService.createNotification(comment.getBoard().getUser(), NotificationType.NEW_COMMENT, "/comments/" + comment.getCommentId());
+            notificationService.sendNotification(comment.getBoard().getUser(), notification);
+        }
 
         log.info("새로운 댓글 알림 전송 완료");
     }
@@ -113,12 +117,17 @@ public class GlobalEventListener {
         log.info("새로운 대댓글 알림 전송 시작");
         Reply reply = event.getReply();
 
-        Notification boardNotification = notificationService.createNotification(reply.getComment().getBoard().getUser(), NotificationType.NEW_COMMENT, "/replies/" + reply.getReplyId());
-        notificationService.sendNotification(reply.getComment().getBoard().getUser(), boardNotification);
-        Notification commentNotification = notificationService.createNotification(reply.getComment().getUser(), NotificationType.NEW_COMMENT, "/replies/" + reply.getReplyId());
-        notificationService.sendNotification(reply.getComment().getUser(), commentNotification);
+        if (!Objects.equals(reply.getUser().getId(), reply.getComment().getBoard().getUser().getId())) {
+            Notification boardNotification = notificationService.createNotification(reply.getComment().getBoard().getUser(), NotificationType.NEW_COMMENT, "/replies/" + reply.getReplyId());
+            notificationService.sendNotification(reply.getComment().getBoard().getUser(), boardNotification);
+        }
 
-        if (reply.getParentReply() != null) {
+        if (!Objects.equals(reply.getUser().getId(), reply.getComment().getUser().getId())) {
+            Notification commentNotification = notificationService.createNotification(reply.getComment().getUser(), NotificationType.NEW_COMMENT, "/replies/" + reply.getReplyId());
+            notificationService.sendNotification(reply.getComment().getUser(), commentNotification);
+        }
+
+        if (reply.getParentReply() != null && !Objects.equals(reply.getParentReply().getUser().getId(), reply.getUser().getId())) {
             Notification parentReplyNotification = notificationService.createNotification(reply.getParentReply().getUser(), NotificationType.NEW_COMMENT, "/replies/" + reply.getReplyId());
             notificationService.sendNotification(reply.getParentReply().getUser(), parentReplyNotification);
         }
