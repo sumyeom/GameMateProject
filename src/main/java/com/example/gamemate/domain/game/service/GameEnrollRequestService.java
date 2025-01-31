@@ -28,7 +28,12 @@ public class GameEnrollRequestService {
     private final GameRepository gameRepository;
     private final GameEnrollRequestRepository gameEnrollRequestRepository;
 
-    //게임등록요청 생성
+    /**
+     * 새로운 게임 등록 요청을 생성합니다.
+     * @param requestDto 게임 등록 요청 정보를 담은 DTO
+     * @param userId 요청을 생성하는 사용자
+     * @return 생성된 게임 등록 요청 정보
+     */
     @Transactional
     public GameEnrollRequestResponseDto createGameEnrollRequest(GameEnrollRequestCreateRequestDto requestDto, User userId) {
         GamaEnrollRequest gameEnrollRequest = new GamaEnrollRequest(
@@ -42,7 +47,11 @@ public class GameEnrollRequestService {
         return new GameEnrollRequestResponseDto(saveEnrollRequest);
     }
 
-    //게임등록요청 다건조회(only Role.ADMIN)
+    /**
+     * 모든 게임 등록 요청을 조회합니다. 관리자 권한이 필요합니다.
+     * @param loginUser 현재 로그인한 사용자
+     * @return 게임 등록 요청 목록 (페이지네이션 적용)
+     */
     public Page<GameEnrollRequestResponseDto> findAllGameEnrollRequest(User loginUser) {
 
         if (!loginUser.getRole().equals(Role.ADMIN)) {
@@ -54,7 +63,12 @@ public class GameEnrollRequestService {
         return gameEnrollRequestRepository.findAll(pageable).map(GameEnrollRequestResponseDto::new);
     }
 
-    //게임등록요청 단건조회(only Role.ADMIN)
+    /**
+     * 특정 ID의 게임 등록 요청을 조회합니다. 관리자 권한이 필요합니다.
+     * @param id 조회할 게임 등록 요청의 ID
+     * @param loginUser 현재 로그인한 사용자
+     * @return 조회된 게임 등록 요청 정보
+     */
     public GameEnrollRequestResponseDto findGameEnrollRequestById(Long id, User loginUser) {
 
         if (!loginUser.getRole().equals(Role.ADMIN)) {
@@ -67,7 +81,12 @@ public class GameEnrollRequestService {
         return new GameEnrollRequestResponseDto(gamaEnrollRequest);
     }
 
-    //게임등록요청 수정 & 게임등록 (only Role.ADMIN)
+    /**
+     * 게임 등록 요청을 수정하고, 승인 시 게임을 등록합니다. 관리자 권한이 필요합니다.
+     * @param id 수정할 게임 등록 요청의 ID
+     * @param requestDto 수정할 게임 등록 요청 정보를 담은 DTO
+     * @param loginUser 현재 로그인한 사용자
+     */
     @Transactional
     public void updateGameEnroll(Long id, GameEnrollRequestUpdateRequestDto requestDto, User loginUser) {
 
@@ -101,7 +120,11 @@ public class GameEnrollRequestService {
         }
     }
 
-    //게임등록요청 삭제 (only Role.ADMIN)
+    /**
+     * 게임 등록 요청을 삭제합니다. 관리자 권한이 필요합니다.
+     * @param id 삭제할 게임 등록 요청의 ID
+     * @param loginUser 현재 로그인한 사용자
+     */
     @Transactional
     public void deleteGameEnroll(Long id, User loginUser) {
 

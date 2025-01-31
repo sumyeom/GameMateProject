@@ -37,7 +37,13 @@ public class GameService {
     private final GameRepository gameRepository;
     private final S3Service s3Service;
 
-    //게임 등록(생성) (only Role.ADMIN)
+    /**
+     * 새로운 게임을 생성합니다. 관리자 권한이 필요합니다.
+     * @param loginUser 로그인한 사용자 정보
+     * @param gameCreateRequestDto 게임 생성 요청 데이터
+     * @param file 게임 이미지 파일
+     * @return 생성된 게임 정보
+     */
     @Transactional
     public GameCreateResponseDto createGame(User loginUser, GameCreateRequestDto gameCreateRequestDto, MultipartFile file) {
 
@@ -82,14 +88,24 @@ public class GameService {
         return new GameCreateResponseDto(savedGame);
     }
 
-    //게임 다건 조회
+    /**
+     * 모든 게임을 페이지네이션하여 조회합니다.
+     * @param page 페이지 번호
+     * @param size 페이지 크기
+     * @return 게임 목록
+     */
     public Page<GameFindAllResponseDto> findAllGame(int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size);
         return gameRepository.findAll(pageable).map(GameFindAllResponseDto::new);
     }
 
-    //게임 단건 조회
+    /**
+     * 특정 ID의 게임을 조회합니다.
+     * @param id 게임 ID
+     * @return 조회된 게임 정보
+     * @throws ApiException 게임을 찾을 수 없는 경우
+     */
     public GameFindByIdResponseDto findGameById(Long id) {
 
         Game game = gameRepository.findGameById(id)
@@ -98,7 +114,13 @@ public class GameService {
         return new GameFindByIdResponseDto(game);
     }
 
-    //게임 정보 수정 (only Role.ADMIN)
+    /**
+     * 게임 정보를 수정합니다. 관리자 권한이 필요합니다.
+     * @param id 수정할 게임의 ID
+     * @param requestDto 수정할 게임 정보
+     * @param newFile 새로운 게임 이미지 파일
+     * @param loginUser 로그인한 사용자 정보
+     */
     @Transactional
     public void updateGame(Long id, GameUpdateRequestDto requestDto, MultipartFile newFile, User loginUser) {
 
@@ -122,7 +144,10 @@ public class GameService {
         gameRepository.save(game);
     }
 
-    //게임 이미지 삭제
+    /**
+     * 기존 게임 이미지를 삭제합니다.
+     * @param game 이미지를 삭제할 게임
+     */
     private void deleteExistingImages(Game game) {
         for (GameImage image : game.getImages()) {
             try {
@@ -134,7 +159,11 @@ public class GameService {
         game.getImages().clear();
     }
 
-    //게임 이미지 등록
+    /**
+     * 새로운 게임 이미지를 업로드합니다.
+     * @param game 이미지를 업로드할 게임
+     * @param newFile 새로운 이미지 파일
+     */
     private void uploadNewImage(Game game, MultipartFile newFile) {
         if (newFile != null && !newFile.isEmpty()) {
             try {
@@ -161,7 +190,11 @@ public class GameService {
         }
     }
 
-    //게임 삭제 (only Role.ADMIN)
+    /**
+     * 게임을 삭제합니다. 관리자 권한이 필요합니다.
+     * @param id 삭제할 게임의 ID
+     * @param loginUser 로그인한 사용자 정보
+     */
     @Transactional
     public void deleteGame(Long id, User loginUser) {
 
@@ -181,7 +214,15 @@ public class GameService {
         gameRepository.delete(game);
     }
 
-    //게임 검색
+    /**
+     * 키워드, 장르, 플랫폼으로 게임을 검색합니다.
+     * @param keyword 검색 키워드
+     * @param genre 게임 장르
+     * @param platform 게임 플랫폼
+     * @param page 페이지 번호
+     * @param size 페이지 크기
+     * @return 검색된 게임 목록
+     */
     public Page<GameFindAllResponseDto> searchGame(String keyword, String genre, String platform, int page, int size) {
 
         log.info("Searching games with parameters - keyword: {}, genre: {}, platform: {}",
