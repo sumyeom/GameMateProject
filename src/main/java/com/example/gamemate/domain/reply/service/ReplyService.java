@@ -26,7 +26,7 @@ public class ReplyService {
     private final NotificationService notificationService;
 
     /**
-     * 대댓글 생성 메서드
+     * 대댓글 생성 메서드입니다.
      *
      * @param loginUser 로그인한 유저
      * @param commentId 댓글 식별자
@@ -73,7 +73,7 @@ public class ReplyService {
     }
 
     /**
-     * 대댓글 업데이트 메서드
+     * 대댓글 업데이트 메서드입니다.
      *
      * @param loginUser 로그인한 유저
      * @param id 대댓글 식별자
@@ -95,7 +95,7 @@ public class ReplyService {
     }
 
     /**
-     * 대댓글 메서드
+     * 대댓글 메서드입니다.
      *
      * @param loginUser 로그인한 유저
      * @param id 대댓글 식별자

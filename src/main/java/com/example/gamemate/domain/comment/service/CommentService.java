@@ -39,7 +39,8 @@ public class CommentService {
     private final NotificationService notificationService;
 
     /**
-     * 댓글 생성 메서드
+     * 댓글 생성 메서드입니다.
+     *
      * @param loginUser 로그인한 유저
      * @param boardId 게시글 식별자
      * @param requestDto 댓글 생성할 requestDto
@@ -65,7 +66,7 @@ public class CommentService {
     }
 
     /**
-     * 댓글 업데이트 메서드
+     * 댓글 업데이트 메서드입니다.
      *
      * @param loginUser 로그인한 유저
      * @param id 댓글 식별자
@@ -87,7 +88,7 @@ public class CommentService {
     }
 
     /**
-     * 댓글 삭제 메서드
+     * 댓글 삭제 메서드입니다.
      *
      * @param loginUser 로그인한 유저
      * @param id 댓글 식별자
@@ -107,7 +108,7 @@ public class CommentService {
     }
 
     /**
-     * 댓글 조회 메서드
+     * 댓글 조회 메서드입니다.
      *
      * @param boardId 게시글 식별자
      * @param page 페이지 번호(기본값 : 0)
@@ -130,7 +131,7 @@ public class CommentService {
     }
 
     /**
-     * 댓글 Dto 변환
+     * 댓글 Dto 변환입니다.
      *
      * @param comment comment
      * @return 댓글 조회 Dto
@@ -152,7 +153,7 @@ public class CommentService {
     }
 
     /**
-     * 대댓글 Dto 변환
+     * 대댓글 Dto 변환입니다.
      *
      * @param reply 대댓글
      * @return 대댓글 조회 Dto

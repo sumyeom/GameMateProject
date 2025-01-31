@@ -28,7 +28,7 @@ public class BoardController {
     private final BoardService boardService;
 
     /**
-     * 게시글 생성 API
+     * 게시글 생성 API 입니다.
      *
      * @param dto 게시글 생성 dto
      * @param customUserDetails 인증 정보
@@ -45,7 +45,7 @@ public class BoardController {
     }
 
     /**
-     * 게시글 조회하고 검색하는 API
+     * 게시글 조회하고 검색하는 API 입니다.
      *
      * @param page 페이지 번호(기본값 : 0)
      * @param category 카테고리 종류
@@ -74,7 +74,7 @@ public class BoardController {
     }
 
     /**
-     * 게시글 단건 조회하는 API
+     * 게시글 단건 조회하는 API 입니다.
      *
      * @param id 게시글 식별자
      * @return 게시글 ResponseEntity
@@ -89,10 +89,8 @@ public class BoardController {
     }
 
 
-    /**
-     *
      /**
-     * 게시글 업데이트하는 API
+     * 게시글 업데이트하는 API 입니다.
      *
      * @param id 게시글 식별자
      * @param dto 게시글 업데이트 dto
@@ -111,7 +109,7 @@ public class BoardController {
     }
 
     /**
-     * 게시글 삭제하는 API
+     * 게시글 삭제하는 API 입니다.
      *
      * @param id 게시글 식별자
      * @param customUserDetails 인증 정보

@@ -30,7 +30,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
 
     /**
-     * 게시글 생성 메서드
+     * 게시글 생성 메서드입니다.
      *
      * @param loginUser 로그인한 유저
      * @param dto 게시글 생성 dto
@@ -53,7 +53,7 @@ public class BoardService {
     }
 
     /**
-     * 게시판 리스트 조회 메서드
+     * 게시판 리스트 조회 메서드입니다.
      *
      * @param page 페이지 번호 (기본값 : 0)
      * @param category 게시글 카테고리
@@ -80,7 +80,7 @@ public class BoardService {
     }
 
     /**
-     * 게시글 단건 조회 메서드
+     * 게시글 단건 조회 메서드입니다.
      *
      * @param id 게시글 식별자
      * @return 게시글 조회 ResponseDto
@@ -94,7 +94,7 @@ public class BoardService {
     }
 
     /**
-     * 게시글 업데이트 메서드
+     * 게시글 업데이트 메서드입니다.
      *
      * @param loginUser 로그인한 유저
      * @param id 게시글 식별자
@@ -116,7 +116,7 @@ public class BoardService {
     }
 
     /**
-     * 게시글 삭제 메서드
+     * 게시글 삭제 메서드입니다.
      *
      * @param loginUser 로그인한 유저
      * @param id 게시글 식별자
