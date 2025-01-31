@@ -1,20 +1,19 @@
 package com.example.gamemate.domain.reply.service;
 
-import com.example.gamemate.domain.board.entity.Board;
 import com.example.gamemate.domain.comment.entity.Comment;
 import com.example.gamemate.domain.comment.repository.CommentRepository;
-import com.example.gamemate.domain.notification.entity.Notification;
-import com.example.gamemate.domain.notification.enums.NotificationType;
-import com.example.gamemate.domain.notification.service.NotificationService;
 import com.example.gamemate.domain.reply.dto.ReplyRequestDto;
 import com.example.gamemate.domain.reply.dto.ReplyResponseDto;
 import com.example.gamemate.domain.reply.entity.Reply;
 import com.example.gamemate.domain.reply.repository.ReplyRepository;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.global.constant.ErrorCode;
+import com.example.gamemate.global.eventListener.event.MatchCreatedEvent;
+import com.example.gamemate.global.eventListener.event.ReplyCreatedEvent;
 import com.example.gamemate.global.exception.ApiException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +24,7 @@ public class ReplyService {
 
     private final ReplyRepository replyRepository;
     private final CommentRepository commentRepository;
-    private final NotificationService notificationService;
+    private final ApplicationEventPublisher publisher;
 
     /**
      * 대댓글 생성 메서드
@@ -44,7 +43,7 @@ public class ReplyService {
         if(requestDto.getParentReplyId()==null){
             newReply = new Reply(requestDto.getContent(), findComment, loginUser);
             Reply createReply = replyRepository.save(newReply);
-            sendCommentNotification(findComment.getBoard(), findComment, createReply);
+            publisher.publishEvent(new ReplyCreatedEvent(this, createReply));
 
             return new ReplyResponseDto(
                     createReply.getReplyId(),
@@ -59,7 +58,7 @@ public class ReplyService {
                     .orElseThrow(()-> new ApiException(ErrorCode.COMMENT_NOT_FOUND));
             newReply = new Reply(requestDto.getContent(), findComment, loginUser, findParentReply);
             Reply createReply = replyRepository.save(newReply);
-            sendReplyNotification(findComment.getBoard(), findComment, findParentReply, createReply);
+            publisher.publishEvent(new ReplyCreatedEvent(this, createReply));
 
             return new ReplyResponseDto(
                     createReply.getReplyId(),
@@ -108,25 +107,5 @@ public class ReplyService {
         }
 
         replyRepository.delete(findReply);
-    }
-
-    // 대댓글 알림 전송
-    @Transactional
-    public void sendCommentNotification(Board board, Comment comment, Reply reply) {
-        Notification boardNotification = notificationService.createNotification(board.getUser(), NotificationType.NEW_COMMENT, "/replies/" + reply.getReplyId());
-        notificationService.sendNotification(board.getUser(), boardNotification);
-        Notification commentNotification = notificationService.createNotification(comment.getUser(), NotificationType.NEW_COMMENT, "/replies/" + reply.getReplyId());
-        notificationService.sendNotification(comment.getUser(), commentNotification);
-    }
-
-    // 대대댓글 알림 전송
-    @Transactional
-    public void sendReplyNotification(Board board, Comment comment, Reply parentReply, Reply reply) {
-        Notification boardNotification = notificationService.createNotification(board.getUser(), NotificationType.NEW_COMMENT, "/replies/" + reply.getReplyId());
-        notificationService.sendNotification(board.getUser(), boardNotification);
-        Notification commentNotification = notificationService.createNotification(comment.getUser(), NotificationType.NEW_COMMENT, "/replies/" + reply.getReplyId());
-        notificationService.sendNotification(comment.getUser(), commentNotification);
-        Notification parentReplyNotification = notificationService.createNotification(parentReply.getUser(), NotificationType.NEW_COMMENT, "/replies/" + reply.getReplyId());
-        notificationService.sendNotification(parentReply.getUser(), parentReplyNotification);
     }
 }

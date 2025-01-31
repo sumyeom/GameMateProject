@@ -24,11 +24,10 @@ public class NotificationController {
 
     @GetMapping(value = "/connect", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> connect(
-            @RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
 
-        SseEmitter sseEmitter = notificationService.subscribe(customUserDetails.getUser(), lastEventId);
+        SseEmitter sseEmitter = notificationService.subscribe(customUserDetails.getUser());
         return new ResponseEntity<>(sseEmitter, HttpStatus.OK);
     }
 

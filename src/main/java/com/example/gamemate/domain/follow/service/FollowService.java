@@ -3,17 +3,17 @@ package com.example.gamemate.domain.follow.service;
 import com.example.gamemate.domain.follow.dto.*;
 import com.example.gamemate.domain.follow.entity.Follow;
 import com.example.gamemate.domain.follow.repository.FollowRepository;
-import com.example.gamemate.domain.notification.entity.Notification;
-import com.example.gamemate.domain.notification.enums.NotificationType;
 import com.example.gamemate.domain.notification.service.NotificationService;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.domain.user.enums.UserStatus;
 import com.example.gamemate.domain.user.repository.UserRepository;
 import com.example.gamemate.global.constant.ErrorCode;
+import com.example.gamemate.global.eventListener.event.FollowCreatedEvent;
 import com.example.gamemate.global.exception.ApiException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +26,7 @@ public class FollowService {
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
     private final NotificationService notificationService;
+    private final ApplicationEventPublisher publisher;
 
     // 팔로우하기
     @Transactional
@@ -48,8 +49,7 @@ public class FollowService {
 
         Follow follow = new Follow(loginUser, followee);
         followRepository.save(follow);
-        Notification notification = notificationService.createNotification(followee, NotificationType.NEW_FOLLOWER, "/users/" + follow.getFollower().getId());
-        notificationService.sendNotification(followee, notification);
+        publisher.publishEvent(new FollowCreatedEvent(this, follow));
 
         return new FollowResponseDto(
                 follow.getId(),

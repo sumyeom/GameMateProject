@@ -7,15 +7,16 @@ import com.example.gamemate.domain.like.entity.BoardLike;
 import com.example.gamemate.domain.like.entity.ReviewLike;
 import com.example.gamemate.domain.like.repository.BoardLikeRepository;
 import com.example.gamemate.domain.like.repository.ReviewLikeRepository;
-import com.example.gamemate.domain.notification.entity.Notification;
-import com.example.gamemate.domain.notification.enums.NotificationType;
 import com.example.gamemate.domain.notification.service.NotificationService;
 import com.example.gamemate.domain.review.repository.ReviewRepository;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.domain.user.repository.UserRepository;
 import com.example.gamemate.global.constant.ErrorCode;
+import com.example.gamemate.global.eventListener.event.BoardLikeCreatedEvent;
+import com.example.gamemate.global.eventListener.event.ReviewLikeCreatedEvent;
 import com.example.gamemate.global.exception.ApiException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,7 @@ public class LikeService {
     private final ReviewRepository reviewRepository;
     private final BoardLikeRepository boardLikeRepository;
     private final BoardRepository boardRepository;
-    private final NotificationService notificationService;
+    private final ApplicationEventPublisher publisher;
 
     @Transactional
     public ReviewLikeResponseDto reviewLikeUp(Long reviewId, Integer status, User loginUser) {
@@ -43,8 +44,7 @@ public class LikeService {
 
         if (reviewLike.getId() == null) {
             reviewLikeRepository.save(reviewLike);
-            Notification notification = notificationService.createNotification(reviewLike.getReview().getUser(), NotificationType.NEW_LIKE, "/reviews/" + reviewLike.getReview().getId());
-            notificationService.sendNotification(reviewLike.getReview().getUser(), notification);
+            publisher.publishEvent(new ReviewLikeCreatedEvent(this, reviewLike));
         } else {
             reviewLike.changeStatus(status);
         }
@@ -66,8 +66,7 @@ public class LikeService {
 
         if (boardLike.getId() == null) {
             boardLikeRepository.save(boardLike);
-            Notification notification = notificationService.createNotification(boardLike.getBoard().getUser(), NotificationType.NEW_LIKE, "/boards/" + boardLike.getBoard().getBoardId());
-            notificationService.sendNotification(boardLike.getBoard().getUser(), notification);
+            publisher.publishEvent(new BoardLikeCreatedEvent(this, boardLike));
         } else {
             boardLike.changeStatus(status);
         }

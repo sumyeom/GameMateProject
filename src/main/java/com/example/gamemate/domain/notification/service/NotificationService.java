@@ -42,7 +42,7 @@ public class NotificationService {
                 .toList();
     }
 
-    public SseEmitter subscribe(User loginUser, String lastEventId) {
+    public SseEmitter subscribe(User loginUser) {
         Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
         SseEmitter sseEmitter = emitterRepository.save(loginUser.getId(), new SseEmitter(DEFAULT_TIMEOUT));
 
@@ -64,10 +64,14 @@ public class NotificationService {
         return sseEmitter;
     }
 
-    @Transactional
     public void sendNotification(User user, Notification notification) {
         long startTime = System.currentTimeMillis();
         SseEmitter sseEmitter = emitterRepository.findById(user.getId());
+
+        if (sseEmitter == null) {
+            log.info("User {}는 현재 연결되어 있지 않습니다", user.getId());
+            return;
+        }
 
         try {
             sseEmitter.send(
@@ -78,7 +82,7 @@ public class NotificationService {
             );
         } catch (IOException e) {
             emitterRepository.deleteById(user.getId());
-            throw new RuntimeException("SSE 연결 오류 발생");
+            log.error("알림 전송 실패: {}", e.getMessage());
         } finally {
             long endTime = System.currentTimeMillis();
             long elapsedTime = endTime - startTime;

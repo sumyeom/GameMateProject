@@ -8,16 +8,15 @@ import com.example.gamemate.domain.comment.dto.CommentRequestDto;
 import com.example.gamemate.domain.comment.dto.CommentResponseDto;
 import com.example.gamemate.domain.comment.entity.Comment;
 import com.example.gamemate.domain.comment.repository.CommentRepository;
-import com.example.gamemate.domain.notification.entity.Notification;
-import com.example.gamemate.domain.notification.enums.NotificationType;
-import com.example.gamemate.domain.notification.service.NotificationService;
 import com.example.gamemate.domain.reply.dto.ReplyFindResponseDto;
 import com.example.gamemate.domain.reply.entity.Reply;
 import com.example.gamemate.domain.reply.repository.ReplyRepository;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.global.constant.ErrorCode;
+import com.example.gamemate.global.eventListener.event.CommentCreatedEvent;
 import com.example.gamemate.global.exception.ApiException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +36,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
     private final BoardRepository boardRepository;
-    private final NotificationService notificationService;
+    private final ApplicationEventPublisher publisher;
 
     /**
      * 댓글 생성 메서드
@@ -54,8 +53,7 @@ public class CommentService {
         Comment comment = new Comment(requestDto.getContent(), findBoard, loginUser);
         Comment createComment = commentRepository.save(comment);
 
-        Notification notification = notificationService.createNotification(findBoard.getUser(), NotificationType.NEW_COMMENT, "/comments/" + createComment.getCommentId());
-        notificationService.sendNotification(findBoard.getUser(), notification);
+        publisher.publishEvent(new CommentCreatedEvent(this, createComment));
 
         return new CommentResponseDto(
                 createComment.getCommentId(),
