@@ -6,6 +6,7 @@ import com.example.gamemate.domain.board.dto.BoardFindAllResponseDto;
 import com.example.gamemate.domain.board.dto.BoardFindOneResponseDto;
 import com.example.gamemate.domain.board.enums.BoardCategory;
 import com.example.gamemate.domain.board.service.BoardService;
+import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.global.config.auth.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -81,10 +82,13 @@ public class BoardController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<BoardFindOneResponseDto> findBoardById(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
     ){
 
-        BoardFindOneResponseDto dto = boardService.findBoardById(id);
+        User loginUser = customUserDetails != null ? customUserDetails.getUser() : null;
+
+        BoardFindOneResponseDto dto = boardService.findBoardById(id, loginUser);
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 

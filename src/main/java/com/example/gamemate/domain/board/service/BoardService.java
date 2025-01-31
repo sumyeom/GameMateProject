@@ -8,9 +8,17 @@ import com.example.gamemate.domain.board.entity.Board;
 import com.example.gamemate.domain.board.enums.BoardCategory;
 import com.example.gamemate.domain.board.enums.ListSize;
 import com.example.gamemate.domain.board.repository.BoardRepository;
+import com.example.gamemate.domain.comment.dto.CommentFindResponseDto;
+import com.example.gamemate.domain.comment.entity.Comment;
+import com.example.gamemate.domain.comment.repository.CommentRepository;
+import com.example.gamemate.domain.reply.dto.ReplyFindResponseDto;
+import com.example.gamemate.domain.reply.entity.Reply;
+import com.example.gamemate.domain.reply.repository.ReplyRepository;
+import com.example.gamemate.domain.reply.service.ReplyService;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
+import com.example.gamemate.global.redis.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +36,9 @@ import java.util.stream.Collectors;
 public class BoardService {
 
     private final BoardRepository boardRepository;
+    private final CommentRepository commentRepository;
+    private final ReplyRepository replyRepository;
+    private final RedisService redisService;
 
     /**
      * 게시글 생성 메서드입니다.
@@ -85,13 +96,32 @@ public class BoardService {
      * @param id 게시글 식별자
      * @return 게시글 조회 ResponseDto
      */
-    public BoardFindOneResponseDto findBoardById(Long id) {
+    @Transactional
+    public BoardFindOneResponseDto findBoardById(Long id, User loginUser) {
+        // 조회수 증가(Redis 저장)
+        if(loginUser == null) {
+            redisService.increaseViewCount(id, null);
+        }else{
+            redisService.increaseViewCount(id, loginUser.getId());
+        }
+
         // 게시글 조회
         Board findBoard = boardRepository.findById(id)
                 .orElseThrow(()->new ApiException(ErrorCode.BOARD_NOT_FOUND));
 
         return new BoardFindOneResponseDto(findBoard);
     }
+
+    /**
+     * 게시글 조회수 리턴하는 메서드입니다.
+     *
+     * @param boardId 게시글 식별자
+     * @return
+     */
+    public int getPostViewCount(Long boardId){
+        return redisService.getViewCount(boardId);
+    }
+
 
     /**
      * 게시글 업데이트 메서드입니다.
