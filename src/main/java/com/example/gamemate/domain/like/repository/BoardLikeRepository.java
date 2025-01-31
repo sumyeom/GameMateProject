@@ -10,10 +10,10 @@ import java.util.Optional;
 
 public interface BoardLikeRepository extends JpaRepository<BoardLike, Long> {
 
-    @Query("SELECT bl FROM BoardLike bl WHERE bl.board.boardId = :boardId AND bl.user.id = :userId")
-    Optional<BoardLike> findByBoardIdAndUserId(@Param("boardId") Long boardId, @Param("userId") Long userId);
+    @Query("SELECT bl FROM BoardLike bl WHERE bl.board.id = :id AND bl.user.id = :userId")
+    Optional<BoardLike> findByBoardIdAndUserId(@Param("id") Long boardId, @Param("userId") Long userId);
 
-    Long countByBoardBoardIdAndStatus(Long boardId, LikeStatus status);
+    Long countByBoardIdAndStatus(Long boardId, LikeStatus status);
 
 
 }

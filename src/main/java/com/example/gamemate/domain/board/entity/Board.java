@@ -18,7 +18,7 @@ public class Board extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long boardId;
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     private BoardCategory category;

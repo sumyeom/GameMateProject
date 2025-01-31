@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class BoardImage extends BaseCreatedEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long BoardImageId;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "board_id")
