@@ -23,7 +23,7 @@ public class BoardFindAllResponseDto {
     }
 
     public BoardFindAllResponseDto(Board board) {
-        this.id = board.getBoardId();
+        this.id = board.getId();
         this.category = board.getCategory();
         this.title = board.getTitle();
         this.createdAt = board.getCreatedAt();

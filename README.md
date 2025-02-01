@@ -39,7 +39,7 @@
 ### ❗️ 게임 추천
  
 > * 내가 원하는 성향을 가진 게임을 추천하는 서비스를 제공합니다.
-> * 1. Gemini API 사용
+> * Gemini API 사용
 
 ### 📖 게임 커뮤니티
  
@@ -64,6 +64,16 @@
 ## [📋 ERD Diagram]
 ## ![📋 ERD Diagram](https://github.com/user-attachments/assets/90506e5f-ecbc-4a9c-b748-02767a68140d)
 
+
+<br>
+
+## 🌐 Architecture
+
+![image](https://github.com/user-attachments/assets/bbb0be82-e50b-4d66-800f-bdd7ebc01266)
+
+
+## 📆 일정 관리 (WBS)
+![image](https://github.com/user-attachments/assets/3cbe94f2-3236-470e-8e43-31ceacb65367)
 
 
 <br>

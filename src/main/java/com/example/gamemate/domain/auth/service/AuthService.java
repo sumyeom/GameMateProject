@@ -2,6 +2,7 @@ package com.example.gamemate.domain.auth.service;
 
 import com.example.gamemate.domain.auth.dto.*;
 import com.example.gamemate.domain.user.entity.User;
+import com.example.gamemate.domain.user.enums.AuthProvider;
 import com.example.gamemate.domain.user.enums.UserStatus;
 import com.example.gamemate.domain.user.repository.UserRepository;
 import com.example.gamemate.global.constant.ErrorCode;
@@ -10,6 +11,7 @@ import com.example.gamemate.global.provider.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +57,7 @@ public class AuthService {
         return new SignupResponseDto(savedUser);
     }
 
-    public EmailLoginResponseDto emailLogin(EmailLoginRequestDto requestDto, HttpServletResponse response) {
+    public LocalLoginResponseDto localLogin(LocalLoginRequestDto requestDto, HttpServletResponse response) {
 
         User findUser = userRepository.findByEmail(requestDto.getEmail())
                 .orElseThrow(()-> new ApiException(ErrorCode.USER_NOT_FOUND));
@@ -64,10 +66,28 @@ public class AuthService {
             throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
         }
 
+        if (findUser.getPassword().equals("OAUTH2_USER")) {
+            throw new ApiException(ErrorCode.SOCIAL_PASSWORD_REQUIRED);
+        }
+
         if(!passwordEncoder.matches(requestDto.getPassword(), findUser.getPassword())) {
             throw new ApiException(ErrorCode.INVALID_PASSWORD);
         }
         return tokenService.generateLoginTokens(findUser, response);
+    }
+
+    public void setOAuth2Password(User user, String password) {
+        if(user.getProvider() == AuthProvider.LOCAL) {
+            throw new ApiException(ErrorCode.SOCIAL_PASSWORD_FORBIDDEN);
+        }
+
+        if(!"OAUTH2_USER".equals(user.getPassword())) {
+            throw new ApiException(ErrorCode.SOCIAL_PASSWORD_ALREADY_SET);
+        }
+
+        String encodedPassword = passwordEncoder.encode(password);
+        user.updatePassword(encodedPassword);
+        userRepository.save(user);
     }
 
     public TokenRefreshResponseDto refreshAccessToken(String refreshToken) {

@@ -39,10 +39,12 @@ public class CommentService {
     private final ApplicationEventPublisher publisher;
 
     /**
-     * 댓글 생성 메서드
-     * @param boardId
-     * @param requestDto
-     * @return
+     * 댓글 생성 메서드입니다.
+     *
+     * @param loginUser 로그인한 유저
+     * @param boardId 게시글 식별자
+     * @param requestDto 댓글 생성할 requestDto
+     * @return CommentResponseDto
      */
     @Transactional
     public CommentResponseDto createComment(User loginUser, Long boardId, CommentRequestDto requestDto) {
@@ -56,7 +58,7 @@ public class CommentService {
         publisher.publishEvent(new CommentCreatedEvent(this, createComment));
 
         return new CommentResponseDto(
-                createComment.getCommentId(),
+                createComment.getId(),
                 createComment.getContent(),
                 createComment.getUser().getNickname(),
                 createComment.getCreatedAt(),
@@ -65,9 +67,11 @@ public class CommentService {
     }
 
     /**
-     * 댓글 업데이트 메서드
-     * @param id
-     * @param requestDto
+     * 댓글 업데이트 메서드입니다.
+     *
+     * @param loginUser 로그인한 유저
+     * @param id 댓글 식별자
+     * @param requestDto 업데이트할 댓글 dto
      */
     @Transactional
     public void updateComment(User loginUser, Long id, CommentRequestDto requestDto) {
@@ -85,8 +89,10 @@ public class CommentService {
     }
 
     /**
-     * 댓글 삭제 메서드
-     * @param id
+     * 댓글 삭제 메서드입니다.
+     *
+     * @param loginUser 로그인한 유저
+     * @param id 댓글 식별자
      */
     @Transactional
     public void deleteComment(User loginUser, Long id) {
@@ -103,10 +109,11 @@ public class CommentService {
     }
 
     /**
-     * 댓글 조회 메서드
-     * @param boardId
-     * @param page
-     * @return
+     * 댓글 조회 메서드입니다.
+     *
+     * @param boardId 게시글 식별자
+     * @param page 페이지 번호(기본값 : 0)
+     * @return Comment 조회 Do
      */
     public List<CommentFindResponseDto> getComments(Long boardId, int page) {
         // page는 댓글 페이지네이션을 위해 필요
@@ -124,6 +131,12 @@ public class CommentService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 댓글 Dto 변환입니다.
+     *
+     * @param comment comment
+     * @return 댓글 조회 Dto
+     */
     private CommentFindResponseDto convertCommentDto(Comment comment) {
         List<ReplyFindResponseDto> replyDtos = Optional.ofNullable(replyRepository.findByComment(comment))
                 .orElse(Collections.emptyList())
@@ -131,7 +144,7 @@ public class CommentService {
                 .map(this::convertReplyDto)
                 .collect(Collectors.toList());
         return new CommentFindResponseDto(
-                comment.getCommentId(),
+                comment.getId(),
                 comment.getContent(),
                 comment.getUser().getNickname(),
                 comment.getCreatedAt(),
@@ -140,10 +153,16 @@ public class CommentService {
         );
     }
 
+    /**
+     * 대댓글 Dto 변환입니다.
+     *
+     * @param reply 대댓글
+     * @return 대댓글 조회 Dto
+     */
     private ReplyFindResponseDto convertReplyDto(Reply reply) {
         String findUserName = reply.getParentReply() == null ? null : reply.getParentReply().getUser().getNickname();
         return new ReplyFindResponseDto(
-                reply.getReplyId(),
+                reply.getId(),
                 findUserName,
                 reply.getContent(),
                 reply.getCreatedAt(),

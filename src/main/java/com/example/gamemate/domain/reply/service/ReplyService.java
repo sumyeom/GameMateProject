@@ -27,10 +27,12 @@ public class ReplyService {
     private final ApplicationEventPublisher publisher;
 
     /**
-     * 대댓글 생성 메서드
-     * @param commentId
-     * @param requestDto
-     * @return
+     * 대댓글 생성 메서드입니다.
+     *
+     * @param loginUser 로그인한 유저
+     * @param commentId 댓글 식별자
+     * @param requestDto 댓글 생성 Dto
+     * @return 대댓글 생성 정보 Dto
      */
     @Transactional
     public ReplyResponseDto createReply(User loginUser, Long commentId, ReplyRequestDto requestDto) {
@@ -46,8 +48,8 @@ public class ReplyService {
             publisher.publishEvent(new ReplyCreatedEvent(this, createReply));
 
             return new ReplyResponseDto(
-                    createReply.getReplyId(),
-                    createReply.getComment().getCommentId(),
+                    createReply.getId(),
+                    createReply.getComment().getId(),
                     createReply.getContent(),
                     createReply.getCreatedAt(),
                     createReply.getModifiedAt()
@@ -61,9 +63,9 @@ public class ReplyService {
             publisher.publishEvent(new ReplyCreatedEvent(this, createReply));
 
             return new ReplyResponseDto(
-                    createReply.getReplyId(),
-                    createReply.getComment().getCommentId(),
-                    createReply.getParentReply().getReplyId(),
+                    createReply.getId(),
+                    createReply.getComment().getId(),
+                    createReply.getParentReply().getId(),
                     createReply.getContent(),
                     createReply.getCreatedAt(),
                     createReply.getModifiedAt()
@@ -72,9 +74,11 @@ public class ReplyService {
     }
 
     /**
-     * 대댓글 업데이트 메서드
-     * @param id
-     * @param requestDto
+     * 대댓글 업데이트 메서드입니다.
+     *
+     * @param loginUser 로그인한 유저
+     * @param id 대댓글 식별자
+     * @param requestDto 대댓글 업데이트 Dto
      */
     @Transactional
     public void updateReply(User loginUser, Long id, ReplyRequestDto requestDto) {
@@ -92,8 +96,10 @@ public class ReplyService {
     }
 
     /**
-     * 대댓글 삭제 메서드
-     * @param id
+     * 대댓글 메서드입니다.
+     *
+     * @param loginUser 로그인한 유저
+     * @param id 대댓글 식별자
      */
     @Transactional
     public void deleteReply(User loginUser, Long id) {

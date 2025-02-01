@@ -1,8 +1,8 @@
 package com.example.gamemate.domain.game.service;
 
-import com.example.gamemate.domain.game.dto.GameEnrollRequestCreateRequestDto;
-import com.example.gamemate.domain.game.dto.GameEnrollRequestResponseDto;
-import com.example.gamemate.domain.game.dto.GameEnrollRequestUpdateRequestDto;
+import com.example.gamemate.domain.game.dto.request.GameEnrollRequestCreateRequestDto;
+import com.example.gamemate.domain.game.dto.response.GameEnrollRequestResponseDto;
+import com.example.gamemate.domain.game.dto.request.GameEnrollRequestUpdateRequestDto;
 
 import com.example.gamemate.domain.game.entity.GamaEnrollRequest;
 import com.example.gamemate.domain.game.entity.Game;
@@ -28,6 +28,12 @@ public class GameEnrollRequestService {
     private final GameRepository gameRepository;
     private final GameEnrollRequestRepository gameEnrollRequestRepository;
 
+    /**
+     * 새로운 게임 등록 요청을 생성합니다.
+     * @param requestDto 게임 등록 요청 정보를 담은 DTO
+     * @param userId 요청을 생성하는 사용자
+     * @return 생성된 게임 등록 요청 정보
+     */
     @Transactional
     public GameEnrollRequestResponseDto createGameEnrollRequest(GameEnrollRequestCreateRequestDto requestDto, User userId) {
         GamaEnrollRequest gameEnrollRequest = new GamaEnrollRequest(
@@ -41,10 +47,14 @@ public class GameEnrollRequestService {
         return new GameEnrollRequestResponseDto(saveEnrollRequest);
     }
 
+    /**
+     * 모든 게임 등록 요청을 조회합니다. 관리자 권한이 필요합니다.
+     * @param loginUser 현재 로그인한 사용자
+     * @return 게임 등록 요청 목록 (페이지네이션 적용)
+     */
     public Page<GameEnrollRequestResponseDto> findAllGameEnrollRequest(User loginUser) {
 
-        //관리자만 게임등록요청 조회 가능함(조회)
-        if (!loginUser.getRole().equals(Role.ADMIN)){
+        if (!loginUser.getRole().equals(Role.ADMIN)) {
             throw new ApiException(ErrorCode.FORBIDDEN);
         }
 
@@ -53,11 +63,15 @@ public class GameEnrollRequestService {
         return gameEnrollRequestRepository.findAll(pageable).map(GameEnrollRequestResponseDto::new);
     }
 
-
+    /**
+     * 특정 ID의 게임 등록 요청을 조회합니다. 관리자 권한이 필요합니다.
+     * @param id 조회할 게임 등록 요청의 ID
+     * @param loginUser 현재 로그인한 사용자
+     * @return 조회된 게임 등록 요청 정보
+     */
     public GameEnrollRequestResponseDto findGameEnrollRequestById(Long id, User loginUser) {
 
-        //관리자만 게임등록요청 조회 가능함(조회)
-        if (!loginUser.getRole().equals(Role.ADMIN)){
+        if (!loginUser.getRole().equals(Role.ADMIN)) {
             throw new ApiException(ErrorCode.FORBIDDEN);
         }
 
@@ -67,11 +81,16 @@ public class GameEnrollRequestService {
         return new GameEnrollRequestResponseDto(gamaEnrollRequest);
     }
 
+    /**
+     * 게임 등록 요청을 수정하고, 승인 시 게임을 등록합니다. 관리자 권한이 필요합니다.
+     * @param id 수정할 게임 등록 요청의 ID
+     * @param requestDto 수정할 게임 등록 요청 정보를 담은 DTO
+     * @param loginUser 현재 로그인한 사용자
+     */
     @Transactional
     public void updateGameEnroll(Long id, GameEnrollRequestUpdateRequestDto requestDto, User loginUser) {
 
-        //관리자만 게임등록요청 수정 가능함(수정)
-        if (!loginUser.getRole().equals(Role.ADMIN)){
+        if (!loginUser.getRole().equals(Role.ADMIN)) {
             throw new ApiException(ErrorCode.FORBIDDEN);
         }
 
@@ -88,7 +107,7 @@ public class GameEnrollRequestService {
 
         gameEnrollRequestRepository.save(gamaEnrollRequest);
 
-        // 만약에 관리자가 true로 바꾸면 게임등록도 함께 진행됨
+        // IsAccepted = true > 게임등록
         Boolean accepted = requestDto.getIsAccepted();
         if (accepted == true) {
             Game game = new Game(
@@ -101,11 +120,15 @@ public class GameEnrollRequestService {
         }
     }
 
+    /**
+     * 게임 등록 요청을 삭제합니다. 관리자 권한이 필요합니다.
+     * @param id 삭제할 게임 등록 요청의 ID
+     * @param loginUser 현재 로그인한 사용자
+     */
     @Transactional
     public void deleteGameEnroll(Long id, User loginUser) {
 
-        //관리자만 게임등록요청 삭제 가능함(삭제)
-        if (!loginUser.getRole().equals(Role.ADMIN)){
+        if (!loginUser.getRole().equals(Role.ADMIN)) {
             throw new ApiException(ErrorCode.FORBIDDEN);
         }
 

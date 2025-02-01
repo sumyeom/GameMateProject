@@ -1,6 +1,6 @@
 package com.example.gamemate.domain.auth.service;
 
-import com.example.gamemate.domain.auth.dto.EmailLoginResponseDto;
+import com.example.gamemate.domain.auth.dto.LocalLoginResponseDto;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.domain.user.repository.UserRepository;
 import com.example.gamemate.global.provider.JwtTokenProvider;
@@ -27,7 +27,7 @@ public class TokenService {
     private final Set<String> blacklist = new ConcurrentHashMap<String, Boolean>().newKeySet();
     private final Map<String, Long> tokenExpirations = new ConcurrentHashMap<>();
 
-    public EmailLoginResponseDto generateLoginTokens(User user, HttpServletResponse response) {
+    public LocalLoginResponseDto generateLoginTokens(User user, HttpServletResponse response) {
         String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRole());
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail());
 
@@ -35,7 +35,7 @@ public class TokenService {
         userRepository.save(user);
 
         addRefreshTokenToCookie(response, refreshToken);
-        return new EmailLoginResponseDto(accessToken);
+        return new LocalLoginResponseDto(accessToken);
     }
 
     public String extractRefreshTokenFromCookie(HttpServletRequest request) {

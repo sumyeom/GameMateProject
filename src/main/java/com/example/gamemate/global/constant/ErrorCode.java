@@ -22,16 +22,21 @@ public enum ErrorCode {
     INVALID_PROVIDER_TYPE(HttpStatus.BAD_REQUEST,"INVALID_PROVIDER_TYPE", "지원하지 않는 서비스 제공자입니다."),
     INVALID_OAUTH2_ATTRIBUTE(HttpStatus.BAD_REQUEST, "INVALID_OAUTH2_ATTRIBUTE", "인증 정보가 유효하지 않습니다."),
     VERIFICATION_TIME_EXPIRED(HttpStatus.BAD_REQUEST, "VERIFICATION_TIME_EXPIRED", "인증 시간이 만료되었습니다."),
+    VERIFICATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "VERIFICATION_NOT_FOUND", "인증 정보를 찾을 수 없습니다."),
     INVALID_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, "INVALID_VERIFICATION_CODE", "인증 코드가 일치하지 않습니다."),
     EMAIL_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "EMAIL_NOT_VERIFIED", "이메일 인증이 필요합니다"),
+    INVALID_FILE_EXTENSION(HttpStatus.BAD_REQUEST,"INVALID_FILE_EXTENSION", "허용되지 않는 파일 형식입니다."),
+    FILE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST,"FILE_SIZE_EXCEEDED","파일 크기가 초과되었습니다."),
+    SOCIAL_PASSWORD_ALREADY_SET(HttpStatus.BAD_REQUEST, "SOCIAL_PASSWORD_ALREADY_SET", "이미 비밀번호가 설정되었습니다."),
+    SOCIAL_PASSWORD_REQUIRED(HttpStatus.BAD_REQUEST, "SOCIAL_PASSWORD_REQUIRED", "소셜 로그인 계정은 비밀번호 설정이 필요합니다."),
 
     /* 401 인증 오류 */
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "로그인이 필요합니다."),
-    NO_SESSION(HttpStatus.UNAUTHORIZED, "NO_SESSION","로그인이 필요합니다."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "INVALID_TOKEN", "유효하지 않은 토큰입니다."),
 
     /* 403 권한 없음 */
     FORBIDDEN(HttpStatus.FORBIDDEN, "FORBIDDEN", "권한이 없습니다."),
+    SOCIAL_PASSWORD_FORBIDDEN(HttpStatus.FORBIDDEN, "SOCIAL_PASSWORD_FORBIDDEN", "소셜 로그인 계정의 비밀번호를 설정할 수 없습니다."),
 
     /* 404 찾을 수 없음 */
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "회원을 찾을 수 없습니다."),

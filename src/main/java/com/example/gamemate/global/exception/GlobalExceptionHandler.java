@@ -4,26 +4,20 @@ import com.example.gamemate.global.constant.ErrorCode;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.security.sasl.AuthenticationException;
 import java.security.SignatureException;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.example.gamemate.global.constant.ErrorCode.NO_SESSION;
 
 @RestControllerAdvice
 @Slf4j
@@ -45,14 +39,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Object> handleIllegalArgument(IllegalArgumentException e) {
         log.warn("handleIllegalArgument", e);
-        ErrorCode errorCode = ErrorCode.INVALID_PARAMETER;
+        ErrorCode errorCode;
+        if("유효하지 않은 토큰입니다.".equals(e.getMessage())) {
+            errorCode = ErrorCode.INVALID_TOKEN;
+        } else {
+            errorCode = ErrorCode.INVALID_PARAMETER;
+        }
         return handleExceptionInternal(errorCode, errorCode.getMessage());
     }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Object> handleIRuntime(RuntimeException e) {
         log.warn("handleIRuntime", e);
-        ErrorCode errorCode = ErrorCode.NO_SESSION;
+        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
         return handleExceptionInternal(errorCode, errorCode.getMessage());
     }
 
@@ -80,11 +79,17 @@ public class GlobalExceptionHandler {
             ExpiredJwtException.class,
             SignatureException.class,
             MalformedJwtException.class,
-            AuthenticationException.class
     })
     public ResponseEntity<Object> handleJwtException(Exception e) {
         log.warn("handleJwtException", e);
         ErrorCode errorCode = ErrorCode.INVALID_TOKEN;
+        return handleExceptionInternal(errorCode, errorCode.getMessage());
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Object> handleAuthenticationException(AuthenticationException e) {
+        log.warn("Authentication exception", e);
+        ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
         return handleExceptionInternal(errorCode, errorCode.getMessage());
     }
 
@@ -141,6 +146,13 @@ public class GlobalExceptionHandler {
                 .code(errorCode.name())
                 .message(message)
                 .build();
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Object> handleMaxSizeException(MaxUploadSizeExceededException exc) {
+        log.warn("File size limit exceeded", exc);
+        ErrorCode errorCode = ErrorCode.FILE_SIZE_EXCEEDED;
+        return handleExceptionInternal(errorCode);
     }
 
 }
