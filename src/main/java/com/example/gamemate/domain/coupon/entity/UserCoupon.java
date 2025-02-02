@@ -18,7 +18,7 @@ public class UserCoupon extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    private Boolean isUsed;
+    private Boolean isUsed = false;
 
     @Column(nullable = false)
     private LocalDateTime issuedAt;
