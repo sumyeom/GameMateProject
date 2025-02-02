@@ -111,8 +111,4 @@ public class User extends BaseEntity {
         this.providerId = providerId;
     }
 
-    public void setOAuthPassword(String password) {
-        this.password = password;
-    }
-
 }
