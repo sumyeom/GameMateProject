@@ -34,7 +34,12 @@ public class GameRecommendService {
     private final GameRecommendHistoryRepository gameRecommendHistoryRepository;
     private final GeminiService geminiService;
 
-    // 게임 추천 요청 및 응답
+    /**
+     * 사용자의 게임 선호도를 기반으로 게임을 추천하고, 그 결과를 저장합니다.
+     * @param requestDto 사용자의 게임 선호도 정보를 담은 DTO
+     * @param loginUser 현재 로그인한 사용자
+     * @return 사용자의 게임 선호도와 추천된 게임 목록을 포함한 응답 DTO
+     */
     @Transactional
     public UserGamePreferenceResponseDto createUserGamePreference(UserGamePreferenceRequestDto requestDto, User loginUser) {
 
@@ -108,7 +113,11 @@ public class GameRecommendService {
         return new UserGamePreferenceResponseDto(saveData, gameRecommendations);
     }
 
-    //게임 추천 조회
+    /**
+     * 로그인한 사용자의 게임 추천 기록을 페이지네이션하여 조회합니다.
+     * @param loginUser 현재 로그인한 사용자
+     * @return 사용자의 게임 추천 기록 목록 (페이지네이션 적용)
+     */
     public Page<GameRecommendHistorysResponseDto> getGameRecommendHistories( User loginUser) {
 
         Pageable pageable = PageRequest.of(0, 15);

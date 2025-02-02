@@ -16,7 +16,7 @@ import java.util.List;
 public class Reply extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long replyId;
+    private Long id;
 
     @Column(nullable = false)
     private String content;

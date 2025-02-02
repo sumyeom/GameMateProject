@@ -23,7 +23,11 @@ public class GeminiService {
     @Value("${gemini.api.key}")
     private String geminiApiKey;
 
-    // Gemini에 요청 전송
+    /**
+     * Gemini API에 프롬프트를 전송하고 응답을 받아옵니다.
+     * @param prompt Gemini API에 전송할 프롬프트 문자열
+     * @return Gemini API로부터 받은 응답 메시지
+     */
     public String getContents(String prompt) {
 
 
