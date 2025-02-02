@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "user")
+@Table(name = "`user`")
 @Getter
 @NoArgsConstructor
 public class User extends BaseEntity {
