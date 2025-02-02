@@ -79,7 +79,7 @@ public class GlobalEventListener {
         log.info("게시글 새로운 좋아요 알림 전송 시작");
         BoardLike boardLike = event.getBoardLike();
 
-        Notification notification = notificationService.createNotification(boardLike.getBoard().getUser(), NotificationType.NEW_LIKE, "/boards/" + boardLike.getBoard().getBoardId());
+        Notification notification = notificationService.createNotification(boardLike.getBoard().getUser(), NotificationType.NEW_LIKE, "/boards/" + boardLike.getBoard().getId());
         notificationService.sendNotification(boardLike.getBoard().getUser(), notification);
 
         log.info("게시글 새로운 좋아요 알림 전송 완료");
@@ -104,7 +104,7 @@ public class GlobalEventListener {
         Comment comment = event.getComment();
 
         if (!Objects.equals(comment.getUser().getId(), comment.getBoard().getUser().getId())) {
-            Notification notification = notificationService.createNotification(comment.getBoard().getUser(), NotificationType.NEW_COMMENT, "/comments/" + comment.getCommentId());
+            Notification notification = notificationService.createNotification(comment.getBoard().getUser(), NotificationType.NEW_COMMENT, "/comments/" + comment.getId());
             notificationService.sendNotification(comment.getBoard().getUser(), notification);
         }
 
@@ -118,17 +118,17 @@ public class GlobalEventListener {
         Reply reply = event.getReply();
 
         if (!Objects.equals(reply.getUser().getId(), reply.getComment().getBoard().getUser().getId())) {
-            Notification boardNotification = notificationService.createNotification(reply.getComment().getBoard().getUser(), NotificationType.NEW_COMMENT, "/replies/" + reply.getReplyId());
+            Notification boardNotification = notificationService.createNotification(reply.getComment().getBoard().getUser(), NotificationType.NEW_COMMENT, "/replies/" + reply.getId());
             notificationService.sendNotification(reply.getComment().getBoard().getUser(), boardNotification);
         }
 
         if (!Objects.equals(reply.getUser().getId(), reply.getComment().getUser().getId())) {
-            Notification commentNotification = notificationService.createNotification(reply.getComment().getUser(), NotificationType.NEW_COMMENT, "/replies/" + reply.getReplyId());
+            Notification commentNotification = notificationService.createNotification(reply.getComment().getUser(), NotificationType.NEW_COMMENT, "/replies/" + reply.getId());
             notificationService.sendNotification(reply.getComment().getUser(), commentNotification);
         }
 
         if (reply.getParentReply() != null && !Objects.equals(reply.getParentReply().getUser().getId(), reply.getUser().getId())) {
-            Notification parentReplyNotification = notificationService.createNotification(reply.getParentReply().getUser(), NotificationType.NEW_COMMENT, "/replies/" + reply.getReplyId());
+            Notification parentReplyNotification = notificationService.createNotification(reply.getParentReply().getUser(), NotificationType.NEW_COMMENT, "/replies/" + reply.getId());
             notificationService.sendNotification(reply.getParentReply().getUser(), parentReplyNotification);
         }
 

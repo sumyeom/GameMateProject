@@ -10,15 +10,17 @@ public class NotificationResponseDto {
     private String content;
     private NotificationType type;
     private String relatedUrl;
+    private Long receiverId;
 
-    public NotificationResponseDto(Long id, String content, NotificationType type, String relatedUrl) {
+    public NotificationResponseDto(Long id, String content, NotificationType type, String relatedUrl, Long receiverId) {
         this.id = id;
         this.content = content;
         this.type = type;
         this.relatedUrl = relatedUrl;
+        this.receiverId = receiverId;
     }
 
     public static NotificationResponseDto toDto(Notification notification) {
-        return new NotificationResponseDto(notification.getId(), notification.getContent(), notification.getType(), notification.getRelatedUrl());
+        return new NotificationResponseDto(notification.getId(), notification.getContent(), notification.getType(), notification.getRelatedUrl(), notification.getReceiver().getId());
     }
 }
