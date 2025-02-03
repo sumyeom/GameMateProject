@@ -68,4 +68,19 @@ public class NotificationController {
         notificationService.readNotification(customUserDetails.getUser(), id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    /**
+     * 사용자의 모든 읽지않은 알림을 읽음 처리합니다.
+     *
+     * @param customUserDetails 현재 인증된 사용자 정보
+     * @return 204 NO_CONTENT
+     */
+    @PatchMapping
+    public ResponseEntity<Void> readAllNotification(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+
+        notificationService.readAllNotification(customUserDetails.getUser());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }
