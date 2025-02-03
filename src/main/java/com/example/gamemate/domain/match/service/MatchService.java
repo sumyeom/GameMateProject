@@ -19,6 +19,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -250,11 +251,15 @@ public class MatchService {
      * @return 입력한 조건과 매칭로직을 통해 점수를 매겨 상위 5명의 정보를 보여줍니다.
      */
     public List<MatchInfoResponseDto> findRecommendation(MatchSearchConditionDto dto, User loginUser) {
-        // 1. 성별과 플레이 시간대를 기준으로 필터링된 사용자 정보 조회
+        // 1. 성별과 플레이 시간대 및 최근 로그인날짜가 7일이내, 유저상태가 ACTIVE 인 필터링된 사용자 정보 조회
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+
         List<MatchUserInfo> filteredUsers = matchUserInfoRepository.findByGenderAndPlayTimeRanges(
                 dto.getGender(),
                 dto.getPlayTimeRanges(),
-                loginUser.getId()
+                loginUser.getId(),
+                sevenDaysAgo,
+                UserStatus.ACTIVE
         );
 
         // 2. 매칭 점수 계산 및 저장
