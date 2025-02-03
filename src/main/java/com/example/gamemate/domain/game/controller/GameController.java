@@ -1,6 +1,10 @@
 package com.example.gamemate.domain.game.controller;
 
-import com.example.gamemate.domain.game.dto.*;
+import com.example.gamemate.domain.game.dto.request.GameCreateRequestDto;
+import com.example.gamemate.domain.game.dto.request.GameUpdateRequestDto;
+import com.example.gamemate.domain.game.dto.response.GameCreateResponseDto;
+import com.example.gamemate.domain.game.dto.response.GameFindAllResponseDto;
+import com.example.gamemate.domain.game.dto.response.GameFindByIdResponseDto;
 import com.example.gamemate.domain.game.service.GameService;
 import com.example.gamemate.global.config.auth.CustomUserDetails;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -8,7 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -87,14 +90,10 @@ public class GameController {
     }
 
     /**
-     * 특정 ID의 게임 정보를 수정합니다.
+     * 특정 ID의 게임을 조회합니다.
      *
-     * @param id 수정할 게임의 ID
-     * @param gameDataString 수정할 게임 데이터를 포함한 JSON 문자열
-     * @param newFile 새로운 게임 이미지 파일 (선택적)
-     * @param customUserDetails 인증된 사용자 정보
-     * @return 수정 결과를 나타내는 ResponseEntity
-     * @throws RuntimeException JSON 파싱 오류 시 발생
+     * @param id 조회할 게임의 ID
+     * @return 조회된 게임 정보를 포함한 ResponseEntity
      */
     @GetMapping("/{id}")
     public ResponseEntity<GameFindByIdResponseDto> findGameById(
@@ -106,11 +105,14 @@ public class GameController {
     }
 
     /**
-     * 특정 ID의 게임을 삭제합니다.
+     * 특정 ID의 게임 정보를 수정합니다.
      *
-     * @param id 삭제할 게임의 ID
+     * @param id 수정할 게임의 ID
+     * @param gameDataString 수정할 게임 데이터를 포함한 JSON 문자열
+     * @param newFile 새로운 게임 이미지 파일 (선택적)
      * @param customUserDetails 인증된 사용자 정보
-     * @return 삭제 결과를 나타내는 ResponseEntity
+     * @return 수정 결과를 나타내는 ResponseEntity
+     * @throws RuntimeException JSON 파싱 오류 시 발생
      */
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateGame(
@@ -131,6 +133,13 @@ public class GameController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    /**
+     * 특정 ID의 게임을 삭제합니다.
+     *
+     * @param id 삭제할 게임의 ID
+     * @param customUserDetails 인증된 사용자 정보
+     * @return 삭제 결과를 나타내는 ResponseEntity
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGame(
             @PathVariable Long id,

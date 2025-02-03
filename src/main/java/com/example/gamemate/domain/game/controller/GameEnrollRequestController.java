@@ -1,13 +1,12 @@
 package com.example.gamemate.domain.game.controller;
 
-import com.example.gamemate.domain.game.dto.GameEnrollRequestCreateRequestDto;
-import com.example.gamemate.domain.game.dto.GameEnrollRequestResponseDto;
-import com.example.gamemate.domain.game.dto.GameEnrollRequestUpdateRequestDto;
+import com.example.gamemate.domain.game.dto.request.GameEnrollRequestCreateRequestDto;
+import com.example.gamemate.domain.game.dto.response.GameEnrollRequestResponseDto;
+import com.example.gamemate.domain.game.dto.request.GameEnrollRequestUpdateRequestDto;
 import com.example.gamemate.domain.game.service.GameEnrollRequestService;
 import com.example.gamemate.global.config.auth.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

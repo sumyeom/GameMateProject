@@ -2,11 +2,12 @@ package com.example.gamemate.domain.review.service;
 
 import com.example.gamemate.domain.game.entity.Game;
 import com.example.gamemate.domain.game.repository.GameRepository;
+import com.example.gamemate.domain.like.enums.LikeStatus;
 import com.example.gamemate.domain.like.repository.ReviewLikeRepository;
-import com.example.gamemate.domain.review.dto.ReviewCreateRequestDto;
-import com.example.gamemate.domain.review.dto.ReviewCreateResponseDto;
-import com.example.gamemate.domain.review.dto.ReviewFindByAllResponseDto;
-import com.example.gamemate.domain.review.dto.ReviewUpdateRequestDto;
+import com.example.gamemate.domain.review.dto.request.ReviewCreateRequestDto;
+import com.example.gamemate.domain.review.dto.response.ReviewCreateResponseDto;
+import com.example.gamemate.domain.review.dto.response.ReviewFindByAllResponseDto;
+import com.example.gamemate.domain.review.dto.request.ReviewUpdateRequestDto;
 import com.example.gamemate.domain.review.entity.Review;
 import com.example.gamemate.domain.review.repository.ReviewRepository;
 import com.example.gamemate.domain.user.entity.User;
@@ -31,6 +32,7 @@ public class ReviewService {
     private final UserRepository userRepository;
     private final ReviewLikeRepository reviewLikeRepository;
 
+    //리뷰 생성
     @Transactional
     public ReviewCreateResponseDto createReview(User loginUser, Long gameId, ReviewCreateRequestDto requestDto) {
 
@@ -39,14 +41,13 @@ public class ReviewService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
-        // 사용자가 이미 해당 게임에 대한 리뷰를 작성했는지 확인
         boolean hasReview = reviewRepository.existsByUserIdAndGameId(userId, gameId);
         if (hasReview) {
             throw new ApiException(ErrorCode.REVIEW_ALREADY_EXISTS);
         }
 
         Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new ApiException(ErrorCode.REVIEW_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(ErrorCode.GAME_NOT_FOUND));
 
         Review review = new Review(
                 requestDto.getContent(),
@@ -59,6 +60,7 @@ public class ReviewService {
         return new ReviewCreateResponseDto(saveReview);
     }
 
+    //리뷰 수정
     @Transactional
     public void updateReview(User loginUser, Long gameId, Long id, ReviewUpdateRequestDto requestDto) {
 
@@ -67,7 +69,6 @@ public class ReviewService {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new ApiException(ErrorCode.REVIEW_NOT_FOUND));
 
-        // 리뷰 작성자와 현재 사용자가 같은지 확인
         if (!review.getUser().getId().equals(userId)) {
             throw new ApiException(ErrorCode.FORBIDDEN);
         }
@@ -80,6 +81,7 @@ public class ReviewService {
         reviewRepository.save(review);
     }
 
+    //리뷰 삭제
     @Transactional
     public void deleteReview(User loginUser, Long id) {
 
@@ -96,6 +98,7 @@ public class ReviewService {
 
     }
 
+    //리뷰 조회(게임별 다건 조회)
     public Page<ReviewFindByAllResponseDto> ReviewFindAllByGameId(Long gameId, User loginUser) {
 
         Game game = gameRepository.findGameById(gameId)
@@ -105,7 +108,7 @@ public class ReviewService {
         Page<Review> reviewPage = reviewRepository.findAllByGame(game, pageable);
 
         return reviewPage.map(review -> {
-            Long likeCount = reviewLikeRepository.countByReviewIdAndStatus(review.getId(), 1);
+            Long likeCount = reviewLikeRepository.countByReviewIdAndStatus(review.getId(), LikeStatus.LIKE);
             return new ReviewFindByAllResponseDto(review, loginUser.getNickname(), likeCount);
         });
     }

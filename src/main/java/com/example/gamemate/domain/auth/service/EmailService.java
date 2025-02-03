@@ -57,7 +57,7 @@ public class EmailService {
 
         //인증 정보가 없는 경우
         if (verificationInfo == null) {
-            throw new ApiException(ErrorCode.VERIFICATION_TIME_EXPIRED);
+            throw new ApiException(ErrorCode.VERIFICATION_NOT_FOUND);
         }
 
         // 인증 정보가 만료된 경우

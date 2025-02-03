@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
-    @Value("${oauth2.failure.redirect.uri}")
+    @Value("${oauth2.failure.redirect-uri}")
     private String redirectUri;
 
     @Override

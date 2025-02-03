@@ -14,6 +14,7 @@ public class BoardRequestDto {
     @NotBlank(message = "내용을 입력하세요.")
     private final String content;
 
+
     public BoardRequestDto(BoardCategory category, String title, String content) {
         this.category = category;
         this.title = title;
