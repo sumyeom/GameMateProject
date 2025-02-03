@@ -6,6 +6,8 @@ import com.example.gamemate.domain.notification.enums.NotificationType;
 import com.example.gamemate.domain.notification.repository.EmitterRepository;
 import com.example.gamemate.domain.notification.repository.NotificationRepository;
 import com.example.gamemate.domain.user.entity.User;
+import com.example.gamemate.global.constant.ErrorCode;
+import com.example.gamemate.global.exception.ApiException;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -90,5 +93,17 @@ public class NotificationService {
                 log.error("알림 전송 실패: {}", e.getMessage());
             }
         }
+    }
+
+    @Transactional
+    public void readNotification(User loginUser, Long id) {
+        Notification notification = notificationRepository.findById(id)
+                .orElseThrow(() -> new ApiException(ErrorCode.NOTIFICATION_NOT_FOUND));
+
+        if (!Objects.equals(notification.getReceiver().getId(), loginUser.getId())) {
+            throw new ApiException(ErrorCode.FORBIDDEN);
+        } // 알림의 받는 사람과 로그인 한 유저가 다르면 예외 처리
+
+        notification.updateIsRead(true);
     }
 }
