@@ -32,9 +32,7 @@ public class GlobalEventListener {
         Follow follow = event.getFollow();
 
         Notification notification = notificationService.createNotification(follow.getFollowee(), NotificationType.NEW_FOLLOWER, "/users/" + follow.getFollower().getId());
-        notificationService.sendNotification(follow.getFollowee(), notification);
-
-        log.info("새로운 팔로우 알림 전송 완료");
+        notificationService.sendNotification(notification);
     }
 
     @Async
@@ -44,9 +42,7 @@ public class GlobalEventListener {
         Match match = event.getMatch();
 
         Notification notification = notificationService.createNotification(match.getReceiver(), NotificationType.NEW_MATCH, "/matches/" + match.getId());
-        notificationService.sendNotification(match.getReceiver(), notification);
-
-        log.info("새로운 매칭 알림 전송 완료");
+        notificationService.sendNotification(notification);
     }
 
     @Async
@@ -56,9 +52,7 @@ public class GlobalEventListener {
         Match match = event.getMatch();
 
         Notification notification = notificationService.createNotification(match.getSender(), NotificationType.MATCH_ACCEPTED, "/matches/" + match.getId());
-        notificationService.sendNotification(match.getSender(), notification);
-
-        log.info("매칭 수락 알림 전송 완료");
+        notificationService.sendNotification(notification);
     }
 
     @Async
@@ -68,9 +62,7 @@ public class GlobalEventListener {
         Match match = event.getMatch();
 
         Notification notification = notificationService.createNotification(match.getSender(), NotificationType.MATCH_REJECTED, "/matches/" + match.getId());
-        notificationService.sendNotification(match.getSender(), notification);
-
-        log.info("매칭 거절 알림 전송 완료");
+        notificationService.sendNotification(notification);
     }
 
     @Async
@@ -80,9 +72,7 @@ public class GlobalEventListener {
         BoardLike boardLike = event.getBoardLike();
 
         Notification notification = notificationService.createNotification(boardLike.getBoard().getUser(), NotificationType.NEW_LIKE, "/boards/" + boardLike.getBoard().getId());
-        notificationService.sendNotification(boardLike.getBoard().getUser(), notification);
-
-        log.info("게시글 새로운 좋아요 알림 전송 완료");
+        notificationService.sendNotification(notification);
     }
 
     @Async
@@ -92,9 +82,7 @@ public class GlobalEventListener {
         ReviewLike reviewLike = event.getReviewLike();
 
         Notification notification = notificationService.createNotification(reviewLike.getReview().getUser(), NotificationType.NEW_LIKE, "/reviews/" + reviewLike.getReview().getId());
-        notificationService.sendNotification(reviewLike.getReview().getUser(), notification);
-
-        log.info("리뷰 새로운 좋아요 알림 전송 완료");
+        notificationService.sendNotification(notification);
     }
 
     @Async
@@ -105,10 +93,8 @@ public class GlobalEventListener {
 
         if (!Objects.equals(comment.getUser().getId(), comment.getBoard().getUser().getId())) {
             Notification notification = notificationService.createNotification(comment.getBoard().getUser(), NotificationType.NEW_COMMENT, "/comments/" + comment.getId());
-            notificationService.sendNotification(comment.getBoard().getUser(), notification);
+            notificationService.sendNotification(notification);
         }
-
-        log.info("새로운 댓글 알림 전송 완료");
     }
 
     @Async
@@ -119,19 +105,17 @@ public class GlobalEventListener {
 
         if (!Objects.equals(reply.getUser().getId(), reply.getComment().getBoard().getUser().getId())) {
             Notification boardNotification = notificationService.createNotification(reply.getComment().getBoard().getUser(), NotificationType.NEW_COMMENT, "/replies/" + reply.getId());
-            notificationService.sendNotification(reply.getComment().getBoard().getUser(), boardNotification);
+            notificationService.sendNotification(boardNotification);
         }
 
         if (!Objects.equals(reply.getUser().getId(), reply.getComment().getUser().getId())) {
             Notification commentNotification = notificationService.createNotification(reply.getComment().getUser(), NotificationType.NEW_COMMENT, "/replies/" + reply.getId());
-            notificationService.sendNotification(reply.getComment().getUser(), commentNotification);
+            notificationService.sendNotification(commentNotification);
         }
 
         if (reply.getParentReply() != null && !Objects.equals(reply.getParentReply().getUser().getId(), reply.getUser().getId())) {
             Notification parentReplyNotification = notificationService.createNotification(reply.getParentReply().getUser(), NotificationType.NEW_COMMENT, "/replies/" + reply.getId());
-            notificationService.sendNotification(reply.getParentReply().getUser(), parentReplyNotification);
+            notificationService.sendNotification(parentReplyNotification);
         }
-
-        log.info("새로운 대댓글 알림 전송 완료");
     }
 }

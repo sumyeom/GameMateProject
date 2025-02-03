@@ -12,13 +12,14 @@ import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.connection.stream.StreamInfo;
+import org.springframework.data.redis.connection.stream.StreamRecords;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 알림을 처리하는 서비스 클래스입니다.
@@ -31,6 +32,9 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final EmitterRepository emitterRepository;
     private final RedisStreamService redisStreamService;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private static final String STREAM_KEY = "notification_stream";
+    private static final String GROUP_NAME = "notification-group";
     private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
 
     /**
@@ -38,7 +42,27 @@ public class NotificationService {
      */
     @PostConstruct
     public void init() {
-        redisStreamService.createStreamGroup();
+        try {
+            // 스트림이 존재하지 않으면 생성
+            if (!Boolean.TRUE.equals(redisTemplate.hasKey(STREAM_KEY))) {
+                redisTemplate.opsForStream()
+                        .add(StreamRecords.newRecord()
+                                .in(STREAM_KEY)
+                                .ofMap(Collections.singletonMap("init", "init")));
+            }
+
+            // 그룹 정보 조회
+            StreamInfo.XInfoGroups groups = redisTemplate.opsForStream().groups(STREAM_KEY);
+            boolean groupExists = groups.stream()
+                    .anyMatch(group -> GROUP_NAME.equals(group.groupName()));
+
+            // 그룹이 없으면 생성
+            if (!groupExists) {
+                redisTemplate.opsForStream().createGroup(STREAM_KEY, GROUP_NAME);
+            }
+        } catch (Exception e) {
+            log.error("스트림 초기화 중 오류 발생: {}", e.getMessage());
+        }
     }
 
     /**
@@ -97,7 +121,7 @@ public class NotificationService {
     }
 
     /**
-     * SSE 연결을 구독합니다.
+     * SSE 연결을 구독합니다. 또한 가장 최근 읽지 않은 알림 1개를 전송합니다.
      * @param loginUser 현재 인증된 사용자 정보
      * @return 사용자 연결정보가 담긴 SseEmitter
      */
@@ -110,46 +134,37 @@ public class NotificationService {
                     .name("connect")
                     .data("connected!"));
 
-            // 미처리된 알림 조회 및 전송
-            List<Map<String, String>> unreadNotifications =
-                    redisStreamService.getUnreadNotifications(loginUser.getId());
-
-            for (Map<String, String> notification : unreadNotifications) {
-                emitter.send(SseEmitter.event()
-                        .name(notification.get("type"))
-                        .data(notification));
-            }
+            // DB에서 가장 최근 읽지 않은 알림 1개만 조회
+            notificationRepository.findTopByReceiverIdAndIsReadOrderByCreatedAtDesc(loginUser.getId(), false)
+                    .ifPresent(notification -> {
+                        try {
+                            NotificationResponseDto notificationDto = NotificationResponseDto.toDto(notification);
+                            emitter.send(SseEmitter.event()
+                                    .name(notification.getType().name())
+                                    .data(notificationDto));
+                            log.debug("최근 알림 전송 - ID: {}", notification.getId());
+                        } catch (IOException e) {
+                            log.error("알림 전송 실패 - ID: {} - 에러: {}", notification.getId(), e.getMessage());
+                        }
+                    });
 
         } catch (IOException e) {
-            throw new RuntimeException("연결 실패!");
+            log.error("SSE 연결 실패 - 유저: {} - 에러: {}", loginUser.getId(), e.getMessage());
+            throw new RuntimeException("SSE 연결 실패", e);
         }
 
-        // emitter를 저장소에 저장 (저장 시 이벤트 핸들러도 자동 등록)
         return emitterRepository.save(loginUser.getId(), emitter);
     }
 
     /**
      * 사용자에게 알림을 전송합니다.
-     * @param user 알림을 받을 사용자
      * @param notification 보내질 알림
      */
-    public void sendNotification(User user, Notification notification) {
+    @Transactional
+    public void sendNotification(Notification notification) {
         NotificationResponseDto notificationDto = NotificationResponseDto.toDto(notification);
 
-        // Redis 스트림에 저장
+        // Redis Stream 에 알림 추가
         redisStreamService.addNotificationToStream(notificationDto);
-
-        // SSE로 전송
-        SseEmitter emitter = emitterRepository.findById(user.getId());
-        if (emitter != null) {
-            try {
-                emitter.send(SseEmitter.event()
-                        .name(notification.getType().name())
-                        .data(notificationDto));
-            } catch (IOException e) {
-                emitterRepository.deleteById(user.getId());
-                log.error("알림 전송 실패: {}", e.getMessage());
-            }
-        }
     }
 }
