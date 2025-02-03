@@ -18,6 +18,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 
+
+/**
+ * 팔로우 기능을 처리하는 서비스 클래스입니다.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -26,7 +30,13 @@ public class FollowService {
     private final FollowRepository followRepository;
     private final NotificationService notificationService;
 
-    // 팔로우하기
+
+    /**
+     * 사용자 간의 팔로우를 생성합니다.
+     * @param dto FollowCreateRequestDto 팔로우할 상대방의 email
+     * @param loginUser 현재 인증된 사용자 정보
+     * @return 팔로우 처리 결과를 담은 FollowResponseDto
+     */
     @Transactional
     public FollowResponseDto createFollow(FollowCreateRequestDto dto, User loginUser) {
 
@@ -57,7 +67,11 @@ public class FollowService {
         );
     }
 
-    // 팔로우 취소하기
+    /**
+     * 사용자 간의 팔로우를 취소합니다.
+     * @param id 팔로우 id
+     * @param loginUser 현재 인증된 사용자 정보
+     */
     @Transactional
     public void deleteFollow(Long id, User loginUser) {
 
@@ -73,7 +87,12 @@ public class FollowService {
         followRepository.delete(findFollow);
     }
 
-    // 팔로우 상태 확인
+    /**
+     * 팔로우 상태를 확인합니다. (loginUser 가 followee 를 팔로우 했는지 확인)
+     * @param loginUser 현재 인증된 사용자 정보
+     * @param email 팔로우 상태를 확인할 사용자 email
+     * @return 팔로우 상태의 정보를 담은 FollowBooleanResponseDto
+     */
     public FollowBooleanResponseDto findFollow(User loginUser, String email) {
 
         User followee = userRepository.findByEmail(email)
@@ -98,7 +117,11 @@ public class FollowService {
         );
     }
 
-    // 팔로워 목록보기
+    /**
+     * 특정 유저의 팔로워 목록를 조회합니다.
+     * @param email 팔로워 목록을 확인할 상대방 email
+     * @return 팔로워 목록을 담은 List<FollowFindResponseDto>
+     */
     public List<FollowFindResponseDto> findFollowers(String email) {
 
         User followee = userRepository.findByEmail(email)
@@ -121,7 +144,11 @@ public class FollowService {
                 .toList();
     }
 
-    // 팔로잉 목록보기
+    /**
+     * 특정 유저의 팔로잉 목록를 조회합니다.
+     * @param email 팔로잉 목록을 조회할 상대방 email
+     * @return 팔로잉 목록을 담은 List<FollowFindResponseDto>
+     */
     public List<FollowFindResponseDto> findFollowing(String email) {
 
         User follower = userRepository.findByEmail(email)
