@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * 알림을 처리하는 서비스 클래스입니다.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -30,17 +33,32 @@ public class NotificationService {
     private final RedisStreamService redisStreamService;
     private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
 
+    /**
+     * 레디스 스트림의 스트림그룹을 생성합니다.
+     */
     @PostConstruct
     public void init() {
         redisStreamService.createStreamGroup();
     }
 
+    /**
+     * 알림을 생성합니다.
+     * @param user 알림을 받는 사용자
+     * @param type 알림 타입
+     * @param relatedUrl 알림과 관련된 URL
+     * @return Notification 생성된 알림
+     */
     @Transactional
     public Notification createNotification(User user, NotificationType type, String relatedUrl) {
         Notification notification = new Notification(type.getContent(), relatedUrl, type, user);
         return notificationRepository.save(notification);
     }
 
+    /**
+     * 사용자의 모든 알림을 조회합니다.
+     * @param loginUser 현재 인증된 사용자 정보
+     * @return 로그인 한 사용자의 모든 알림이 담긴 List<NotificationResponseDto>
+     */
     public List<NotificationResponseDto> findAllNotification(User loginUser) {
         return notificationRepository.findAllByReceiverId(loginUser.getId())
                 .stream()
@@ -48,6 +66,41 @@ public class NotificationService {
                 .toList();
     }
 
+    /**
+     * 단일 알림을 읽음 처리합니다.
+     * @param loginUser 현재 인증된 사용자 정보
+     * @param id 읽음 처리할 알림 id
+     */
+    @Transactional
+    public void readNotification(User loginUser, Long id) {
+        Notification notification = notificationRepository.findById(id)
+                .orElseThrow(() -> new ApiException(ErrorCode.NOTIFICATION_NOT_FOUND));
+
+        if (!Objects.equals(notification.getReceiver().getId(), loginUser.getId())) {
+            throw new ApiException(ErrorCode.FORBIDDEN);
+        } // 알림의 받는 사람과 로그인 한 유저가 다르면 예외 처리
+
+        notification.updateIsRead(true);
+    }
+
+    /**
+     * 로그인한 사용자의 읽지 않은 모든 알림을 읽음 처리합니다.
+     * @param loginUser 현재 인증된 사용자 정보
+     */
+    @Transactional
+    public void readAllNotification(User loginUser) {
+        List<Notification> unreadNotificationList = notificationRepository.findAllByReceiverIdAndIsRead(loginUser.getId(), false);
+
+        for (Notification notification : unreadNotificationList) {
+            notification.updateIsRead(true);
+        }
+    }
+
+    /**
+     * SSE 연결을 구독합니다.
+     * @param loginUser 현재 인증된 사용자 정보
+     * @return 사용자 연결정보가 담긴 SseEmitter
+     */
     public SseEmitter subscribe(User loginUser) {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
 
@@ -75,6 +128,11 @@ public class NotificationService {
         return emitterRepository.save(loginUser.getId(), emitter);
     }
 
+    /**
+     * 사용자에게 알림을 전송합니다.
+     * @param user 알림을 받을 사용자
+     * @param notification 보내질 알림
+     */
     public void sendNotification(User user, Notification notification) {
         NotificationResponseDto notificationDto = NotificationResponseDto.toDto(notification);
 
@@ -92,27 +150,6 @@ public class NotificationService {
                 emitterRepository.deleteById(user.getId());
                 log.error("알림 전송 실패: {}", e.getMessage());
             }
-        }
-    }
-
-    @Transactional
-    public void readNotification(User loginUser, Long id) {
-        Notification notification = notificationRepository.findById(id)
-                .orElseThrow(() -> new ApiException(ErrorCode.NOTIFICATION_NOT_FOUND));
-
-        if (!Objects.equals(notification.getReceiver().getId(), loginUser.getId())) {
-            throw new ApiException(ErrorCode.FORBIDDEN);
-        } // 알림의 받는 사람과 로그인 한 유저가 다르면 예외 처리
-
-        notification.updateIsRead(true);
-    }
-
-    @Transactional
-    public void readAllNotification(User loginUser) {
-        List<Notification> unreadNotificationList = notificationRepository.findAllByReceiverIdAndIsRead(loginUser.getId(), false);
-
-        for (Notification notification : unreadNotificationList) {
-            notification.updateIsRead(true);
         }
     }
 }
