@@ -9,17 +9,13 @@ import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -28,7 +24,6 @@ import java.util.UUID;
 public class OAuth2Service {
 
     private final UserRepository userRepository;
-    private final OAuth2ClientProperties clientProperties;
 
     public OAuth2LoginResponseDto extractOAuth2Attributes(AuthProvider provider, Map<String, Object> attributes) {
         if(provider == AuthProvider.GOOGLE) {
@@ -50,6 +45,12 @@ public class OAuth2Service {
             // 탈퇴한 사용자 체크
             if (existingUser.getUserStatus() == UserStatus.WITHDRAW) {
                 throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
+            }
+
+            // 이메일로 가입한 계정이 소셜 로그인 시도한 경우
+            if (existingUser.getProvider() == AuthProvider.LOCAL) {
+                existingUser.integrateOAuthProvider(responseDto.getProvider(), responseDto.getProviderId());
+                return userRepository.save(existingUser);
             }
 
             // 다른 OAuth 제공자로 로그인 시도한 경우

@@ -25,8 +25,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final UserRepository userRepository;
     private int refreshTokenMaxAge = 60 * 60 * 24 * 3; //3일
 
-    @Value("${oauth2.success.redirect.uri}")
-    private String redirectUri;
+    @Value("${oauth2.success.redirect-uri}")
+    private String successRedirectUri;
+
+    @Value("${oauth2.set-password.redirect-uri}")
+    private String passwordSetupRedirectUri;
 
     @Override
     public void onAuthenticationSuccess(
@@ -48,9 +51,16 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             // 쿠키에 Refresh 토큰 저장
             addRefreshTokenCookie(response, refreshToken);
 
-            String targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
-                    .queryParam("token", accessToken)
-                    .build(false).toUriString();
+            String targetUrl;
+            if("OAUTH2_USER".equals(user.getPassword())) {
+                targetUrl = UriComponentsBuilder.fromUriString(passwordSetupRedirectUri)
+                        .queryParam("token", accessToken)
+                        .build(false).toUriString();
+            } else {
+                targetUrl = UriComponentsBuilder.fromUriString(successRedirectUri)
+                        .queryParam("token", accessToken)
+                        .build(false).toUriString();
+            }
 
             getRedirectStrategy().sendRedirect(request, response, targetUrl);
 

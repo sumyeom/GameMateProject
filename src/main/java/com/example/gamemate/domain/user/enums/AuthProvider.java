@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public enum AuthProvider {
 
-    EMAIL("email"),
+    LOCAL("local"),
     GOOGLE("google"),
     KAKAO("kakao");
 

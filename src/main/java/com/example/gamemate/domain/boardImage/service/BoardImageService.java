@@ -27,10 +27,11 @@ public class BoardImageService {
 
     /**
      * 이미지 업로드 메서드
-     * @param loginUser
-     * @param boardId
-     * @param image
-     * @throws IOException
+     *
+     * @param loginUser 로그인한 유저
+     * @param boardId 게시글 식별자
+     * @param image 게시글에 업로드할 이미지
+     * @throws IOException 오류 발생
      */
     @Transactional
     public void createBoardImage(User loginUser, Long boardId, MultipartFile image) throws IOException {
@@ -54,10 +55,11 @@ public class BoardImageService {
 
     /**
      * 이미지 업데이트 메서드
-     * @param loginUser
-     * @param id
-     * @param image
-     * @throws IOException
+     *
+     * @param loginUser 로그인한 유저
+     * @param id 이미지 식별자
+     * @param image 게시글에 업데이트할 이미지
+     * @throws IOException 오류 발생
      */
     @Transactional
     public void updateBoardImage(User loginUser, Long id, MultipartFile image) throws IOException {
@@ -90,8 +92,8 @@ public class BoardImageService {
 
     /**
      * 이미지 삭제 메서드
-     * @param loginUser
-     * @param id
+     * @param loginUser 로그인한 유저
+     * @param id 이미지 식별자
      */
     @Transactional
     public void deleteImage(User loginUser, Long id) {
