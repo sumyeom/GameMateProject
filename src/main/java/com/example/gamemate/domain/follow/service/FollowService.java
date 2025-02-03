@@ -66,7 +66,7 @@ public class FollowService {
 
         log.info("사용자 email : {}" , loginUser.getEmail());
 
-        if (findFollow.getFollower() != loginUser) {
+        if (!Objects.equals(findFollow.getFollower().getId(), loginUser.getId())) {
             throw new ApiException(ErrorCode.INVALID_INPUT);
         } // 본인의 팔로우가 아닐때 예외처리
 
