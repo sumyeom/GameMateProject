@@ -6,6 +6,7 @@ import com.example.gamemate.domain.board.dto.BoardFindAllResponseDto;
 import com.example.gamemate.domain.board.dto.BoardFindOneResponseDto;
 import com.example.gamemate.domain.board.enums.BoardCategory;
 import com.example.gamemate.domain.board.service.BoardService;
+import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.global.config.auth.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,30 @@ public class BoardController {
 
         BoardResponseDto responseDto = boardService.createBoard(customUserDetails.getUser(), dto);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+    }
+
+
+    /**
+     * 게시글 조회하고 검색하는 API 입니다.
+     *
+     * @param category 카테고리 종류
+     * @return 게시글 목록을 포함한 ResponseEntity
+     */
+    @GetMapping("/rankings")
+    public ResponseEntity<List<BoardFindAllResponseDto>> findTopBoards(
+            @RequestParam(required = false) String category
+    ) {
+
+        BoardCategory boardCategory = null;
+        if (category != null) {
+            boardCategory = BoardCategory.fromName(category);
+        }
+
+        List<BoardFindAllResponseDto> dtos = boardService.findTopBoards(boardCategory);
+        if(dtos.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
 
     /**
@@ -81,10 +106,13 @@ public class BoardController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<BoardFindOneResponseDto> findBoardById(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
     ){
 
-        BoardFindOneResponseDto dto = boardService.findBoardById(id);
+        User loginUser = customUserDetails != null ? customUserDetails.getUser() : null;
+
+        BoardFindOneResponseDto dto = boardService.findBoardById(id, loginUser);
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
