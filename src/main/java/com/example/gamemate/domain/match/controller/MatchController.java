@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 매칭 기능을 처리하는 컨트롤러 클래스입니다.
+ * 사용자 간의 매칭 기능을 제공합니다.
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/matches")
@@ -19,9 +23,11 @@ public class MatchController {
     private final MatchService matchService;
 
     /**
-     * 매칭 요청 생성
-     * @param dto MatchCreateRequestDto 상대 유저 id, 상대방에게 전할 메세지
-     * @return matchCreateResponseDto
+     * 사용자 간의 매칭 요청을 생성합니다.
+     *
+     * @param dto 매칭을 원하는 상대방 ID, 상대방에게 보낼 메세지를 포함합니다.
+     * @param customUserDetails 현재 인증된 사용자 정보
+     * @return 매칭 요청 처리 결과를 담은 ResponseEntity
      */
     @PostMapping
     public ResponseEntity<MatchResponseDto> createMatch(
@@ -34,10 +40,12 @@ public class MatchController {
     }
 
     /**
-     * 매칭 수락/거절하기
-     * @param id  매칭 id
-     * @param dto MatchUpdateRequestDto 수락/거절
-     * @return 204 NO CONTENT
+     * 받은 매칭 요청의 수락/거절을 처리합니다.
+     *
+     * @param id 수락/거절할 매칭 요청 ID
+     * @param dto status (ACCEPTED 수락 / REJECTED 거절)
+     * @param customUserDetails 현재 인증된 사용자 정보
+     * @return 204 NO_CONTENT 성공했지만 반환값이 없음
      */
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateMatch(
@@ -50,9 +58,12 @@ public class MatchController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+
     /**
-     * 받은 매칭 전체 조회
-     * @return MatchResponseDtoList
+     * 사용자가 받은 매칭 요청을 조회합니다.
+     *
+     * @param customUserDetails 현재 인증된 사용자 정보
+     * @return 사용자의 받은 매칭 요청 목록을 담은 ResponseEntity
      */
     @GetMapping("/received-matches")
     public ResponseEntity<List<MatchResponseDto>> findAllReceivedMatch(
@@ -64,8 +75,10 @@ public class MatchController {
     }
 
     /**
-     * 보낸 매칭 전체 조회
-     * @return MatchResponseDtoList
+     * 사용자가 보낸 매칭 요청을 조회합니다.
+     *
+     * @param customUserDetails 현재 인증된 사용자 정보
+     * @return 사용자가 보낸 매칭 요청 목록을 담은 ResponseEntity
      */
     @GetMapping("/sent-matches")
     public ResponseEntity<List<MatchResponseDto>> findAllSentMatch(
@@ -77,9 +90,11 @@ public class MatchController {
     }
 
     /**
-     * 매칭 삭제(취소)
-     * @param id 매칭 id
-     * @return NO_CONTENT
+     * 사용자가 보낸 매칭 요청을 취소합니다.
+     *
+     * @param id 취소할 매칭 요청 ID
+     * @param customUserDetails 현재 인증된 사용자 정보
+     * @return 204 NO_CONTENT 성공했지만 반환값 없음
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMatch(
@@ -92,9 +107,11 @@ public class MatchController {
     }
 
     /**
-     * 매칭을 위해 내 정보 입력하기, 매칭 정보 입력시 매칭추천에서 검색됨
-     * @param dto MatchInfoCreateRequestDto
-     * @return matchInfoResponseDto
+     * 매칭을 위한 정보를 입력합니다.
+     *
+     * @param dto 매칭을 위해 자신의 정보를 입력합니다.
+     * @param customUserDetails 현재 인증된 사용자 정보
+     * @return 사용자의 정보가 처리된 ResponseEntity
      */
     @PostMapping("/my-info")
     public ResponseEntity<MatchInfoResponseDto> createMyInfo(
@@ -107,8 +124,10 @@ public class MatchController {
     }
 
     /**
-     * 매칭 내정보 조회하기
-     * @return MatchInfoResponseDto
+     * 매칭을 위해 입력한 내 정보를 확인합니다.
+     *
+     * @param customUserDetails 현재 인증된 사용자 정보
+     * @return 내 정보를 담은 ResponseEntity
      */
     @GetMapping("/my-info")
     public ResponseEntity<MatchInfoResponseDto> findMyInfo(
@@ -120,9 +139,11 @@ public class MatchController {
     }
 
     /**
-     * 매칭 상대방 정보 조회하기
-     * @param id 매치 id
-     * @return MatchInfoResponseDto 상대방 정보
+     * 매칭 상대방의 입력한 정보를 확인합니다.
+     *
+     * @param id 확인할 매칭 요청 ID
+     * @param customUserDetails 현재 인증된 사용자 정보
+     * @return 매칭 요청 ID의 상대방이 입력한 정보를 담은 ResponseEntity
      */
     @GetMapping("/{id}/opponent-info")
     public ResponseEntity<MatchInfoResponseDto> findOpponentInfo(
@@ -135,9 +156,11 @@ public class MatchController {
     }
 
     /**
-     * 매칭 내정보 수정하기
-     * @param dto MatchInfoUpdateRequestDto
-     * @return 204 NO_CONTENT
+     * 입력한 내 정보를 수정합니다.
+     *
+     * @param dto 수정할 정보를 입력합니다.
+     * @param customUserDetails 현재 인증된 사용자 정보
+     * @return 204 NO_CONTENT 성공했지만 반환값 없음
      */
     @PutMapping("/my-info")
     public ResponseEntity<Void> updateMyInfo(
@@ -150,8 +173,10 @@ public class MatchController {
     }
 
     /**
-     * 내 정보 삭제, 내 정보 삭제시 더이상 매칭에서 검색되지 않음
-     * @return 204 NO_CONTENT
+     * 내 정보 삭제, 내 정보 삭제시 더이상 매칭에서 검색되지 않습니다.
+     *
+     * @param customUserDetails 현재 인증된 사용자 정보
+     * @return 204 NO_CONTENT 성공했지만 반환값 없음
      */
     @DeleteMapping("/my-info")
     public ResponseEntity<Void> deleteMyInfo(
@@ -164,8 +189,10 @@ public class MatchController {
 
     /**
      * 매칭 추천 받기
-     * @param dto MatchSearchConditionDto 매칭 조건 설정
-     * @return recommendationList 매칭 로직을 통해 가장 점수가 높은 최대 5명 리스트
+     *
+     * @param dto 원하는 매칭 조건을 설정합니다.
+     * @param customUserDetails 현재 인증된 사용자 정보
+     * @return 원하는 매칭 조건을 토대로 매칭 로직을 통해 가장 점수가 높은 5명을 추천해줍니다.
      */
     @PostMapping("/recommendations")
     public ResponseEntity<List<MatchInfoResponseDto>> findRecommendation(

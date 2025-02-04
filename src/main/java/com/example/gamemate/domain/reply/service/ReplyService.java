@@ -2,17 +2,18 @@ package com.example.gamemate.domain.reply.service;
 
 import com.example.gamemate.domain.comment.entity.Comment;
 import com.example.gamemate.domain.comment.repository.CommentRepository;
-import com.example.gamemate.domain.notification.enums.NotificationType;
-import com.example.gamemate.domain.notification.service.NotificationService;
 import com.example.gamemate.domain.reply.dto.ReplyRequestDto;
 import com.example.gamemate.domain.reply.dto.ReplyResponseDto;
 import com.example.gamemate.domain.reply.entity.Reply;
 import com.example.gamemate.domain.reply.repository.ReplyRepository;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.global.constant.ErrorCode;
+import com.example.gamemate.global.eventListener.event.MatchCreatedEvent;
+import com.example.gamemate.global.eventListener.event.ReplyCreatedEvent;
 import com.example.gamemate.global.exception.ApiException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +24,7 @@ public class ReplyService {
 
     private final ReplyRepository replyRepository;
     private final CommentRepository commentRepository;
-    private final NotificationService notificationService;
+    private final ApplicationEventPublisher publisher;
 
     /**
      * 대댓글 생성 메서드입니다.
@@ -44,7 +45,7 @@ public class ReplyService {
         if(requestDto.getParentReplyId()==null){
             newReply = new Reply(requestDto.getContent(), findComment, loginUser);
             Reply createReply = replyRepository.save(newReply);
-            createCommentNotification(findComment.getBoard().getUser(), findComment.getUser());
+            publisher.publishEvent(new ReplyCreatedEvent(this, createReply));
 
             return new ReplyResponseDto(
                     createReply.getId(),
@@ -59,7 +60,7 @@ public class ReplyService {
                     .orElseThrow(()-> new ApiException(ErrorCode.COMMENT_NOT_FOUND));
             newReply = new Reply(requestDto.getContent(), findComment, loginUser, findParentReply);
             Reply createReply = replyRepository.save(newReply);
-            createCommentNotification(findComment.getBoard().getUser(), findComment.getUser(), findParentReply.getUser());
+            publisher.publishEvent(new ReplyCreatedEvent(this, createReply));
 
             return new ReplyResponseDto(
                     createReply.getId(),
@@ -112,18 +113,5 @@ public class ReplyService {
         }
 
         replyRepository.delete(findReply);
-    }
-
-    // 대댓글 알림 전송
-    private void createCommentNotification(User board, User comment) {
-        notificationService.createNotification(board, NotificationType.NEW_COMMENT);
-        notificationService.createNotification(comment, NotificationType.NEW_COMMENT);
-    }
-
-    // 대댓글 알림 전송
-    private void createCommentNotification(User board, User comment, User reply) {
-        notificationService.createNotification(board, NotificationType.NEW_COMMENT);
-        notificationService.createNotification(comment, NotificationType.NEW_COMMENT);
-        notificationService.createNotification(reply, NotificationType.NEW_COMMENT);
     }
 }
