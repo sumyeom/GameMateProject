@@ -18,4 +18,4 @@ docker stop spring-app || true
 docker rm spring-app || true
 
 # docker-compose 실행 (환경변수 적용)
-docker-compose -f /home/ec2-user/docker-compose.yml up -d
+docker-compose -f /home/ubuntu/docker-compose.yml up -d
