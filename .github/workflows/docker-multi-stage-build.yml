@@ -49,6 +49,37 @@ jobs:
           source: "./deploy.sh, ./docker-compose.yml"
           target: "/home/ubuntu/"
 
+      # .env 파일 생성 후 EC2로 전송
+      - name: Create and Upload .env file to EC2
+        run: |
+          echo "DOCKERHUB_USERNAME=${{ vars.DOCKERHUB_USERNAME }}" > .env
+          echo "DOCKER_IMAGE_TAG_NAME=${{ vars.DOCKER_IMAGE_TAG_NAME }}" >> .env
+          echo "MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}" >> .env
+          echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env
+          echo "MYSQL_URL=${{ secrets.MYSQL_URL }}" >> .env
+          echo "JPA_HIBERNATE_DDL=${{ secrets.JPA_HIBERNATE_DDL }}" >> .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "YOUR_ACCESS_KEY=${{ secrets.YOUR_ACCESS_KEY }}" >> .env
+          echo "YOUR_SECRET_KEY=${{ secrets.YOUR_SECRET_KEY }}" >> .env
+          echo "YOUR_BUCKET_NAME=${{ secrets.YOUR_BUCKET_NAME }}" >> .env
+          echo "OAUTH2_GOOGLE_CLIENT_ID=${{ secrets.OAUTH2_GOOGLE_CLIENT_ID }}" >> .env
+          echo "OAUTH2_GOOGLE_CLIENT_SECRET=${{ secrets.OAUTH2_GOOGLE_CLIENT_SECRET }}" >> .env
+          echo "OAUTH2_KAKAO_CLIENT_ID=${{ secrets.OAUTH2_KAKAO_CLIENT_ID }}" >> .env
+          echo "OAUTH2_KAKAO_CLIENT_SECRET=${{ secrets.OAUTH2_KAKAO_CLIENT_SECRET }}" >> .env
+          echo "EMAIL_USERNAME=${{ secrets.EMAIL_USERNAME }}" >> .env
+          echo "EMAIL_APP_PASSWORD=${{ secrets.EMAIL_APP_PASSWORD }}" >> .env
+          echo "GEMINI_URL=${{ secrets.GEMINI_URL }}" >> .env
+          echo "GEMINI_KEY=${{ secrets.GEMINI_KEY }}" >> .env
+
+      - name: Upload .env file to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          source: "./.env"
+          target: "/home/ubuntu/"
+
       # EC2에서 deploy.sh 실행 (최신 Docker 이미지 가져와서 실행)
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
@@ -56,6 +87,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
+
           script: |
             chmod +x /home/ubuntu/deploy.sh
             /home/ubuntu/deploy.sh
