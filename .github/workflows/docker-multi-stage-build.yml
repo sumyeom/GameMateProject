@@ -2,7 +2,11 @@ name: docker multi-stage build
 
 on:
   pull_request:
-    branches: [ "develop" ]
+    branches:
+      - develop
+  push:
+    branches:
+      - develop
 
 jobs:
   deploy:
