@@ -20,8 +20,8 @@ services:
       OAUTH2_KAKAO_CLIENT_SECRET: "${OAUTH2_KAKAO_CLIENT_SECRET}"
       EMAIL_USERNAME: "${EMAIL_USERNAME}"
       EMAIL_APP_PASSWORD: "${EMAIL_APP_PASSWORD}"
-      GEMINI_URL: "${ secrets.GEMINI_URL }"
-      GEMINI_KEY: "${ secrets.GEMINI_KEY }"
+      GEMINI_URL: "${GEMINI_URL}"
+      GEMINI_KEY: "${GEMINI_KEY}"
     depends_on:
       - db
 
