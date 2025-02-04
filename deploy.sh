@@ -16,5 +16,5 @@ sudo docker pull $ECR_URI:$IMAGE_TAG
 # 기존 컨테이너 중지 및 삭제
 sudo docker-compose down || true
 
-# docker-compose 실행 (환경변수 적용)
+# docker-compose 실행
 sudo docker-compose -f /home/ubuntu/docker-compose.yml up -d
