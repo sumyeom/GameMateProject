@@ -28,11 +28,17 @@ public class DistributedLockAop {
             ProceedingJoinPoint joinPoint,
             DistributedLock distributedLock
     ) throws Throwable {
-        String lockKey = LOCK_PREFIX + joinPoint.getArgs()[0] + ":" + ((User) joinPoint.getArgs()[1]).getId();
+        String lockKey = LOCK_PREFIX + "coupon:" + joinPoint.getArgs()[0];
         RLock lock = redissonClient.getLock(lockKey);
 
         log.info("락 획득 시도: {}", lockKey);
-        lock.lock(distributedLock.leaseTime(), distributedLock.timeUnit());
+        boolean isLocked = lock.tryLock(distributedLock.waitTime(), distributedLock.leaseTime(), distributedLock.timeUnit());
+
+        if (!isLocked) {
+            log.warn("락 획득 실패: {}", lockKey);
+            throw new ApiException(ErrorCode.COUPON_ISSUE_FAILED);
+        }
+
         log.info("락 획득 완료: {}", lockKey);
 
         try {
@@ -56,5 +62,5 @@ public class DistributedLockAop {
             }
             throw e;
         }
-        }
+    }
 }

@@ -50,7 +50,7 @@ public class CouponService {
         return new CouponCreateResponseDto(savedCoupon);
     }
 
-    @DistributedLock(key = "'LOCK:' + #couponId + ':' + #loginUser.id")
+    @DistributedLock(key = "'LOCK:coupon:' + #couponId")
     public CouponIssueResponseDto issueCoupon(Long couponId, User loginUser) {
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new ApiException(ErrorCode.COUPON_NOT_FOUND));
