@@ -45,6 +45,30 @@ public class BoardController {
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
+
+    /**
+     * 게시글 조회하고 검색하는 API 입니다.
+     *
+     * @param category 카테고리 종류
+     * @return 게시글 목록을 포함한 ResponseEntity
+     */
+    @GetMapping("/rankings")
+    public ResponseEntity<List<BoardFindAllResponseDto>> findTopBoards(
+            @RequestParam(required = false) String category
+    ) {
+
+        BoardCategory boardCategory = null;
+        if (category != null) {
+            boardCategory = BoardCategory.fromName(category);
+        }
+
+        List<BoardFindAllResponseDto> dtos = boardService.findTopBoards(boardCategory);
+        if(dtos.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(dtos, HttpStatus.OK);
+    }
+
     /**
      * 게시글 조회하고 검색하는 API 입니다.
      *

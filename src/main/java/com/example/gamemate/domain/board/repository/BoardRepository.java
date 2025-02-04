@@ -14,4 +14,16 @@ import java.util.List;
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Long>, BoardQuerydslRepository{
     Page<Board> findByCategory(String category, Pageable pageable);
+
+    List<Board> findTop5ByOrderByViewsDesc();
+
+    @Query("select b from Board b where b.id IN :boardIds order by b.views desc, b.createdAt desc")
+    List<Board> findByIdInOrderByCreatedAtDesc(@Param("boardIds") List<Long> boardIds);
+
+    List<Board> findTop5ByOrderByCreatedAtDesc();
+
+    @Query("select b from Board b where b.id IN :boardIds order by b.views desc, b.createdAt desc")
+    List<Board> findByIdInOrderByViewsDescCreatedAtDesc(@Param("boardIds") List<Long> boardIds);
+
+    List<Board> findByIdIn(List<Long> boardIds);
 }
