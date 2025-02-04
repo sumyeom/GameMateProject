@@ -28,12 +28,6 @@ public class Coupon extends BaseEntity {
     private Integer discountAmount;
 
     @Column(nullable = false)
-    private Integer quantity;
-
-    @Column(nullable = false)
-    private Integer issuedQuantity = 0;
-
-    @Column(nullable = false)
     private LocalDateTime startAt;
 
     @Column(nullable = false)
@@ -42,11 +36,10 @@ public class Coupon extends BaseEntity {
     @OneToMany(mappedBy = "coupon")
     private List<UserCoupon> userCoupons = new ArrayList<>();
 
-    public Coupon(String code, String name, Integer discountAmount, Integer quantity, LocalDateTime startAt, LocalDateTime expiredAt) {
+    public Coupon(String code, String name, Integer discountAmount, LocalDateTime startAt, LocalDateTime expiredAt) {
         this.code = code;
         this.name = name;
         this.discountAmount = discountAmount;
-        this.quantity = quantity;
         this.startAt = startAt;
         this.expiredAt = expiredAt;
     }
@@ -54,14 +47,6 @@ public class Coupon extends BaseEntity {
     public boolean isIssuable() {
         LocalDateTime now = LocalDateTime.now();
         return now.isAfter(startAt) && now.isBefore(expiredAt);
-    }
-
-    public boolean isExhausted() {
-        return issuedQuantity >= quantity;
-    }
-
-    public void incrementIssuedQuantity() {
-        this.issuedQuantity++;
     }
 }
 

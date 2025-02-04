@@ -12,6 +12,7 @@ import com.example.gamemate.domain.user.enums.Role;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,10 @@ import java.util.stream.Collectors;
 public class CouponService {
     private final CouponRepository couponRepository;
     private final UserCouponRepository userCouponRepository;
+    private final StringRedisTemplate redisTemplate;
+
+    private static final String COUPON_QUANTITY_KEY = "coupon:%d:quantity";
+    private static final String COUPON_ISSUED_COUNT_KEY = "coupon:%d:issued";
 
     public CouponCreateResponseDto createCoupon(CouponCreateRequestDto requestDto, User loginUser) {
         // 관리자 권한 체크
@@ -41,8 +46,14 @@ public class CouponService {
         validateCouponDates(requestDto.getStartAt(), requestDto.getExpiredAt());
 
         // 쿠폰 생성
-        Coupon coupon = new Coupon(requestDto.getCode(), requestDto.getName(), requestDto.getDiscountAmount(), requestDto.getQuantity(), requestDto.getStartAt(), requestDto.getExpiredAt());
+        Coupon coupon = new Coupon(requestDto.getCode(), requestDto.getName(), requestDto.getDiscountAmount(), requestDto.getStartAt(), requestDto.getExpiredAt());
         Coupon savedCoupon = couponRepository.save(coupon);
+
+        // Redis에 쿠폰 수량 정보 저장
+        String quantityKey = String.format(COUPON_QUANTITY_KEY, savedCoupon.getId());
+        String issuedKey = String.format(COUPON_ISSUED_COUNT_KEY, savedCoupon.getId());
+        redisTemplate.opsForValue().set(quantityKey, String.valueOf(requestDto.getQuantity()));
+        redisTemplate.opsForValue().set(issuedKey, "0");
 
         return new CouponCreateResponseDto(savedCoupon);
     }
@@ -56,18 +67,25 @@ public class CouponService {
             throw new ApiException(ErrorCode.COUPON_NOT_ISSUABLE);
         }
 
-        // 수량 체크
-        if (coupon.isExhausted()) {
-            throw new ApiException(ErrorCode.COUPON_EXHAUSTED);
-        }
-
         // 중복 발급 체크
         if (userCouponRepository.existsByUserIdAndCouponId(loginUser.getId(), couponId)) {
             throw new ApiException(ErrorCode.COUPON_ALREADY_ISSUED);
         }
 
+        // Redis에서 수량 확인 및 증가
+        String quantityKey = String.format(COUPON_QUANTITY_KEY, couponId);
+        String issuedKey = String.format(COUPON_ISSUED_COUNT_KEY, couponId);
+
+        Long issuedCount = redisTemplate.opsForValue().increment(issuedKey);
+        String quantityStr = redisTemplate.opsForValue().get(quantityKey);
+        int quantity = Integer.parseInt(quantityStr);
+
+        if (issuedCount > quantity) {
+            redisTemplate.opsForValue().decrement(issuedKey);
+            throw new ApiException(ErrorCode.COUPON_EXHAUSTED);
+        }
+
         // 쿠폰 발급
-        coupon.incrementIssuedQuantity();
         UserCoupon userCoupon = new UserCoupon(loginUser, coupon);
         userCoupon.updateIsUsed(false);
 
