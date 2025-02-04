@@ -78,7 +78,6 @@ public class CouponService {
         return new CouponIssueResponseDto(savedUserCoupon);
     }
 
-
     @Transactional(readOnly = true)
     public List<CouponIssueResponseDto> findMyCoupons(User loginUser) {
         List<UserCoupon> userCoupons = userCouponRepository.findByUserId(loginUser.getId());
