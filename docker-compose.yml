@@ -1,6 +1,6 @@
 services:
   app:
-    image: "${DOCKERHUB_USERNAME}/${DOCKER_IMAGE_TAG_NAME}:latest"
+    image: "863518453426.dkr.ecr.ap-northeast-2.amazonaws.com/game_mate:latest"
     platform: linux/amd64
     container_name: app
     ports:
