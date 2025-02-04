@@ -5,7 +5,6 @@ import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.global.common.BaseCreatedEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
 
 @Entity
 @Getter
@@ -17,28 +16,32 @@ public class Notification extends BaseCreatedEntity {
     @Column
     private String content;
 
+    @Column
+    private String relatedUrl;
+
     @Enumerated(EnumType.STRING)
     @Column
     private NotificationType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "receiver_id")
+    private User receiver;
 
     @Column
-    private boolean sentStatus;
+    private boolean isRead;
 
     public Notification() {
     }
 
-    public Notification(String content, NotificationType type, User user) {
+    public Notification(String content, String relatedUrl, NotificationType type, User receiver) {
         this.content = content;
+        this.relatedUrl = relatedUrl;
         this.type = type;
-        this.user = user;
-        this.sentStatus = false;
+        this.receiver = receiver;
+        this.isRead = false;
     }
 
-    public void updateSentStatus(boolean sentStatus) {
-        this.sentStatus = sentStatus;
+    public void updateIsRead(boolean isRead) {
+        this.isRead = isRead;
     }
 }
