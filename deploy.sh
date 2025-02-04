@@ -14,8 +14,8 @@ aws ecr get-login-password --region $REGION | docker login --username AWS --pass
 docker pull $ECR_URI:$IMAGE_TAG
 
 # 기존 컨테이너 중지 및 삭제
-docker stop spring-app || true
-docker rm spring-app || true
+docker stop app || true
+docker rm app || true
 
 # docker-compose 실행 (환경변수 적용)
 docker-compose -f /home/ubuntu/docker-compose.yml up -d
