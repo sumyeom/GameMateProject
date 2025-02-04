@@ -22,8 +22,6 @@ services:
       EMAIL_APP_PASSWORD: "${EMAIL_APP_PASSWORD}"
       GEMINI_URL: "${GEMINI_URL}"
       GEMINI_KEY: "${GEMINI_KEY}"
-    env_file:
-        - .env
     depends_on:
       - db
 
@@ -36,8 +34,6 @@ services:
       - db-data:/var/lib/mysql
     ports:
       - "3306:3306"
-    env_file:
-      - .env
 
 
 volumes:
