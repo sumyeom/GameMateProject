@@ -18,7 +18,7 @@ public class Board extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long boardId;
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     private BoardCategory category;
@@ -29,7 +29,7 @@ public class Board extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
-    private final int views = 0;
+    private int views = 0;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -51,4 +51,7 @@ public class Board extends BaseEntity {
         this.content = content;
     }
 
+    public void updateViewCount(int views){
+        this.views=views;
+    }
 }

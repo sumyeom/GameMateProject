@@ -12,7 +12,7 @@ public class BoardLikeResponseDto {
 
 
     public BoardLikeResponseDto(BoardLike boardLike){
-        this.boardId = boardLike.getBoard().getBoardId();
+        this.boardId = boardLike.getBoard().getId();
         this.status = boardLike.getStatus();
         this.userId = boardLike.getUser().getId();
     }

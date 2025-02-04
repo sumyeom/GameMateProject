@@ -57,11 +57,13 @@ public enum ErrorCode {
     RECOMMENDATION_NOT_FOUND(HttpStatus.NOT_FOUND,"RECOMMENDATION_NOT_FOUND","추천 게임을 찾을 수 없습니다."),
     MATCH_USER_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "MATCH_USER_INFO_NOT_FOUND", "매칭을 위해 입력된 회원 정보를 찾을 수 없습니다."),
     MATCH_USER_INFO_NOT_WRITTEN(HttpStatus.NOT_FOUND, "MATCH_USER_INFO_NOT_WRITTEN", "매칭을 위해 회원 정보 입력은 필수입니다."),
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION_NOT_FOUND", "알림을 찾을수 없습니다."),
     COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "COUPON_NOT_FOUND", "쿠폰을 찾을 수 없습니다."),
 
     /* 500 서버 오류 */
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"INTERNAL_SERVER_ERROR","서버 오류 입니다."),
-    EMAIL_SEND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "EMAIL_SEND_ERROR", "이메일 전송에 문제가 발생했습니다.");
+    EMAIL_SEND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "EMAIL_SEND_ERROR", "이메일 전송에 문제가 발생했습니다."),
+    COUPON_ISSUE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "COUPON_ISSUE_FAILED", "쿠폰 발급에 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
 
     private final HttpStatus status;
     private final String code;

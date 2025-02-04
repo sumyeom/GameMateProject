@@ -14,8 +14,11 @@ import com.example.gamemate.domain.review.repository.ReviewRepository;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.domain.user.repository.UserRepository;
 import com.example.gamemate.global.constant.ErrorCode;
+import com.example.gamemate.global.eventListener.event.BoardLikeCreatedEvent;
+import com.example.gamemate.global.eventListener.event.ReviewLikeCreatedEvent;
 import com.example.gamemate.global.exception.ApiException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +30,7 @@ public class LikeService {
     private final ReviewRepository reviewRepository;
     private final BoardLikeRepository boardLikeRepository;
     private final BoardRepository boardRepository;
-    private final NotificationService notificationService;
+    private final ApplicationEventPublisher publisher;
 
     //리뷰 좋아요 생성 취소 수정
     @Transactional
@@ -44,7 +47,7 @@ public class LikeService {
 
         if (reviewLike.getId() == null) {
             reviewLikeRepository.save(reviewLike);
-            notificationService.createNotification(reviewLike.getReview().getUser(), NotificationType.NEW_LIKE);
+            publisher.publishEvent(new ReviewLikeCreatedEvent(this, reviewLike));
         } else {
             reviewLike.changeStatus(status);
         }
@@ -67,7 +70,7 @@ public class LikeService {
 
         if (boardLike.getId() == null) {
             boardLikeRepository.save(boardLike);
-            notificationService.createNotification(boardLike.getBoard().getUser(), NotificationType.NEW_LIKE);
+            publisher.publishEvent(new BoardLikeCreatedEvent(this, boardLike));
         } else {
             boardLike.changeStatus(status);
         }
@@ -79,7 +82,7 @@ public class LikeService {
 
         boardRepository.findById(boardId)
                 .orElseThrow(() -> new ApiException(ErrorCode.BOARD_NOT_FOUND));
-        return boardLikeRepository.countByBoardBoardIdAndStatus(boardId, LikeStatus.LIKE);
+        return boardLikeRepository.countByBoardIdAndStatus(boardId, LikeStatus.LIKE);
     }
 
     public Long getReivewLikeCount(Long reviewId) {

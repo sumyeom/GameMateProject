@@ -19,10 +19,12 @@ public class ReplyController {
     private final ReplyService replyService;
 
     /**
-     * 대댓글 생성 API
-     * @param commentId
-     * @param requestDto
-     * @return
+     * 대댓글 생성 API 입니다.
+     *
+     * @param commentId 댓글 식별자
+     * @param requestDto 대댓글 생성 Dto
+     * @param customUserDetails 인증된 사용자
+     * @return 대댓글 생성 ResponseEntity
      */
     @PostMapping
     public ResponseEntity<ReplyResponseDto> createReply(
@@ -35,10 +37,12 @@ public class ReplyController {
     }
 
     /**
-     * 대댓글 수정 API
-     * @param id
-     * @param requestDto
-     * @return
+     * 대댓글 수정 API 입니다.
+     *
+     * @param id 대댓글 식별자
+     * @param requestDto 업데이트할 대댓글 Dto
+     * @param customUserDetails 인증된 사용자
+     * @return Void
      */
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateReply(
@@ -51,9 +55,11 @@ public class ReplyController {
     }
 
     /**
-     * 대댓글 삭제 API
-     * @param id
-     * @return
+     * 대댓글 삭제 API 입니다.
+     *
+     * @param id 대댓글 식별자
+     * @param customUserDetails 인증된 사용자
+     * @return Void
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReply(
