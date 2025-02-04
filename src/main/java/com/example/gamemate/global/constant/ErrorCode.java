@@ -29,6 +29,13 @@ public enum ErrorCode {
     FILE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST,"FILE_SIZE_EXCEEDED","파일 크기가 초과되었습니다."),
     SOCIAL_PASSWORD_ALREADY_SET(HttpStatus.BAD_REQUEST, "SOCIAL_PASSWORD_ALREADY_SET", "이미 비밀번호가 설정되었습니다."),
     SOCIAL_PASSWORD_REQUIRED(HttpStatus.BAD_REQUEST, "SOCIAL_PASSWORD_REQUIRED", "소셜 로그인 계정은 비밀번호 설정이 필요합니다."),
+    COUPON_CODE_DUPLICATED(HttpStatus.BAD_REQUEST, "COUPON_CODE_DUPLICATED", "이미 존재하는 쿠폰 코드입니다."),
+    INVALID_COUPON_DATE(HttpStatus.BAD_REQUEST, "INVALID_COUPON_DATE", "쿠폰의 사용 기간이 올바르지 않습니다."),
+    COUPON_EXHAUSTED(HttpStatus.BAD_REQUEST, "COUPON_EXHAUSTED", "쿠폰이 모두 소진되었습니다."),
+    COUPON_ALREADY_ISSUED(HttpStatus.BAD_REQUEST, "COUPON_ALREADY_ISSUED", "이미 발급된 쿠폰입니다."),
+    COUPON_NOT_ISSUABLE(HttpStatus.BAD_REQUEST, "COUPON_NOT_ISSUABLE", "쿠폰 발급 기간이 아닙니다."),
+    COUPON_ALREADY_USED(HttpStatus.BAD_REQUEST, "COUPON_ALREADY_USED", "이미 사용된 쿠폰입니다."),
+    COUPON_EXPIRED(HttpStatus.BAD_REQUEST, "COUPON_EXPIRED", "쿠폰의 유효 기간이 만료되었습니다."),
 
     /* 401 인증 오류 */
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "로그인이 필요합니다."),
@@ -51,10 +58,12 @@ public enum ErrorCode {
     MATCH_USER_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "MATCH_USER_INFO_NOT_FOUND", "매칭을 위해 입력된 회원 정보를 찾을 수 없습니다."),
     MATCH_USER_INFO_NOT_WRITTEN(HttpStatus.NOT_FOUND, "MATCH_USER_INFO_NOT_WRITTEN", "매칭을 위해 회원 정보 입력은 필수입니다."),
     NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION_NOT_FOUND", "알림을 찾을수 없습니다."),
+    COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "COUPON_NOT_FOUND", "쿠폰을 찾을 수 없습니다."),
 
     /* 500 서버 오류 */
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"INTERNAL_SERVER_ERROR","서버 오류 입니다."),
-    EMAIL_SEND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "EMAIL_SEND_ERROR", "이메일 전송에 문제가 발생했습니다.");
+    EMAIL_SEND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "EMAIL_SEND_ERROR", "이메일 전송에 문제가 발생했습니다."),
+    COUPON_ISSUE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "COUPON_ISSUE_FAILED", "쿠폰 발급에 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
 
     private final HttpStatus status;
     private final String code;
