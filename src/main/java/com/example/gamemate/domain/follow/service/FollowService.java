@@ -123,7 +123,6 @@ public class FollowService {
      * @return 팔로워 목록을 담은 List<FollowFindResponseDto>
      */
     public List<FollowFindResponseDto> findFollowers(String email) {
-
         User followee = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
@@ -131,17 +130,7 @@ public class FollowService {
             throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
         } // 확인할 상대방이 탈퇴한 회원일때 예외처리
 
-        List<Follow> followListByFollowee = followRepository.findByFollowee(followee);
-
-        List<User> followersByFollowee = followListByFollowee.stream()
-                .map(Follow::getFollower)
-                .filter(follower -> follower.getUserStatus() != UserStatus.WITHDRAW)
-                .toList();
-
-        return followersByFollowee
-                .stream()
-                .map(FollowFindResponseDto::toDto)
-                .toList();
+        return followRepository.findFollowersByFolloweeEmail(email);
     }
 
     /**
@@ -150,7 +139,6 @@ public class FollowService {
      * @return 팔로잉 목록을 담은 List<FollowFindResponseDto>
      */
     public List<FollowFindResponseDto> findFollowing(String email) {
-
         User follower = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
@@ -158,16 +146,6 @@ public class FollowService {
             throw new ApiException(ErrorCode.IS_WITHDRAWN_USER);
         } // 확인할 상대방이 탈퇴한 회원일때 예외처리
 
-        List<Follow> followListByFollower = followRepository.findByFollower(follower);
-
-        List<User> followingByFollower = followListByFollower.stream()
-                .map(Follow::getFollowee)
-                .filter(followee -> followee.getUserStatus() != UserStatus.WITHDRAW)
-                .toList();
-
-        return followingByFollower
-                .stream()
-                .map(FollowFindResponseDto::toDto)
-                .toList();
+        return followRepository.findFollowingByFollowerEmail(email);
     }
 }
