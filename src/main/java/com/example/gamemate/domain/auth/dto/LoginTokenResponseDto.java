@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class LocalLoginResponseDto {
+public class LoginTokenResponseDto {
 
     private final String accessToken;
 
