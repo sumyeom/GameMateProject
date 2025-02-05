@@ -12,6 +12,8 @@ import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.stream.StreamInfo;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -25,17 +27,28 @@ import java.util.*;
  * 알림을 처리하는 서비스 클래스입니다.
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class NotificationService {
+
+    private static final String STREAM_KEY = "notification_stream";
+    private static final String GROUP_NAME = "notification-group";
+    private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
 
     private final NotificationRepository notificationRepository;
     private final EmitterRepository emitterRepository;
     private final RedisStreamService redisStreamService;
     private final RedisTemplate<String, Object> redisTemplate;
-    private static final String STREAM_KEY = "notification_stream";
-    private static final String GROUP_NAME = "notification-group";
-    private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
+
+    public NotificationService(
+            NotificationRepository notificationRepository,
+            EmitterRepository emitterRepository,
+            RedisStreamService redisStreamService,
+            @Qualifier("notificationRedisTemplate") RedisTemplate<String, Object> redisTemplate) {
+        this.notificationRepository = notificationRepository;
+        this.emitterRepository = emitterRepository;
+        this.redisStreamService = redisStreamService;
+        this.redisTemplate = redisTemplate;
+    }
 
     /**
      * 레디스 스트림의 스트림그룹을 생성합니다.

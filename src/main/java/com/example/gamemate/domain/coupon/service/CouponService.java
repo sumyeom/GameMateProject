@@ -12,6 +12,7 @@ import com.example.gamemate.domain.user.enums.Role;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,16 +23,21 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
 public class CouponService {
+
+    private static final String COUPON_STOCK_KEY = "coupon:%d:stock";
+
     private final CouponRepository couponRepository;
     private final UserCouponRepository userCouponRepository;
     private final StringRedisTemplate redisTemplate;
 
-    private static final String COUPON_STOCK_KEY = "coupon:%d:stock";
-
-    private String getCouponStockKey(Long couponId) {
-        return String.format(COUPON_STOCK_KEY, couponId);
+    public CouponService(
+            CouponRepository couponRepository,
+            UserCouponRepository userCouponRepository,
+            @Qualifier("couponRedisTemplate") StringRedisTemplate redisTemplate) {
+        this.couponRepository = couponRepository;
+        this.userCouponRepository = userCouponRepository;
+        this.redisTemplate = redisTemplate;
     }
 
     public CouponCreateResponseDto createCoupon(CouponCreateRequestDto requestDto, User loginUser) {
@@ -57,6 +63,12 @@ public class CouponService {
                 String.valueOf(requestDto.getQuantity()));
 
         return new CouponCreateResponseDto(savedCoupon);
+    }
+
+    private void validateCouponDates(LocalDateTime startAt, LocalDateTime expiredAt) {
+        if (startAt.isAfter(expiredAt)) {
+            throw new ApiException(ErrorCode.INVALID_COUPON_DATE);
+        }
     }
 
     public CouponIssueResponseDto issueCoupon(Long couponId, User loginUser) {
@@ -131,9 +143,7 @@ public class CouponService {
         userCoupon.updateUsedAt();
     }
 
-    private void validateCouponDates(LocalDateTime startAt, LocalDateTime expiredAt) {
-        if (startAt.isAfter(expiredAt)) {
-            throw new ApiException(ErrorCode.INVALID_COUPON_DATE);
-        }
+    private String getCouponStockKey(Long couponId) {
+        return String.format(COUPON_STOCK_KEY, couponId);
     }
 }

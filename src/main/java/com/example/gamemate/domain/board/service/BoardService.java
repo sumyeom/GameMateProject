@@ -14,11 +14,13 @@ import com.example.gamemate.global.exception.ApiException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,14 +34,22 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class BoardService {
 
     private final BoardRepository boardRepository;
     private final String VIEW_COUNT_KEY = "board:view:";
     private final String VIEW_RANKING_KEY = "board:ranking:";
-    private final RedisTemplate<String, String> redisTemplate;
+    private final StringRedisTemplate redisTemplate;
     private final HttpServletRequest request;
+
+    public BoardService(
+            BoardRepository boardRepository,
+            @Qualifier("viewCountRedisTemplate")StringRedisTemplate redisTemplate,
+            HttpServletRequest request) {
+        this.boardRepository = boardRepository;
+        this.redisTemplate = redisTemplate;
+        this.request = request;
+    }
 
     /**
      * 게시글 생성 메서드입니다.
