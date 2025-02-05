@@ -24,6 +24,7 @@ services:
       EMAIL_APP_PASSWORD: "${EMAIL_APP_PASSWORD}"
       GEMINI_URL: "${GEMINI_URL}"
       GEMINI_KEY: "${GEMINI_KEY}"
+      REDIS_HOST: "${REDIS_HOST}"
     depends_on:
       - db
 

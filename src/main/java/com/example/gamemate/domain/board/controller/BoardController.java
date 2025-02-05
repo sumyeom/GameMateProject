@@ -6,6 +6,7 @@ import com.example.gamemate.domain.board.dto.BoardFindAllResponseDto;
 import com.example.gamemate.domain.board.dto.BoardFindOneResponseDto;
 import com.example.gamemate.domain.board.enums.BoardCategory;
 import com.example.gamemate.domain.board.service.BoardService;
+import com.example.gamemate.domain.board.service.BoardViewService;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.global.config.auth.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -27,6 +28,7 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
+    private final BoardViewService boardViewService;
 
     /**
      * 게시글 생성 API 입니다.
@@ -62,7 +64,7 @@ public class BoardController {
             boardCategory = BoardCategory.fromName(category);
         }
 
-        List<BoardFindAllResponseDto> dtos = boardService.findTopBoards(boardCategory);
+        List<BoardFindAllResponseDto> dtos = boardViewService.findTopBoards(boardCategory);
         if(dtos.isEmpty()){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }

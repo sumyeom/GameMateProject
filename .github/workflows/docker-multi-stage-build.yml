@@ -78,7 +78,7 @@ jobs:
           echo "EMAIL_APP_PASSWORD=${{ secrets.EMAIL_APP_PASSWORD }}" >> .env
           echo "GEMINI_URL=${{ secrets.GEMINI_URL }}" >> .env
           echo "GEMINI_KEY=${{ secrets.GEMINI_KEY }}" >> .env
-
+          echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
       - name: Upload .env file to EC2
         uses: appleboy/scp-action@master
         with:
