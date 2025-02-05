@@ -63,6 +63,8 @@ jobs:
           echo "MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}" >> .env
           echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env
           echo "MYSQL_URL=${{ secrets.MYSQL_URL }}" >> .env
+          echo "MYSQL_PROD_URL=${{ secrets.MYSQL_PROD_URL }}" >> .env
+          echo "MYSQL_DEV_URL=${{ secrets.MYSQL_DEV_URL }}" >> .env
           echo "JPA_HIBERNATE_DDL=${{ secrets.JPA_HIBERNATE_DDL }}" >> .env
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
           echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> .env
