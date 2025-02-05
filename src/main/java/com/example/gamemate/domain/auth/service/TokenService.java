@@ -6,6 +6,7 @@ import com.example.gamemate.global.provider.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,13 +15,21 @@ import org.springframework.util.StringUtils;
 import java.time.Duration;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class TokenService {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
     private final StringRedisTemplate tokenBlacklistRedisTemplate;
+
+    public TokenService(
+            JwtTokenProvider jwtTokenProvider,
+            RefreshTokenService refreshTokenService,
+            @Qualifier("blacklistRedisTemplate") StringRedisTemplate tokenBlacklistRedisTemplate) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.refreshTokenService = refreshTokenService;
+        this.tokenBlacklistRedisTemplate = tokenBlacklistRedisTemplate;
+    }
 
     public LoginTokenResponseDto generateLoginTokens(User user, HttpServletResponse response) {
         String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRole());

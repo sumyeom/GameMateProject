@@ -3,6 +3,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,13 +11,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class RefreshTokenService {
 
     private final StringRedisTemplate refreshTokenRedisTemplate;
     private final Duration REFRESH_TOKEN_TTL = Duration.ofDays(7);
     private int refreshTokenMaxAge = 60 * 60 * 24 * 7; // 7일
+
+    public RefreshTokenService(
+            @Qualifier("refreshTokenRedisTemplate") StringRedisTemplate refreshTokenRedisTemplate
+            ) {
+        this.refreshTokenRedisTemplate = refreshTokenRedisTemplate;
+    }
 
     public void saveRefreshToken(String email, String refreshToken, HttpServletResponse response) {
         String key = getKey(email);
