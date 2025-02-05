@@ -3,7 +3,6 @@ package com.example.gamemate.domain.notification.service;
 import com.example.gamemate.domain.notification.dto.NotificationResponseDto;
 import com.example.gamemate.domain.notification.repository.EmitterRepository;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.stream.*;
@@ -32,7 +31,7 @@ public class RedisStreamService {
     private final EmitterRepository emitterRepository;
 
     public RedisStreamService(
-            @Qualifier("notificationRedisTemplate") RedisTemplate<String, Object> redisTemplate,
+            @Qualifier("redisTemplate") RedisTemplate<String, Object> redisTemplate,
             EmitterRepository emitterRepository) {
         this.redisTemplate = redisTemplate;
         this.emitterRepository = emitterRepository;

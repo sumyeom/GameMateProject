@@ -1,17 +1,15 @@
 package com.example.gamemate.global.config;
 
-import org.redisson.Redisson;
-import org.redisson.api.RedissonClient;
-import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
@@ -26,6 +24,7 @@ public class RedisConfig {
     // LettuceConnectionFactory를 DB별로 하나씩 생성하여 Bean으로 관리
     // DB 0: 알림
     @Bean
+    @Primary
     public LettuceConnectionFactory notificationConnectionFactory() {
         return createLettuceConnectionFactory(0);
     }
@@ -67,14 +66,15 @@ public class RedisConfig {
 
     // 알림 RedisTemplate (DB 0)
     @Bean
-    public RedisTemplate<String, Object> notificationRedisTemplate(
+    @Primary
+    public RedisTemplate<String, Object> redisTemplate(
             @Qualifier("notificationConnectionFactory") LettuceConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(connectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
         return redisTemplate;
     }
 

@@ -10,9 +10,7 @@ import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.stream.StreamInfo;
 import org.springframework.data.redis.connection.stream.StreamRecords;
@@ -43,7 +41,7 @@ public class NotificationService {
             NotificationRepository notificationRepository,
             EmitterRepository emitterRepository,
             RedisStreamService redisStreamService,
-            @Qualifier("notificationRedisTemplate") RedisTemplate<String, Object> redisTemplate) {
+            @Qualifier("redisTemplate") RedisTemplate<String, Object> redisTemplate) {
         this.notificationRepository = notificationRepository;
         this.emitterRepository = emitterRepository;
         this.redisStreamService = redisStreamService;
