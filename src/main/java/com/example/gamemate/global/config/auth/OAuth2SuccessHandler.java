@@ -1,9 +1,8 @@
 package com.example.gamemate.global.config.auth;
 
+import com.example.gamemate.domain.auth.dto.LoginTokenResponseDto;
+import com.example.gamemate.domain.auth.service.TokenService;
 import com.example.gamemate.domain.user.entity.User;
-import com.example.gamemate.domain.user.repository.UserRepository;
-import com.example.gamemate.global.provider.JwtTokenProvider;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +20,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    private final JwtTokenProvider jwtTokenProvider;
-    private final UserRepository userRepository;
-    private int refreshTokenMaxAge = 60 * 60 * 24 * 3; //3일
+    private final TokenService tokenService;
 
     @Value("${oauth2.success.redirect-uri}")
     private String successRedirectUri;
@@ -42,23 +39,17 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         User user = userDetails.getUser();
 
         try {
-            String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRole());
-            String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail());
-
-            user.updateRefreshToken(refreshToken);
-            userRepository.save(user);
-
-            // 쿠키에 Refresh 토큰 저장
-            addRefreshTokenCookie(response, refreshToken);
+            // 토큰 생성 및 저장
+            LoginTokenResponseDto tokenDto = tokenService.generateLoginTokens(user, response);
 
             String targetUrl;
             if("OAUTH2_USER".equals(user.getPassword())) {
                 targetUrl = UriComponentsBuilder.fromUriString(passwordSetupRedirectUri)
-                        .queryParam("token", accessToken)
+                        .queryParam("token", tokenDto.getAccessToken())
                         .build(false).toUriString();
             } else {
                 targetUrl = UriComponentsBuilder.fromUriString(successRedirectUri)
-                        .queryParam("token", accessToken)
+                        .queryParam("token", tokenDto.getAccessToken())
                         .build(false).toUriString();
             }
 
@@ -67,14 +58,5 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         } catch (Exception e) {
             throw new IOException("OAuth2 인증 처리 중 오류가 발생했습니다.", e);
         }
-    }
-
-    private void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
-        Cookie cookie = new Cookie("refresh_token", refreshToken);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(refreshTokenMaxAge);
-        response.addCookie(cookie);
     }
 }

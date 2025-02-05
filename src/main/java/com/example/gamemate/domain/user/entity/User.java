@@ -43,8 +43,6 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
 
-    private String refreshToken;
-
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
 
@@ -70,7 +68,6 @@ public class User extends BaseEntity {
         this.role = Role.USER;
         this.isPremium = false;
         this.userStatus = UserStatus.ACTIVE;
-        this.refreshToken = null;
     }
 
     // OAuth용 생성자
@@ -96,14 +93,6 @@ public class User extends BaseEntity {
 
     public void updateUserStatus(UserStatus status) {
         this.userStatus = status;
-    }
-
-    public void updateRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
-
-    public void removeRefreshToken() {
-        this.refreshToken = null;
     }
 
     public void integrateOAuthProvider(AuthProvider provider, String providerId) {

@@ -11,11 +11,9 @@ import com.example.gamemate.global.provider.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
@@ -27,6 +25,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
+    private final RefreshTokenService refreshTokenService;
     private final JwtTokenProvider jwtTokenProvider;
     private final EmailService emailService;
 
@@ -57,7 +56,7 @@ public class AuthService {
         return new SignupResponseDto(savedUser);
     }
 
-    public LocalLoginResponseDto localLogin(LocalLoginRequestDto requestDto, HttpServletResponse response) {
+    public LoginTokenResponseDto localLogin(LocalLoginRequestDto requestDto, HttpServletResponse response) {
 
         User findUser = userRepository.findByEmail(requestDto.getEmail())
                 .orElseThrow(()-> new ApiException(ErrorCode.USER_NOT_FOUND));
@@ -96,37 +95,30 @@ public class AuthService {
         }
 
         String email = jwtTokenProvider.getEmailFromToken(refreshToken);
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(()-> new ApiException(ErrorCode.USER_NOT_FOUND));
+        String storedToken = refreshTokenService.getRefreshToken(email);
 
-        if(!refreshToken.equals(user.getRefreshToken())) {
+        if(!refreshToken.equals(storedToken)) {
             throw new ApiException(ErrorCode.INVALID_TOKEN);
         }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(()-> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         String newAccessToken = jwtTokenProvider.createAccessToken(email, user.getRole());
         return new TokenRefreshResponseDto(newAccessToken);
     }
 
     public void logout(User user, HttpServletRequest request, HttpServletResponse response) {
-        String accessToken = extractToken(request);
+        // 엑세스 토큰 블랙리스트 추가
+        String accessToken = tokenService.extractToken(request);
         if(accessToken != null) {
             tokenService.blacklistToken(accessToken);
         }
 
-        String refreshToken = tokenService.extractRefreshTokenFromCookie(request);
+        // 리프레시 토큰 처리
+        String refreshToken = refreshTokenService.extractRefreshTokenFromCookie(request);
         if(refreshToken != null) {
-            user.removeRefreshToken();
-            userRepository.save(user);
-            tokenService.removeRefreshTokenCookie(response);
+            refreshTokenService.removeRefreshToken(user.getEmail(), response);
         }
     }
-
-    private String extractToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
-    }
-
 }

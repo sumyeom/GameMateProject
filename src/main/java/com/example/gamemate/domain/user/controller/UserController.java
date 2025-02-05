@@ -90,7 +90,7 @@ public class UserController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        userService.withdrawUser(customUserDetails.getUser());
+        userService.withdrawUser(customUserDetails.getUser(), request, response);
         authService.logout(customUserDetails.getUser(), request, response);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
