@@ -12,7 +12,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 모든 히스토리를 가져와서 최신 코드 보장
 
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew
@@ -40,7 +42,7 @@ jobs:
           ECR_REPOSITORY: game_mate
           IMAGE_TAG: latest
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker build --no-cache -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
       # deploy.sh & docker-compose.yml을 EC2로 업로드
@@ -76,7 +78,7 @@ jobs:
           echo "EMAIL_APP_PASSWORD=${{ secrets.EMAIL_APP_PASSWORD }}" >> .env
           echo "GEMINI_URL=${{ secrets.GEMINI_URL }}" >> .env
           echo "GEMINI_KEY=${{ secrets.GEMINI_KEY }}" >> .env
-
+          echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
       - name: Upload .env file to EC2
         uses: appleboy/scp-action@master
         with:
