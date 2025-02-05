@@ -4,6 +4,7 @@ import com.example.gamemate.domain.coupon.entity.Coupon;
 import com.example.gamemate.domain.coupon.repository.CouponRepository;
 import com.example.gamemate.domain.coupon.repository.UserCouponRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -12,16 +13,21 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 public class CouponDataSynchronizer {
+
+    private static final String COUPON_STOCK_KEY = "coupon:%d:stock";
+
     private final CouponRepository couponRepository;
     private final UserCouponRepository userCouponRepository;
     private final StringRedisTemplate redisTemplate;
 
-    private static final String COUPON_STOCK_KEY = "coupon:%d:stock";
-
-    private String getCouponStockKey(Long couponId) {
-        return String.format(COUPON_STOCK_KEY, couponId);
+    public CouponDataSynchronizer(
+            CouponRepository couponRepository,
+            UserCouponRepository userCouponRepository,
+            @Qualifier("couponRedisTemplate") StringRedisTemplate redisTemplate) {
+        this.couponRepository = couponRepository;
+        this.userCouponRepository = userCouponRepository;
+        this.redisTemplate = redisTemplate;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -33,5 +39,10 @@ public class CouponDataSynchronizer {
             redisTemplate.opsForValue().set(getCouponStockKey(coupon.getId()),
                     String.valueOf(remainingStock));
         }
+    }
+
+
+    private String getCouponStockKey(Long couponId) {
+        return String.format(COUPON_STOCK_KEY, couponId);
     }
 }

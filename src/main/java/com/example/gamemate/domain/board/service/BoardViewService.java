@@ -9,7 +9,9 @@ import com.example.gamemate.global.exception.ApiException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,16 +24,23 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class BoardViewService {
 
     private final BoardRepository boardRepository;
     private final String VIEW_COUNT_KEY = "board:view:";
     private final String VIEW_RANKING_KEY = "board:ranking:";
-    private final RedisTemplate<String, String> redisTemplate;
+    private final StringRedisTemplate redisTemplate;
     private final HttpServletRequest request;
 
+    public BoardViewService(
+            BoardRepository boardRepository,
+            @Qualifier("viewCountRedisTemplate")StringRedisTemplate redisTemplate,
+            HttpServletRequest request) {
+        this.boardRepository = boardRepository;
+        this.redisTemplate = redisTemplate;
+        this.request = request;
+    }
 
     /**
      * 조회수 높은 게시글 조회 하는 메서드입니다.
