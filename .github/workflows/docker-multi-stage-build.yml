@@ -1,89 +1,101 @@
 name: docker multi-stage build
 
 on:
+  pull_request:
+    branches:
+      - develop
   push:
     branches:
-      - '**'
+      - develop
 
 jobs:
-  docker-build-and-push:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
+      - uses: actions/checkout@v4
         with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          file: ./Dockerfile
-          push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKER_IMAGE_TAG_NAME }}:latest
+          fetch-depth: 0  # 모든 히스토리를 가져와서 최신 코드 보장
 
-  deploy-to-ec2:
-    needs: docker-build-and-push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1.2.0
+      - name: Grant execute permission to gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build -x test
+
+      # AWS 인증 설정
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      # ECR 로그인
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v1
+        id: login-ecr
+
+      # Docker 이미지 빌드 및 ECR에 Push
+      - name: Build and Push Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: game_mate
+          IMAGE_TAG: latest
+        run: |
+          docker build --no-cache -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      # deploy.sh & docker-compose.yml을 EC2로 업로드
+      - name: Upload deploy script and docker-compose.yml to EC2
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
+          username: ubuntu
           key: ${{ secrets.EC2_KEY }}
+          source: "./deploy.sh, ./docker-compose.yml"
+          target: "/home/ubuntu/"
+
+      # .env 파일 생성 후 EC2로 전송
+      - name: Create and Upload .env file to EC2
+        run: |
+          echo "DOCKERHUB_USERNAME=${{ vars.DOCKERHUB_USERNAME }}" > .env
+          echo "DOCKER_IMAGE_TAG_NAME=${{ vars.DOCKER_IMAGE_TAG_NAME }}" >> .env
+          echo "MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}" >> .env
+          echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env
+          echo "MYSQL_URL=${{ secrets.MYSQL_URL }}" >> .env
+          echo "JPA_HIBERNATE_DDL=${{ secrets.JPA_HIBERNATE_DDL }}" >> .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> .env
+          echo "AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}" >> .env
+          echo "AWS_BUCKET=${{ secrets.AWS_BUCKET }}" >> .env
+          echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
+          echo "AWS_STACK_AUTO=${{ secrets.AWS_STACK_AUTO }}" >> .env
+          echo "OAUTH2_GOOGLE_CLIENT_ID=${{ secrets.OAUTH2_GOOGLE_CLIENT_ID }}" >> .env
+          echo "OAUTH2_GOOGLE_CLIENT_SECRET=${{ secrets.OAUTH2_GOOGLE_CLIENT_SECRET }}" >> .env
+          echo "OAUTH2_KAKAO_CLIENT_ID=${{ secrets.OAUTH2_KAKAO_CLIENT_ID }}" >> .env
+          echo "OAUTH2_KAKAO_CLIENT_SECRET=${{ secrets.OAUTH2_KAKAO_CLIENT_SECRET }}" >> .env
+          echo "EMAIL_USERNAME=${{ secrets.EMAIL_USERNAME }}" >> .env
+          echo "EMAIL_APP_PASSWORD=${{ secrets.EMAIL_APP_PASSWORD }}" >> .env
+          echo "GEMINI_URL=${{ secrets.GEMINI_URL }}" >> .env
+          echo "GEMINI_KEY=${{ secrets.GEMINI_KEY }}" >> .env
+
+      - name: Upload .env file to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          source: "./.env"
+          target: "/home/ubuntu/"
+
+      # EC2에서 deploy.sh 실행 (최신 Docker 이미지 가져와서 실행)
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+
           script: |
-            # 기존 컨테이너 정리
-            echo "Stopping and removing existing containers..."
-            sudo docker-compose down || true
-
-            # docker-compose.yml 파일 생성
-            echo "Creating docker-compose.yml..."
-            cat <<EOF > docker-compose.yml
-            services:
-              app:
-                image: "${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKER_IMAGE_TAG_NAME }}:latest"
-                platform: linux/amd64
-                container_name: app
-                ports:
-                  - "8080:8080"
-                environment:
-                  MYSQL_USERNAME: "${{ secrets.MYSQL_USERNAME }}"
-                  MYSQL_PASSWORD: "${{ secrets.MYSQL_PASSWORD }}"
-                  MYSQL_URL: "${{ secrets.MYSQL_URL }}"
-                  JPA_HIBERNATE_DDL: "${{ secrets.JPA_HIBERNATE_DDL }}"
-                  JWT_SECRET: "${{ secrets.JWT_SECRET }}"
-                  YOUR_ACCESS_KEY: "${{ secrets.YOUR_ACCESS_KEY }}"
-                  YOUR_SECRET_KEY: "${{ secrets.YOUR_SECRET_KEY }}"
-                  YOUR_BUCKET_NAME: "${{ secrets.YOUR_BUCKET_NAME }}"
-                  OAUTH2_GOOGLE_CLIENT_ID: "${{ secrets.OAUTH2_GOOGLE_CLIENT_ID }}"
-                  OAUTH2_GOOGLE_CLIENT_SECRET: "${{ secrets.OAUTH2_GOOGLE_CLIENT_SECRET }}"
-                  OAUTH2_KAKAO_CLIENT_ID: "${{ secrets.OAUTH2_KAKAO_CLIENT_ID }}"
-                  OAUTH2_KAKAO_CLIENT_SECRET: "${{ secrets.OAUTH2_KAKAO_CLIENT_SECRET }}"
-                  EMAIL_USERNAME: "${{ secrets.EMAIL_USERNAME }}"
-                  EMAIL_APP_PASSWORD: "${{ secrets.EMAIL_APP_PASSWORD }}"
-                  GEMINI_URL: "${{ secrets.GEMINI_URL }}"
-                  GEMINI_KEY: "${{ secrets.GEMINI_KEY }}"
-                depends_on:
-                  - db
-
-              db:
-                image: mysql:8.0
-                container_name: db
-                environment:
-                  MYSQL_ROOT_PASSWORD: "${{ secrets.MYSQL_PASSWORD }}"
-                volumes:
-                  - db-data:/var/lib/mysql
-                ports:
-                  - "3306:3306"
-
-            volumes:
-              db-data:
-            EOF
-
-            # docker-compose 실행
-            echo "Starting services with docker-compose..."
-            sudo docker-compose up -d
+            chmod +x /home/ubuntu/deploy.sh
+            /home/ubuntu/deploy.sh

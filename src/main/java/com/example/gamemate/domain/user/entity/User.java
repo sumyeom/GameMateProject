@@ -1,5 +1,6 @@
 package com.example.gamemate.domain.user.entity;
 
+import com.example.gamemate.domain.coupon.entity.UserCoupon;
 import com.example.gamemate.domain.follow.entity.Follow;
 import com.example.gamemate.domain.user.enums.AuthProvider;
 import com.example.gamemate.global.common.BaseEntity;
@@ -9,6 +10,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -19,7 +21,6 @@ public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -54,6 +55,9 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "followee")
     private List<Follow> followerList;
+
+    @OneToMany(mappedBy = "user")
+    private List<UserCoupon> userCoupons = new ArrayList<>();
 
     // 이메일 로그인용 생성자
     public User(String email, String name, String nickname, String password) {
