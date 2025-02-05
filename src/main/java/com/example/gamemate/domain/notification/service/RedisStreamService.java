@@ -3,8 +3,8 @@ package com.example.gamemate.domain.notification.service;
 import com.example.gamemate.domain.notification.dto.NotificationResponseDto;
 import com.example.gamemate.domain.notification.repository.EmitterRepository;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,18 +16,26 @@ import java.time.Duration;
 import java.util.*;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class RedisStreamService {
-    private final RedisTemplate<String, Object> redisTemplate;
-    private final EmitterRepository emitterRepository;
 
     private static final String STREAM_KEY = "notification_stream";
     private static final String GROUP_NAME = "notification-group";
+
     private static final String CONSUMER_PREFIX = "consumer";
     private static final int BATCH_SIZE = 100;
     private static final Duration POLL_TIMEOUT = Duration.ofMillis(100);
     private static final int MAX_STREAM_LENGTH = 1000;
+
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final EmitterRepository emitterRepository;
+
+    public RedisStreamService(
+            @Qualifier("notificationRedisTemplate") RedisTemplate<String, Object> redisTemplate,
+            EmitterRepository emitterRepository) {
+        this.redisTemplate = redisTemplate;
+        this.emitterRepository = emitterRepository;
+    }
 
     @PostConstruct
     public void init() {
