@@ -67,7 +67,7 @@ public class RedisConfig {
     // 알림 RedisTemplate (DB 0)
     @Bean
     @Primary
-    public RedisTemplate<String, Object> redisTemplate(
+    public RedisTemplate<String, Object> notificationRedisTemplate(
             @Qualifier("notificationConnectionFactory") LettuceConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(connectionFactory);

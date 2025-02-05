@@ -41,7 +41,7 @@ public class NotificationService {
             NotificationRepository notificationRepository,
             EmitterRepository emitterRepository,
             RedisStreamService redisStreamService,
-            @Qualifier("redisTemplate") RedisTemplate<String, Object> redisTemplate) {
+            @Qualifier("notificationRedisTemplate") RedisTemplate<String, Object> redisTemplate) {
         this.notificationRepository = notificationRepository;
         this.emitterRepository = emitterRepository;
         this.redisStreamService = redisStreamService;

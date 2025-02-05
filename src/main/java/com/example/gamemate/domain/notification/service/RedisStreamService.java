@@ -31,7 +31,7 @@ public class RedisStreamService {
     private final EmitterRepository emitterRepository;
 
     public RedisStreamService(
-            @Qualifier("redisTemplate") RedisTemplate<String, Object> redisTemplate,
+            @Qualifier("notificationRedisTemplate") RedisTemplate<String, Object> redisTemplate,
             EmitterRepository emitterRepository) {
         this.redisTemplate = redisTemplate;
         this.emitterRepository = emitterRepository;
