@@ -113,11 +113,7 @@ public class NotificationService {
      */
     @Transactional
     public void readAllNotification(User loginUser) {
-        List<Notification> unreadNotificationList = notificationRepository.findAllByReceiverIdAndIsRead(loginUser.getId(), false);
-
-        for (Notification notification : unreadNotificationList) {
-            notification.updateIsRead(true);
-        }
+        notificationRepository.updateUnreadNotificationToRead(loginUser.getId());
     }
 
     /**
