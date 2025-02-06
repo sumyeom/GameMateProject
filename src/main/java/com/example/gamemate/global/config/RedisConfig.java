@@ -47,6 +47,7 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory notificationConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
+        config.setHostName(redisHost);
         config.setDatabase(1);
         return new LettuceConnectionFactory(config);
     }
@@ -55,6 +56,7 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory viewCountConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
+        config.setHostName(redisHost);
         config.setDatabase(2);
         return new LettuceConnectionFactory(config);
     }
@@ -63,6 +65,7 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory refreshTokenConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
+        config.setHostName(redisHost);
         config.setDatabase(3);
         return new LettuceConnectionFactory(config);
     }
@@ -71,6 +74,7 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory blacklistConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
+        config.setHostName(redisHost);
         config.setDatabase(4);
         return new LettuceConnectionFactory(config);
     }
