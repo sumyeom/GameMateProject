@@ -1,5 +1,8 @@
 package com.example.gamemate.global.config;
 
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -109,9 +112,13 @@ public class RedisConfig {
         return new StringRedisTemplate(blacklistConnectionFactory());
     }
 
-    // 쿠폰 RedisTemplate (DB 5)
+    // 쿠폰 RedissonClient (DB 5)
     @Bean
-    public StringRedisTemplate couponRedisTemplate() {
-        return new StringRedisTemplate(couponConnectionFactory());
+    public RedissonClient redissonClient() {
+        Config config = new Config();
+        config.useSingleServer()
+                .setAddress("redis://127.0.0.1:6379")
+                .setDatabase(5);
+        return Redisson.create(config);
     }
 }
