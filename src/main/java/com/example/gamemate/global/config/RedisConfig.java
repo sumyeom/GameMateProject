@@ -113,7 +113,7 @@ public class RedisConfig {
     public RedissonClient redissonClient() {
         Config config = new Config();
         config.useSingleServer()
-                .setAddress("redis://127.0.0.1:6379")
+                .setAddress("redis://" + redisHost + ":6379")
                 .setDatabase(5);
         return Redisson.create(config);
     }
