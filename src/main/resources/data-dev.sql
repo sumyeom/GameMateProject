@@ -1,5 +1,5 @@
 -- User 테이블 데이터
-INSERT INTO user (
+INSERT INTO `user` (
     email,
     name,
     nickname,

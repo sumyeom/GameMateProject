@@ -8,6 +8,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -75,14 +76,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
-    @ExceptionHandler({
-            ExpiredJwtException.class,
-            SignatureException.class,
-            MalformedJwtException.class,
-    })
-    public ResponseEntity<Object> handleJwtException(Exception e) {
-        log.warn("handleJwtException", e);
-        ErrorCode errorCode = ErrorCode.INVALID_TOKEN;
+    @ExceptionHandler(InsufficientAuthenticationException.class)
+    public ResponseEntity<Object> handleInsufficientAuthenticationException(InsufficientAuthenticationException e) {
+        log.warn("Authentication exception", e);
+        ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
         return handleExceptionInternal(errorCode, errorCode.getMessage());
     }
 

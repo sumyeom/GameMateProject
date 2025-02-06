@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "user")
+@Table(name = "`user`")
 @Getter
 @NoArgsConstructor
 public class User extends BaseEntity {
@@ -98,10 +98,6 @@ public class User extends BaseEntity {
     public void integrateOAuthProvider(AuthProvider provider, String providerId) {
         this.provider = provider;
         this.providerId = providerId;
-    }
-
-    public void setOAuthPassword(String password) {
-        this.password = password;
     }
 
 }

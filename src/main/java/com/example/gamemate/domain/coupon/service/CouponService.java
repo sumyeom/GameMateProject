@@ -9,11 +9,11 @@ import com.example.gamemate.domain.coupon.repository.CouponRepository;
 import com.example.gamemate.domain.coupon.repository.UserCouponRepository;
 import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.domain.user.enums.Role;
+import com.example.gamemate.global.common.aop.DistributedLock;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,22 +23,11 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
+@Slf4j
 public class CouponService {
-
-    private static final String COUPON_STOCK_KEY = "coupon:%d:stock";
-
     private final CouponRepository couponRepository;
     private final UserCouponRepository userCouponRepository;
-    private final StringRedisTemplate redisTemplate;
-
-    public CouponService(
-            CouponRepository couponRepository,
-            UserCouponRepository userCouponRepository,
-            @Qualifier("couponRedisTemplate") StringRedisTemplate redisTemplate) {
-        this.couponRepository = couponRepository;
-        this.userCouponRepository = userCouponRepository;
-        this.redisTemplate = redisTemplate;
-    }
 
     public CouponCreateResponseDto createCoupon(CouponCreateRequestDto requestDto, User loginUser) {
         // 관리자 권한 체크
@@ -58,19 +47,10 @@ public class CouponService {
         Coupon coupon = new Coupon(requestDto.getCode(), requestDto.getName(), requestDto.getDiscountAmount(), requestDto.getQuantity(), requestDto.getStartAt(), requestDto.getExpiredAt());
         Coupon savedCoupon = couponRepository.save(coupon);
 
-        // Redis에 쿠폰 재고 수량 저장
-        redisTemplate.opsForValue().set(getCouponStockKey(savedCoupon.getId()),
-                String.valueOf(requestDto.getQuantity()));
-
         return new CouponCreateResponseDto(savedCoupon);
     }
 
-    private void validateCouponDates(LocalDateTime startAt, LocalDateTime expiredAt) {
-        if (startAt.isAfter(expiredAt)) {
-            throw new ApiException(ErrorCode.INVALID_COUPON_DATE);
-        }
-    }
-
+    @DistributedLock(key = "'LOCK:coupon:' + #couponId")
     public CouponIssueResponseDto issueCoupon(Long couponId, User loginUser) {
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new ApiException(ErrorCode.COUPON_NOT_FOUND));
@@ -85,30 +65,17 @@ public class CouponService {
             throw new ApiException(ErrorCode.COUPON_ALREADY_ISSUED);
         }
 
-        // 재고 감소
-        Long stock = redisTemplate.opsForValue().decrement(getCouponStockKey(couponId));
-
-        // 재고 체크
-        if (stock == null || stock < 0) {
-            // 재고 복원
-            redisTemplate.opsForValue().increment(getCouponStockKey(couponId));
+        // 수량 체크
+        if (coupon.isExhausted()) {
             throw new ApiException(ErrorCode.COUPON_EXHAUSTED);
         }
 
-        try {
-            // 쿠폰 발급
-            UserCoupon userCoupon = new UserCoupon(loginUser, coupon);
-            userCoupon.updateIsUsed(false);
+        // 쿠폰 발급
+        coupon.incrementIssuedQuantity();
+        UserCoupon userCoupon = new UserCoupon(loginUser, coupon);
+        UserCoupon savedUserCoupon = userCouponRepository.save(userCoupon);
 
-            UserCoupon savedUserCoupon = userCouponRepository.save(userCoupon);
-
-            return new CouponIssueResponseDto(savedUserCoupon);
-
-        } catch (Exception e) {
-            // DB 저장 실패 시 Redis 재고 복원
-            redisTemplate.opsForValue().increment(getCouponStockKey(couponId));
-            throw e;
-        }
+        return new CouponIssueResponseDto(savedUserCoupon);
     }
 
     @Transactional(readOnly = true)
@@ -143,7 +110,9 @@ public class CouponService {
         userCoupon.updateUsedAt();
     }
 
-    private String getCouponStockKey(Long couponId) {
-        return String.format(COUPON_STOCK_KEY, couponId);
+    private void validateCouponDates(LocalDateTime startAt, LocalDateTime expiredAt) {
+        if (startAt.isAfter(expiredAt)) {
+            throw new ApiException(ErrorCode.INVALID_COUPON_DATE);
+        }
     }
 }

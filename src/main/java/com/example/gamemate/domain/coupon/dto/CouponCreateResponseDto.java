@@ -13,6 +13,7 @@ public class CouponCreateResponseDto {
     private final Integer discountAmount;
     private final LocalDateTime startAt;
     private final LocalDateTime expiredAt;
+    private final Integer quantity;
 
     public CouponCreateResponseDto(Coupon coupon) {
         this.id = coupon.getId();
@@ -21,5 +22,6 @@ public class CouponCreateResponseDto {
         this.discountAmount = coupon.getDiscountAmount();
         this.startAt = coupon.getStartAt();
         this.expiredAt = coupon.getExpiredAt();
+        this.quantity = coupon.getTotalQuantity();
     }
 }
