@@ -71,14 +71,6 @@ public class RedisConfig {
         return new LettuceConnectionFactory(config);
     }
 
-    // DB 5: 쿠폰
-    @Bean
-    public RedisConnectionFactory couponConnectionFactory() {
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
-        config.setDatabase(5);
-        return new LettuceConnectionFactory(config);
-    }
-
     // 알림 RedisTemplate (DB 1)
     @Bean
     public RedisTemplate<String, Object> notificationRedisTemplate() {
