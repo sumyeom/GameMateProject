@@ -24,8 +24,8 @@ public class JwtTokenProvider {
     @Value("${jwt.access-token.expiration:3600000}")
     private int accessTokenExpirationMs; //60분
 
-    @Value("${jwt.refresh-token.expiration:259200000}")
-    private int refreshTokenExpirationMs; //3일
+    @Value("${jwt.refresh-token.expiration:604800000}")
+    private int refreshTokenExpirationMs; //7일
 
     public String createAccessToken(String email, Role role) {
         Claims claims = Jwts.claims().setSubject(email);

@@ -3,7 +3,6 @@ package com.example.gamemate.domain.auth.controller;
 import com.example.gamemate.domain.auth.dto.*;
 import com.example.gamemate.domain.auth.service.AuthService;
 import com.example.gamemate.domain.auth.service.EmailService;
-import com.example.gamemate.domain.auth.service.OAuth2Service;
 import com.example.gamemate.global.config.auth.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -48,11 +47,11 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<LocalLoginResponseDto> localLogin(
+    public ResponseEntity<LoginTokenResponseDto> localLogin(
             @Valid @RequestBody LocalLoginRequestDto requestDto,
             HttpServletResponse response
     ) {
-        LocalLoginResponseDto responseDto = authService.localLogin(requestDto, response);
+        LoginTokenResponseDto responseDto = authService.localLogin(requestDto, response);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 

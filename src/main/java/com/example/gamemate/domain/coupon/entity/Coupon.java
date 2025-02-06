@@ -31,9 +31,6 @@ public class Coupon extends BaseEntity {
     private Integer totalQuantity;
 
     @Column(nullable = false)
-    private Integer issuedQuantity = 0;
-
-    @Column(nullable = false)
     private LocalDateTime startAt;
 
     @Column(nullable = false)
@@ -54,14 +51,6 @@ public class Coupon extends BaseEntity {
     public boolean isIssuable() {
         LocalDateTime now = LocalDateTime.now();
         return now.isAfter(startAt) && now.isBefore(expiredAt);
-    }
-
-    public boolean isExhausted() {
-        return issuedQuantity >= totalQuantity;
-    }
-
-    public void incrementIssuedQuantity() {
-        this.issuedQuantity++;
     }
 }
 

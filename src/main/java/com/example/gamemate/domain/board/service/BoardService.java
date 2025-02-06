@@ -12,6 +12,7 @@ import com.example.gamemate.domain.user.entity.User;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,12 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @Service
 @RequiredArgsConstructor
 public class BoardService {
 
     private final BoardRepository boardRepository;
+    private final BoardViewService boardViewService;
 
     /**
      * 게시글 생성 메서드입니다.
@@ -67,14 +68,13 @@ public class BoardService {
 
         Page<Board> boardPage = boardRepository.searchBoardQuerydsl(category, title, content, pageable);
 
-
         return boardPage.stream()
                 .map(board -> new BoardFindAllResponseDto(
                         board.getId(),
                         board.getCategory(),
                         board.getTitle(),
                         board.getCreatedAt(),
-                        board.getViews()
+                        boardViewService.getViewCount(board.getId())
                 ))
                 .collect(Collectors.toList());
     }
@@ -85,13 +85,22 @@ public class BoardService {
      * @param id 게시글 식별자
      * @return 게시글 조회 ResponseDto
      */
-    public BoardFindOneResponseDto findBoardById(Long id) {
+    @Transactional
+    public BoardFindOneResponseDto findBoardById(Long id, User loginUser) {
+        // 조회수 증가(Redis 저장)
+        if(loginUser == null) {
+            boardViewService.increaseViewCount(id, null);
+        }else{
+            boardViewService.increaseViewCount(id, loginUser.getId());
+        }
+
         // 게시글 조회
         Board findBoard = boardRepository.findById(id)
                 .orElseThrow(()->new ApiException(ErrorCode.BOARD_NOT_FOUND));
 
         return new BoardFindOneResponseDto(findBoard);
     }
+
 
     /**
      * 게시글 업데이트 메서드입니다.
@@ -134,4 +143,6 @@ public class BoardService {
 
         boardRepository.delete(findBoard);
     }
+
+
 }

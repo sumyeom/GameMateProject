@@ -8,6 +8,8 @@ import com.example.gamemate.domain.user.repository.UserRepository;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import com.example.gamemate.global.provider.JwtTokenProvider;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -90,20 +92,14 @@ public class UserService {
      * 사용자의 탈퇴 요청을 처리합니다.
      * @param loginUser 현재 로그인한 사용자
      */
-    public void withdrawUser(User loginUser) {
+    public void withdrawUser(User loginUser, HttpServletRequest request, HttpServletResponse response) {
 
         loginUser.updateUserStatus(UserStatus.WITHDRAW);
-        loginUser.removeRefreshToken();
-
         userRepository.save(loginUser);
 
-    }
+        authService.logout(loginUser, request, response);
 
-//    private void validateToken(String token) {
-//        if(!jwtTokenProvider.validateToken(token)) {
-//            throw new ApiException(ErrorCode.INVALID_TOKEN);
-//        }
-//    }
+    }
 
     /**
      * 사용자가 일치하는지 확인합니다.

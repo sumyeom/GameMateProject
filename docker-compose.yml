@@ -1,6 +1,6 @@
 services:
   app:
-    image: "${DOCKERHUB_USERNAME}/${DOCKER_IMAGE_TAG_NAME}:latest"
+    image: "863518453426.dkr.ecr.ap-northeast-2.amazonaws.com/game_mate:latest"
     platform: linux/amd64
     container_name: app
     ports:
@@ -9,19 +9,24 @@ services:
       MYSQL_USERNAME: "${MYSQL_USERNAME}"
       MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
       MYSQL_URL: "${MYSQL_URL}"
+      MYSQL_PROD_URL: "${MYSQL_PROD_URL}"
+      MYSQL_DEV_URL: "${MYSQL_DEV_URL}"
       JPA_HIBERNATE_DDL: "${JPA_HIBERNATE_DDL}"
       JWT_SECRET: "${JWT_SECRET}"
-      YOUR_ACCESS_KEY: "${YOUR_ACCESS_KEY}"
-      YOUR_SECRET_KEY: "${YOUR_SECRET_KEY}"
-      YOUR_BUCKET_NAME: "${YOUR_BUCKET_NAME}"
+      AWS_ACCESS_KEY: "${AWS_ACCESS_KEY}"
+      AWS_SECRET_KEY: "${AWS_SECRET_KEY}"
+      AWS_BUCKET: "${AWS_BUCKET}"
+      AWS_REGION: "${AWS_REGION}"
+      AWS_STACK_AUTO: "${AWS_STACK_AUTO}"
       OAUTH2_GOOGLE_CLIENT_ID: "${OAUTH2_GOOGLE_CLIENT_ID}"
       OAUTH2_GOOGLE_CLIENT_SECRET: "${OAUTH2_GOOGLE_CLIENT_SECRET}"
       OAUTH2_KAKAO_CLIENT_ID : "${OAUTH2_KAKAO_CLIENT_ID}"
       OAUTH2_KAKAO_CLIENT_SECRET: "${OAUTH2_KAKAO_CLIENT_SECRET}"
       EMAIL_USERNAME: "${EMAIL_USERNAME}"
       EMAIL_APP_PASSWORD: "${EMAIL_APP_PASSWORD}"
-      GEMINI_URL: "${ secrets.GEMINI_URL }"
-      GEMINI_KEY: "${ secrets.GEMINI_KEY }"
+      GEMINI_URL: "${GEMINI_URL}"
+      GEMINI_KEY: "${GEMINI_KEY}"
+      REDIS_HOST: "${REDIS_HOST}"
     depends_on:
       - db
 
@@ -34,6 +39,7 @@ services:
       - db-data:/var/lib/mysql
     ports:
       - "3306:3306"
+
 
 volumes:
   db-data:

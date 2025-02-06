@@ -57,6 +57,7 @@ public enum ErrorCode {
     RECOMMENDATION_NOT_FOUND(HttpStatus.NOT_FOUND,"RECOMMENDATION_NOT_FOUND","추천 게임을 찾을 수 없습니다."),
     MATCH_USER_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "MATCH_USER_INFO_NOT_FOUND", "매칭을 위해 입력된 회원 정보를 찾을 수 없습니다."),
     MATCH_USER_INFO_NOT_WRITTEN(HttpStatus.NOT_FOUND, "MATCH_USER_INFO_NOT_WRITTEN", "매칭을 위해 회원 정보 입력은 필수입니다."),
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION_NOT_FOUND", "알림을 찾을수 없습니다."),
     COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "COUPON_NOT_FOUND", "쿠폰을 찾을 수 없습니다."),
 
     /* 500 서버 오류 */
