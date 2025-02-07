@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -72,6 +73,9 @@ public class AuthService {
         if(!passwordEncoder.matches(requestDto.getPassword(), findUser.getPassword())) {
             throw new ApiException(ErrorCode.INVALID_PASSWORD);
         }
+
+        findUser.updateModifiedAt();
+
         return tokenService.generateLoginTokens(findUser, response);
     }
 
