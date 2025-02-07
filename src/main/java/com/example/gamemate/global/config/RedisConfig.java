@@ -3,6 +3,7 @@ package com.example.gamemate.global.config;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -16,6 +17,9 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 public class RedisConfig {
+
+    @Value("${spring.data.redis.host}")
+    private String redisHost;
 
     // 기본 RedisConnectionFactory
     @Bean
@@ -43,6 +47,7 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory notificationConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
+        config.setHostName(redisHost);
         config.setDatabase(1);
         return new LettuceConnectionFactory(config);
     }
@@ -51,6 +56,7 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory viewCountConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
+        config.setHostName(redisHost);
         config.setDatabase(2);
         return new LettuceConnectionFactory(config);
     }
@@ -59,6 +65,7 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory refreshTokenConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
+        config.setHostName(redisHost);
         config.setDatabase(3);
         return new LettuceConnectionFactory(config);
     }
@@ -67,6 +74,7 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory blacklistConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
+        config.setHostName(redisHost);
         config.setDatabase(4);
         return new LettuceConnectionFactory(config);
     }
@@ -109,7 +117,7 @@ public class RedisConfig {
     public RedissonClient redissonClient() {
         Config config = new Config();
         config.useSingleServer()
-                .setAddress("redis://127.0.0.1:6379")
+                .setAddress("redis://" + redisHost + ":6379")
                 .setDatabase(5);
         return Redisson.create(config);
     }

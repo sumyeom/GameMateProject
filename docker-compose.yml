@@ -29,19 +29,5 @@ services:
       GEMINI_URL: "${GEMINI_URL}"
       GEMINI_KEY: "${GEMINI_KEY}"
       REDIS_HOST: "${REDIS_HOST}"
-    depends_on:
-      - db
-
-  db:
-    image: mysql:8.0
-    container_name: db
-    environment:
-      MYSQL_ROOT_PASSWORD: "${MYSQL_PASSWORD}"
-    volumes:
-      - db-data:/var/lib/mysql
-    ports:
-      - "3306:3306"
 
 
-volumes:
-  db-data:
