@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OAuth2 Login Failure</title>
+    <script>
+        function getErrorMessage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('error');
+        }
+
+        window.onload = () => {
+            const errorMessage = getErrorMessage();
+            if (errorMessage) {
+                document.getElementById('error-message').textContent = decodeURIComponent(errorMessage);
+            }
+        };
+    </script>
+</head>
+<body>
+<h1>OAuth2 Login Failure</h1>
+<p>Error: <span id="error-message">Unknown error occurred</span></p>
+</body>
+</html>
