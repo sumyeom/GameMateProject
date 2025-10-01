@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -124,10 +125,21 @@ public class CommentService {
                 .orElseThrow(()->new ApiException(ErrorCode.BOARD_NOT_FOUND));
 
         // 댓글 조회
-        Page<Comment> comments = commentRepository.findByBoard(findBoard,pageable);
+
+        List<Comment> comments = commentRepository.findByBoard(findBoard, pageable).getContent();
+        List<Long> commentIds = comments.stream().map(Comment::getId).collect(Collectors.toList());
+
+        List<Reply> replies = replyRepository.findByCommentIdIn(commentIds);
+        //Page<Comment> comments = commentRepository.findByBoard(findBoard,pageable);
+
+        //return comments.stream()
+        //        .map(this::convertCommentDto)
+        //        .collect(Collectors.toList());
+        Map<Long, List<Reply>> repliesByCommentId = replies.stream()
+                .collect(Collectors.groupingBy(reply -> reply.getComment().getId()));
 
         return comments.stream()
-                .map(this::convertCommentDto)
+                .map(comment -> convertCommentDto(comment, repliesByCommentId.getOrDefault(comment.getId(), List.of())))
                 .collect(Collectors.toList());
     }
 
@@ -137,10 +149,13 @@ public class CommentService {
      * @param comment comment
      * @return 댓글 조회 Dto
      */
-    private CommentFindResponseDto convertCommentDto(Comment comment) {
-        List<ReplyFindResponseDto> replyDtos = Optional.ofNullable(replyRepository.findByComment(comment))
-                .orElse(Collections.emptyList())
-                .stream()
+    private CommentFindResponseDto convertCommentDto(Comment comment, List<Reply> replies) {
+//        List<ReplyFindResponseDto> replyDtos = Optional.ofNullable(replyRepository.findByComment(comment))
+//                .orElse(Collections.emptyList())
+//                .stream()
+//                .map(this::convertReplyDto)
+//                .collect(Collectors.toList());
+        List<ReplyFindResponseDto> replyDtos = replies.stream()
                 .map(this::convertReplyDto)
                 .collect(Collectors.toList());
         return new CommentFindResponseDto(

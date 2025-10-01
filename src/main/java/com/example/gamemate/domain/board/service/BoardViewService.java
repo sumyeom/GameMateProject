@@ -17,10 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -86,7 +83,7 @@ public class BoardViewService {
             uniqueKey = VIEW_COUNT_KEY + boardId + ":" + ipAddress;
         }
 
-        if (Boolean.FALSE.equals(redisTemplate.hasKey(uniqueKey))) {
+        if (!redisTemplate.hasKey(uniqueKey)) {
             redisTemplate.opsForValue().set(uniqueKey, "1", Duration.ofHours(1));
             redisTemplate.opsForValue().increment(VIEW_COUNT_KEY + boardId);
             redisTemplate.opsForZSet().incrementScore(VIEW_RANKING_KEY, String.valueOf(boardId),1);
@@ -159,22 +156,36 @@ public class BoardViewService {
         if(!keys.isEmpty()){
             List<Board> updatedBoards = new ArrayList<>();
             for(String key : keys){
-                Long boardId = Long.parseLong(key.split(":")[2]);
-                int viewCount = getViewCount(boardId);
-                if(viewCount > 0){
-                    Board findBoard = boardRepository.findById(boardId)
-                            .orElseThrow(()->new ApiException(ErrorCode.BOARD_NOT_FOUND));
-                    int boardViewCount = findBoard.getViews();
-                    findBoard.updateViewCount( viewCount);
-                    updatedBoards.add(findBoard);
+                try{
+                    Long boardId = Long.parseLong(key.split(":")[2]);
+                    int viewCount = getViewCount(boardId);
+                    if(viewCount > 0) {
+                        Optional<Board> boardOpt = boardRepository.findById(boardId);
+                        if (boardOpt.isPresent()) {
+                            Board board = boardOpt.get();
+                            board.updateViewCount(viewCount);
 
-                    // redis 값을 유지(db 값 반영 후 덮어쓰기)
-                    redisTemplate.opsForValue().set(VIEW_COUNT_KEY + boardId, String.valueOf(viewCount));
+                            updatedBoards.add(board);
+
+                            // redis 값을 유지(db 값 반영 후 덮어쓰기)
+                            redisTemplate.opsForValue().set(VIEW_COUNT_KEY + boardId, String.valueOf(viewCount));
+                        } else {
+                            log.warn("게시글 없음 - boardId : {}", boardId);
+                        }
+                    }
+                } catch(NumberFormatException e){
+                    log.warn("잘못된 키 형식: {}", key);
+
+                } catch(Exception e){
+                        log.error("조회수 동기화 중 예외 발생 - key: {}, error: {}", key, e.getMessage());
                 }
             }
-            // 업데이트
-            boardRepository.saveAll(updatedBoards);
-            log.info("업데이트 완료");
+            if(!updatedBoards.isEmpty()){
+                // 업데이트
+                boardRepository.saveAll(updatedBoards);
+                log.info("업데이트 완료");
+            }
+
         }
 
     }
