@@ -1,12 +1,17 @@
 package com.example.gamemate.domain.auth.service;
 
+import com.example.gamemate.domain.auth.dto.EamilVerifyRequestDto;
+import com.example.gamemate.domain.auth.dto.EmailVerificationCodeRequestDto;
 import com.example.gamemate.domain.user.repository.UserRepository;
+import com.example.gamemate.global.config.RabbitMQConfig;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -21,13 +26,19 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class EmailService {
 
     private static final long VERIFICATION_TIME_LIMIT = 5; //5분
     private final JavaMailSender emailSender;
     private final UserRepository userRepository;
+    private final RabbitTemplate rabbitTemplate;
     private final Map<String, VerificationInfo> verificationMap = new ConcurrentHashMap<>();
 
+    /**
+     * 이메일 발송 요청
+     * @param email
+     */
     public void sendVerificationEmail(String email) {
         // 이미 가입된 이메일인지 확인
         if (userRepository.findByEmail(email).isPresent()) {
@@ -36,17 +47,44 @@ public class EmailService {
 
         String verificationCode = generateVerificationCode();
 
+        verificationMap.put(email, new VerificationInfo(
+                verificationCode,
+                LocalDateTime.now().plusMinutes(VERIFICATION_TIME_LIMIT)
+        ));
+
+        try{
+            EamilVerifyRequestDto message = new EamilVerifyRequestDto(
+                    email,
+                    verificationCode
+            );
+
+            rabbitTemplate.convertAndSend(
+                    RabbitMQConfig.EMAIL_EXCHANGE,
+                    RabbitMQConfig.EMAIL_ROUTING_KEY,
+                    message
+            );
+            log.info("이메일 발송: {}", email);
+        }catch (Exception e){
+            log.error("이메일 발송 실패 : ",e);
+
+            try{
+                sendEmailDirectly(email, verificationCode);
+            }catch (Exception ex){
+                throw new ApiException(ErrorCode.EMAIL_SEND_ERROR);
+            }
+        }
+    }
+
+    /**
+     * Consumer에서 호출
+     */
+    public void sendEmailDirectly(String email, String verificationCode){
         try {
             MimeMessage message = createEmailMessage(email, verificationCode);
             emailSender.send(message);
-
-            // 메모리에 인증 정보 저장
-            // Todo: 추후 Redis로 수정 예정
-            verificationMap.put(email, new VerificationInfo(
-                    verificationCode,
-                    LocalDateTime.now().plusMinutes(VERIFICATION_TIME_LIMIT)
-            ));
+            log.info("Email sent successfully: {}", email);
         } catch (MailException e) {
+            log.error("Failed to send email: {}", email, e);
             throw new ApiException(ErrorCode.EMAIL_SEND_ERROR);
         }
     }
