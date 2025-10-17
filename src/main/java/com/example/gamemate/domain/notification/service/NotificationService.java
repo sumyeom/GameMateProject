@@ -6,18 +6,11 @@ import com.example.gamemate.domain.notification.enums.NotificationType;
 import com.example.gamemate.domain.notification.repository.EmitterRepository;
 import com.example.gamemate.domain.notification.repository.NotificationRepository;
 import com.example.gamemate.domain.user.entity.User;
-import com.example.gamemate.global.config.RabbitMQConfig;
 import com.example.gamemate.global.constant.ErrorCode;
 import com.example.gamemate.global.exception.ApiException;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.AmqpException;
-import org.springframework.amqp.core.AmqpAdmin;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.core.Queue;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.stream.StreamInfo;
 import org.springframework.data.redis.connection.stream.StreamRecords;
@@ -44,25 +37,15 @@ public class NotificationService {
     private final RedisStreamService redisStreamService;
     private final RedisTemplate<String, Object> redisTemplate;
 
-    private final RabbitTemplate rabbitTemplate;
-    private final AmqpAdmin amqpAdmin;
-    private final DirectExchange notificationExchange;
-
     public NotificationService(
             NotificationRepository notificationRepository,
             EmitterRepository emitterRepository,
             RedisStreamService redisStreamService,
-            RabbitTemplate rabbitTemplate,
-            AmqpAdmin amqpAdmin,
-            DirectExchange notificationExchange,
             @Qualifier("notificationRedisTemplate") RedisTemplate<String, Object> redisTemplate) {
         this.notificationRepository = notificationRepository;
         this.emitterRepository = emitterRepository;
         this.redisStreamService = redisStreamService;
         this.redisTemplate = redisTemplate;
-        this.rabbitTemplate = rabbitTemplate;
-        this.amqpAdmin = amqpAdmin;
-        this.notificationExchange = notificationExchange;
     }
 
     /**
@@ -145,31 +128,14 @@ public class NotificationService {
     }
 
     /**
-     * SSE 연결을 구독합니다, RabbitMQ에 사용자 전용 Queue를 설정합니다.
+     * SSE 연결을 구독합니다. 또한 가장 최근 읽지 않은 알림 1개를 전송합니다.
      * @param loginUser 현재 인증된 사용자 정보
      * @return 사용자 연결정보가 담긴 SseEmitter
      */
     public SseEmitter subscribe(User loginUser) {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
 
-        String receiverId = loginUser.getId().toString();
-        // 라우팅 키와 큐 이름은 사용자 ID를 기반으로 설정
-        String routingKey = receiverId;
-        String queueName = "notification.queue." + receiverId;
-
         try {
-            // 1. 사용자 전용 큐 생성 (Durable: 영속성, Exclusive : 연결 종료 시 자동 삭제)
-            // 'exclusive' 는 연결이 끊어지면 큐가 자동으로 삭제되도록 설정
-            Queue queue = new Queue(queueName, true, true, true);
-
-            // 2. Exchange와 큐를 바인딩(유저 ID를 라우팅 키로 사용)
-            amqpAdmin.declareBinding(BindingBuilder
-                    .bind(queue)
-                    .to(notificationExchange) // 주입받은 DirectExchange 빈
-                    .with(routingKey));
-            log.info("사용자 전용 RabbitMQ Queue 및 Binding 생성 완료 : {}", queueName);
-
-
             // 연결 직후 더미 데이터를 보내 503 에러 방지
             emitter.send(SseEmitter.event()
                     .name("connect")
@@ -204,27 +170,6 @@ public class NotificationService {
     @Transactional
     public void sendNotification(Notification notification) {
         NotificationResponseDto notificationDto = NotificationResponseDto.toDto(notification);
-
-        String receiverId = notification.getReceiver().getId().toString();
-        String queueName = "notification.queue." + receiverId;
-
-        // 1. Queue 이름과 Routing Key 정의
-        String routingKey = receiverId;
-
-        // 2. 메시지 발생
-        try{
-            // [RabbitMQ 발행] Exchange, Routing Key, 메시지 DTO
-            rabbitTemplate.convertAndSend(
-                    RabbitMQConfig.EXCHANGE_NAME,
-                    routingKey,
-                    notificationDto
-            );
-            log.info("RabbitMQ 발행 성공 - 유저 : {}, 타입 : {}", receiverId, notificationDto);
-
-        } catch (AmqpException e) {
-            log.error("RabbitMQ 발행 실패 - 유저 : {} - 에러 : {}", receiverId, notificationDto);
-            // TODO: 실패 시 DB에 알림 저장하거나 재시도 로직 구현
-        }
 
         // Redis Stream 에 알림 추가
         redisStreamService.addNotificationToStream(notificationDto);
